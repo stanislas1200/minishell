@@ -1,14 +1,14 @@
-//* *************************************************************************************** */
-//*																						    */
-//*																	    :::      ::::::     */
-//*   main.c												          :+:+:   :+:      :+:  */
-//*													                +:+ +:+   +:+      +:+  */
-//*   By: Godin Stanislas <godinstanislas1@student.19.fr>         +#+   +#+   +#+      +#+  */
-//*														                +#+      +#++#++#+  */
-//*   Created: 2022/07/26 ??:??:?? by Godin Stanislas        	        #+#            #+#  */
-//*   Updated: 2022/07/26 ??:??:?? by Godin Stanislas			        ###            ###  */
-//*																		###      ########   */
-//* *************************************************************************************** */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
+/*   Updated: 2023/08/12 16:39:17 by sgodin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -165,18 +165,16 @@ int main() {
 	print_header();
 	char cwd[1024];
 	getcwd(cwd, sizeof(cwd));
-	char str[1024];
-	str[0] = '\0';
-	strcat(str, "\x1b[1;32m");
+	char str[1024] = "\x1b[1;32m";
 	strcat(str, getenv("USER"));
-	strcat(str, "@");
-	strcat(str, getenv("NAME"));
+	// strcat(str, "@");
+	// strcat(str, getenv("NAME"));
 	strcat(str, "\x1b[0m:\x1b[1;36m");
 	strcat(str, cwd);
-	strcat(str, "\x1b[0m$ ");
+	strcat(str, "\x1b[0m$ \0");
 	while (1) {
 		// dir
-		//printf("\x1b[1;32m%s@%s\x1b[0m:\x1b[1;34m%s\x1b[0m$ ", getenv("USER"), getenv("NAME"), cwd);
+		// printf("\x1b[1;32m%s@%s\x1b[0m:\x1b[1;34m%s\x1b[0m$ ", getenv("USER"), getenv("NAME"), cwd);
 		// printf("\x1b[1;32m%s@%s\x1b[0m:\x1b[1;36m%s\x1b[0m$ ", getenv("USER"), getenv("NAME"), cwd);
 		// if (fgets(cmdLine, MAXLINE, stdin) == NULL) // read command line
 		// 	; // EOF from stdin, terminate the program
