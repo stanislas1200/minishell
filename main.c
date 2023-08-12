@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/12 16:39:17 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/12 18:22:01 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #define MAXLINE 1024
 
 #define MAXARGS 128
+
+int shellId;
 
 typedef struct command_t {
 	char *argv[MAXARGS]; // argv for execve()
@@ -156,10 +158,17 @@ void eval(char *cmdLine) {
 
 
 void signal_handler(int signum) {
+	if (signum == 2 && atoi(getenv("shellId")) == shellId)
+	{
+		printf("exit\n");
+		exit(1);
+	}
     printf("Received signal: %d\n", signum);
+	
 }
 
 int main() {
+	shellId = atoi(getenv("shellId"));
     signal(SIGINT, signal_handler);
 	char cmdLine[MAXLINE]; // buffer for fgets
 	print_header();
