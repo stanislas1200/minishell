@@ -31,12 +31,13 @@
 # include "./libft/libft.h"
 # include <sys/types.h>
 # include <sys/wait.h>
-
 typedef struct command_t {
 	char *argv[MAXARGS]; // argv for execve()
 	int argc; // nb of args
 	enum builtin_t { NONE, QUIT, JOBS, BG, FG, KILL, HELP } builtin; // type of builtin command
 } command_t;
 
+
+void	signal_handler(int signum);
 
 #endif
