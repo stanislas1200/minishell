@@ -16,7 +16,7 @@ OBJS = ${SRCS:.c=.o}
 
 SHELL = bash
 NAME = minishell
-GCC = gcc -Wall -Wextra -Werror -g -lreadline
+GCC = gcc -Wall -Wextra -Werror -g 
 
 .PHONY: all clean fclean re .c.o bonus
 
@@ -25,7 +25,7 @@ all: ${NAME}
 ${NAME}: ${OBJS}
 	@echo -ne "\033[1;34mBuilding libft...\033[0m"
 	@make -sC ./libft
-	@${GCC} ${OBJS} -o ${NAME} -L./libft -lft && echo -ne "\r\033[1;34mCompiling ${NAME} \033[1;32mDone\033[0m\n" || echo -ne "\r\033[1;34mCompiling ${NAME} \33[1;31mError\033[0m\n"
+	@${GCC} ${OBJS} -o ${NAME} -lreadline -L./libft -lft && echo -ne "\r\033[1;34mCompiling ${NAME} \033[1;32mDone\033[0m\n" || echo -ne "\r\033[1;34mCompiling ${NAME} \33[1;31mError\033[0m\n"
 
 clean:
 	@echo -ne "\033[1;31mCleaning...\033[0m"
