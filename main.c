@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/13 15:43:20 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/13 14:07:17 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	parse(const char *cmdline, struct command_t *cmd)
 	int is_bg; // background job?
 
 	if (cmdline == NULL) {
-		perror("Error reading the command line");
+		printf(R "exit\n");
 		exit(1);
 	}
 	strncpy(line, cmdline, MAXLINE);
@@ -136,7 +136,13 @@ void	eval(char *cmdLine)
 
 void	signal_handler(int signum)
 {
-	printf("Received signal: %d\n", signum);
+	if (signum == 2)
+	{
+		printf("\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+	}
 }
 
 void	*get_prompt()
