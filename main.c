@@ -6,53 +6,30 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/13 14:43:41 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/13 15:43:20 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <signal.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include "minishell.h"
 
-#define MAXLINE 1024
-
-#define MAXARGS 128
-
-int shellId;
-
-typedef struct command_t {
-	char *argv[MAXARGS]; // argv for execve()
-	int argc; // nb of args
-	enum builtin_t { NONE, QUIT, JOBS, BG, FG, KILL, HELP } builtin; // type of builtin command
-} command_t;
-
-
-#define R     "\x1b[1;31m"
-#define G   "\x1b[1;32m"
-#define B   "\x1b[1;36m"
-#define Y   "\x1b[1;33m"
-#define M   "\x1b[1;35m"
-#define C   "\x1b[0m"
-void print_header() {
-    printf("\n");
-    printf(G "********************************************\n");
-    printf("*                                          *\n");
-    printf("*        " M "Welcome to My Custom Shell!" R "       *\n");
-    printf("*                                          *\n");
-    printf("********************************************\n" C);
-    printf("\n");
+void	print_header(void)
+{
+	printf("\n");
+	printf(G "********************************************\n");
+	printf("*                                          *\n");
+	printf("*        " M "Welcome to My Custom Shell!" R "       *\n");
+	printf("*                                          *\n");
+	printf("********************************************\n" C);
+	printf("\n");
 }
 
-void print_exit_message() {
-    printf(R "Error: Shell has encountered an   \n");
-    printf("                   		unexpected shutdown!\n");
+void	print_exit_message(void)
+{
+	printf(R "Error: Shell has encountered an   \n");
+	printf("                   		unexpected shutdown!\n");
 }
 
-int parse(const char *cmdline, struct command_t *cmd)
+int	parse(const char *cmdline, struct command_t *cmd)
 {
 	static char arry[MAXLINE]; // local copy of command line
 	const char delims[10] = " \t\r\n"; // argument delimiters (white-space)
@@ -104,10 +81,9 @@ int parse(const char *cmdline, struct command_t *cmd)
 		cmd->argv[--cmd->argc] = NULL;
 
 	return is_bg;
-	
 }
 
-void runSystemCommand(struct command_t *cmd, int bg)
+void	runSystemCommand(struct command_t *cmd, int bg)
 {
 	pid_t childPid;
 	//FORK
@@ -137,7 +113,8 @@ void runSystemCommand(struct command_t *cmd, int bg)
 	}
 }
 
-void eval(char *cmdLine) {
+void	eval(char *cmdLine)
+{
 	int bg;
 	struct command_t cmd;
 
@@ -157,43 +134,39 @@ void eval(char *cmdLine) {
 }
 
 
-void signal_handler(int signum) {
-	// if (signum == 2 && atoi(getenv("shellId")) == shellId)
-	// {
-	// 	printf("exit\n");
-	// 	exit(1);
-	// }
-    printf("Received signal: %d\n", signum);
-	
+void	signal_handler(int signum)
+{
+	printf("Received signal: %d\n", signum);
 }
 
-int main() {
-	// shellId = atoi(getenv("shellId"));
-    signal(SIGINT, signal_handler);
-	// char cmdLine[MAXLINE]; // buffer for fgets
-	print_header();
-	char cwd[1024];
+void	*get_prompt()
+{
+	char	*str;
+	char	cwd[1024];
+
+	str = malloc(1024);
 	getcwd(cwd, sizeof(cwd));
-	char str[1024] = "\x1b[1;32m";
+	strcat(str, "\x1b[1;32m");
 	strcat(str, getenv("USER"));
-	// strcat(str, "@");
-	// strcat(str, getenv("NAME"));
 	strcat(str, "\x1b[0m:\x1b[1;36m");
 	strcat(str, cwd);
 	strcat(str, "\x1b[0m$ \0");
-	while (1) {
-		// dir
-		// printf("\x1b[1;32m%s@%s\x1b[0m:\x1b[1;34m%s\x1b[0m$ ", getenv("USER"), getenv("NAME"), cwd);
-		// printf("\x1b[1;32m%s@%s\x1b[0m:\x1b[1;36m%s\x1b[0m$ ", getenv("USER"), getenv("NAME"), cwd);
-		// if (fgets(cmdLine, MAXLINE, stdin) == NULL) // read command line
-		// 	; // EOF from stdin, terminate the program
-		// if (feof(stdin)) // EOF from stdin, terminate the program
-		// 	exit(0);
-		char * buff;
-		buff = readline(str);
+	return (str);
+}
+
+int	main(void)
+{
+	char	*buff;
+	char	*prompt;
+
+	signal(SIGINT, signal_handler);
+	print_header();
+	prompt = get_prompt();
+	while (1)
+	{
+		buff = readline(prompt);
 		add_history(buff);
-		// process the command line
 		eval(buff);
 	}
-	return 0;
+	return (0);
 }
