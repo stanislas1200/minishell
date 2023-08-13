@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 15:41:15 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/13 15:42:49 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/13 16:02:43 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# include "./libft/libft.h"
 
 typedef struct command_t {
 	char *argv[MAXARGS]; // argv for execve()
