@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/12 18:22:01 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/13 14:43:41 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,19 +158,19 @@ void eval(char *cmdLine) {
 
 
 void signal_handler(int signum) {
-	if (signum == 2 && atoi(getenv("shellId")) == shellId)
-	{
-		printf("exit\n");
-		exit(1);
-	}
+	// if (signum == 2 && atoi(getenv("shellId")) == shellId)
+	// {
+	// 	printf("exit\n");
+	// 	exit(1);
+	// }
     printf("Received signal: %d\n", signum);
 	
 }
 
 int main() {
-	shellId = atoi(getenv("shellId"));
+	// shellId = atoi(getenv("shellId"));
     signal(SIGINT, signal_handler);
-	char cmdLine[MAXLINE]; // buffer for fgets
+	// char cmdLine[MAXLINE]; // buffer for fgets
 	print_header();
 	char cwd[1024];
 	getcwd(cwd, sizeof(cwd));
