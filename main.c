@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/13 14:07:17 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/13 14:53:48 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,9 @@ void	runSystemCommand(struct command_t *cmd, int bg)
 		}
 		// FG
 		else {
+			signal(SIGINT, SIG_IGN);
 			waitpid(childPid, NULL, 0);
+			signal(SIGINT, signal_handler);
 			return;
 		}
 	}
@@ -136,7 +138,7 @@ void	eval(char *cmdLine)
 
 void	signal_handler(int signum)
 {
-	if (signum == 2)
+	if (signum == SIGINT)
 	{
 		printf("\n");
 		rl_replace_line("", 0);
