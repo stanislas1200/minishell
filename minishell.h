@@ -29,6 +29,8 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "./libft/libft.h"
+# include <sys/types.h>
+# include <sys/wait.h>
 
 typedef struct command_t {
 	char *argv[MAXARGS]; // argv for execve()
