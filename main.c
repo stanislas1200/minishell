@@ -6,11 +6,11 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/14 10:33:34 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 00:41:46 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+ #include "minishell.h"
 
 void	print_header(void)
 {
@@ -149,9 +149,9 @@ void	signal_handler(int signum)
 
 void	*get_prompt()
 {
-	char	*str;
-	char	cwd[1024];
-	char	*user;
+	char		*str;
+	char		cwd[1024];
+	char		*user;
 
 	str = malloc(1024);
 	if (!str)
@@ -160,6 +160,7 @@ void	*get_prompt()
 	user = getenv("USER");
 	if (!getcwd(cwd, sizeof(cwd)) || !user)
 	{
+		cperror("getcwd", NULL, 1);
 		free(str);
 		return (NULL);
 	}
@@ -175,16 +176,32 @@ int	main(void)
 {
 	char	*buff;
 	char	*prompt;
+	char	**envp;
+	int i = 0;
 
+	envp = dup_env(__environ);
 	signal(SIGINT, signal_handler);
 	print_header();
 	while (1)
 	{
 		prompt = get_prompt();
 		buff = readline(prompt);
-		free(prompt);
+		free (prompt);
 		add_history(buff);
-		eval(buff);
+		if (ft_strncmp(buff, "export", ft_strlen("export")) == 0)
+			envp = export(envp, &buff[7]);
+		else if (ft_strncmp(buff, "env", ft_strlen("env")) == 0)
+			env(envp);
+		else if (ft_strncmp(buff, "unset", ft_strlen("unset")) == 0)
+			envp = unset(envp, &buff[6]);
+		else if (ft_strncmp(buff, "pwd", ft_strlen("pwd")) == 0)
+			pwd();
+		else if (ft_strncmp(buff, "cd", ft_strlen("cd")) == 0)
+			cd(&buff[3]);
+		else if (ft_strncmp(buff, "echo", ft_strlen("echo")) == 0)
+			echo(&buff[5], 0);
+		else
+			eval(buff);
 	}
 	return (0);
 }

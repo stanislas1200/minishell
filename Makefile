@@ -6,11 +6,11 @@
 #    By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/14 11:52:33 by dspilleb         ###   ########.fr        #
+#    Updated: 2023/08/15 00:10:58 by dspilleb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c utils.c ./builtins/builtin.c
+SRCS = main.c utils.c ./builtins/builtin.c ./builtins/builtin_2.c ./builtins/builtin_tool1.c ./builtins/builtin_tool2.c
 
 OBJS_DIR = ./objects/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
@@ -18,7 +18,7 @@ OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
 
 SHELL = bash
 NAME = minishell
-GCC = gcc -Wall -Wextra -Werror -g #-fsanitize=address
+GCC = gcc -Wall -Wextra -Werror -g -fsanitize=address
 
 RED = \033[1;31m
 GREEN = \033[1;32m
