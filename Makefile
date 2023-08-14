@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c builtin.c lexer.c
+SRCS = main.c builtin.c lexer.c parser.c executer.c
 
 OBJS = ${SRCS:.c=.o}
 

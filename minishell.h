@@ -21,12 +21,17 @@
 # define M "\x1b[1;35m"
 # define C "\x1b[0m"
 
-# define CHAR_NULL 0
-# define CHAR_CHAR 1
-# define CHAR_SPACE 2
-# define CHAR_PIPE 3
-
-# define TOKEN 1
+enum e_TOKEN_TYPE
+{
+	CHAR_NULL = 0,
+	CHAR_CHAR = -1,
+	CHAR_SPACE = ' ',
+	CHAR_PIPE = '|',
+	CHAR_QUOTE = '\'',
+	CHAR_DQUOTE = '\"',
+	TOKEN = -1,
+	ARG = -2
+};
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -57,13 +62,35 @@ typedef struct t_lexer
 	t_token	*tokens;
 } t_lexer;
 
+typedef struct t_ASTNode // Abstract Syntax Tree Node
+{
+	int				type;
+	char			*data;
+	struct t_ASTNode	*left;
+	struct t_ASTNode	*right;
+}	t_ASTNode;
+
 //builtin
 void	cd(char *path);
 
 void	signal_handler(int signum);
+
+/* LEXING -> PARSING -> EXECUTING*/
 t_lexer	*lexer_build(char *str);
+t_ASTNode	*parse(t_lexer *lexer);
+int	execute_ast_node(t_ASTNode *node);
+
+
+enum e_NODE_TYPE // Node Type Enum (for AST) using bitwise operators to allow for multiple types per node
+{
+	NODE_PIPE = (1 << 0),
+	NODE_ARGUMENT = (1 << 1),
+
+	NODE_DATA = (1 << 2),
+} NodeType;
 
 /* DEBUG */
 void lexer_print(t_lexer *lexer);
+void print_ast(t_ASTNode *root);
 
 #endif

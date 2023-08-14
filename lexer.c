@@ -12,24 +12,19 @@
 
 #include "minishell.h"
 
-int	get_char_type(char c)
-{
-	if (c == 0)
-		return CHAR_NULL;
-	else if (c == '|')
-		return CHAR_PIPE;
-	else if (c == ' ')
-		return CHAR_SPACE;
-	else
-		return CHAR_CHAR;
-}
+#define GENERAL 0
+#define QUOTE 1
+#define DQUOTE 2
 
-void	token_init(t_token *token, int size)
+int	token_init(t_token *token, int size)
 {
 	token->data = malloc(size + 1);
+	if (!token->data)
+		return (1);
 	token->data[0] = 0;
 	token->type = CHAR_NULL;
 	token->next = NULL;
+	return (0);
 }
 
 void	token_destroy(t_token *token)
@@ -58,8 +53,8 @@ t_lexer	*lexer_build(char *str)
 	t_token	*token;		// 3. Create a new token
 	int		i;			// Index for iterating through input string
 	int		j;			// Index for copying data to token
-	int		chartype;	// Variable to store the type of character
 	int		size;	// Size of input string
+	int		state;		// State of the lexer
 	
 	// 1. Check if input string is valid
 	if (!str)
@@ -68,70 +63,107 @@ t_lexer	*lexer_build(char *str)
 	
 	// 2. Create a new lexer
 	lexer = malloc(sizeof(t_lexer));
+	if (!lexer)
+		return (NULL);
 	lexer->tokens = malloc(sizeof(t_token));
+	if (!lexer->tokens)
+		return (free(lexer), NULL);
 	
 	// 3. Create a new token
 	token = lexer->tokens;
 	
 	// 4. Initialize token properties
-	token_init(token, size);
+	if (token_init(token, size))
+		return (free(lexer->tokens), free(lexer), NULL);
 	
 	i = -1;
 	j = 0;
 	
+	state = GENERAL;
 	while (str[++i])
-	{
-		// Get the type of character
-		chartype = get_char_type(str[i]);
-		
+	{	
 		// Handle different character types
-		if (chartype == CHAR_CHAR)
+		if (state == GENERAL)
 		{
-			// Copy character to token
-			token->data[j++] = str[i];
-			token->type = TOKEN;
-		}
-		else if (chartype == CHAR_SPACE)
-		{
-			// End current token and start a new one
-			if (j > 0) // If there is a token to end
+			if (str[i] == CHAR_SPACE)
 			{
-				token->data[j] = 0;
+				// End current token and start a new one
+				if (j > 0) // If there is a token to end
+				{
+					token->data[j] = 0;
+					token->next = malloc(sizeof(t_token));
+					if (!token->next)
+						return (token_destroy(lexer->tokens), free(lexer), NULL);
+					token = token->next;
+					if (token_init(token, size - i))
+						return (token_destroy(lexer->tokens), free(lexer), NULL);
+					j = 0;
+				}
+			}
+			else if (str[i] == CHAR_QUOTE)
+			{
+				token->type = TOKEN;
+				token->data[j++] = CHAR_QUOTE;
+				state = QUOTE;
+			}
+			else if (str[i] == CHAR_DQUOTE)
+			{
+				token->type = TOKEN;
+				token->data[j++] = CHAR_DQUOTE;
+				state = DQUOTE;
+			}
+			else if (str[i] == CHAR_PIPE)
+			{
+				// End current token and start a new one
+				if (j > 0) // If there is a token to end
+				{
+					token->data[j] = 0;
+					token->next = malloc(sizeof(t_token));
+					if (!token->next)
+						return (token_destroy(lexer->tokens), free(lexer), NULL);
+					token = token->next;
+					if (token_init(token, size - i))
+						return (token_destroy(lexer->tokens), free(lexer), NULL);
+					j = 0;
+				}
+
+				// Pipe token
+				token->data[0] = CHAR_PIPE;
+				token->data[1] = 0;
+				token->type = CHAR_PIPE;
+				// Next token
 				token->next = malloc(sizeof(t_token));
+				if (!token->next)
+					return (token_destroy(lexer->tokens), free(lexer), NULL);
 				token = token->next;
-				token_init(token, size - i);
-				j = 0;
+				if (token_init(token, size - i))
+					return (token_destroy(lexer->tokens), free(lexer), NULL);
+			}
+			else
+			{
+				// Copy character to token
+				token->data[j++] = str[i];
+				token->type = TOKEN;
 			}
 		}
-		else if (chartype == CHAR_PIPE)
+		else if (state == QUOTE)
 		{
-			// End current token and start a new one
-			if (j > 0) // If there is a token to end
-			{
-				token->data[j] = 0;
-				token->next = malloc(sizeof(t_token));
-				token = token->next;
-				token_init(token, size - i);
-				j = 0;
-			}
-			
-			// Pipe token
-			token->data[0] = chartype;
-			token->data[1] = 0;
-			token->type = CHAR_PIPE;
-			// Next token
-			token->next = malloc(sizeof(t_token));
-			token = token->next;
-			token_init(token, size - i);
-			continue;
+				token->data[j++] = str[i];
+				if (str[i] == CHAR_QUOTE)
+					state = GENERAL;
+		}
+		else if (state == DQUOTE)
+		{
+				token->data[j++] = str[i];
+				if (str[i] == CHAR_DQUOTE)
+					state = GENERAL;
 		}
 	}
 	token->data[j] = 0;
-	
-	// 6. Return the lexer
-	return lexer;
-}
 
+	// 6. Return the lexer
+	return (lexer);
+}
 
 /* DEBUG */
 void	lexer_print(t_lexer *lexer)
