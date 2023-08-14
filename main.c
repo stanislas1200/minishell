@@ -175,6 +175,7 @@ int	main(void)
 {
 	char	*buff;
 	char	*prompt;
+	t_lexer	*lexer;
 
 	signal(SIGINT, signal_handler);
 	print_header();
@@ -184,6 +185,8 @@ int	main(void)
 		buff = readline(prompt);
 		free(prompt);
 		add_history(buff);
+		lexer = lexer_build(buff);
+		// lexer_print(lexer); /* DEBUG */
 		eval(buff);
 	}
 	return (0);

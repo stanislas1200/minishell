@@ -21,6 +21,13 @@
 # define M "\x1b[1;35m"
 # define C "\x1b[0m"
 
+# define CHAR_NULL 0
+# define CHAR_CHAR 1
+# define CHAR_SPACE 2
+# define CHAR_PIPE 3
+
+# define TOKEN 1
+
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
@@ -31,15 +38,32 @@
 # include "./libft/libft.h"
 # include <sys/types.h>
 # include <sys/wait.h>
+
 typedef struct command_t {
 	char *argv[MAXARGS]; // argv for execve()
 	int argc; // nb of args
 	enum builtin_t { NONE, QUIT, JOBS, BG, FG, KILL, HELP } builtin; // type of builtin command
 } command_t;
 
+typedef struct t_token
+{
+	int				type;
+	char			*data;
+	struct t_token	*next;
+} t_token;
+
+typedef struct t_lexer
+{
+	t_token	*tokens;
+} t_lexer;
+
 //builtin
 void	cd(char *path);
 
 void	signal_handler(int signum);
+t_lexer	*lexer_build(char *str);
+
+/* DEBUG */
+void lexer_print(t_lexer *lexer);
 
 #endif
