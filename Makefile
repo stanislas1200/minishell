@@ -3,20 +3,20 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+         #
+#    By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/13 16:03:12 by sgodin           ###   ########.fr        #
+#    Updated: 2023/08/14 10:32:38 by dspilleb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c
+SRCS = main.c builtin.c
 
 OBJS = ${SRCS:.c=.o}
 
 SHELL = bash
 NAME = minishell
-GCC = gcc -Wall -Wextra -Werror -g 
+GCC = gcc -Wall -Wextra -Werror -g #-fsanitize=address
 
 .PHONY: all clean fclean re .c.o bonus
 

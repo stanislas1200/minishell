@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/13 14:53:48 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/14 10:33:34 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,9 +151,18 @@ void	*get_prompt()
 {
 	char	*str;
 	char	cwd[1024];
+	char	*user;
 
 	str = malloc(1024);
-	getcwd(cwd, sizeof(cwd));
+	if (!str)
+		return (NULL);
+	str[0] = '\0';
+	user = getenv("USER");
+	if (!getcwd(cwd, sizeof(cwd)) || !user)
+	{
+		free(str);
+		return (NULL);
+	}
 	strcat(str, "\x1b[1;32m");
 	strcat(str, getenv("USER"));
 	strcat(str, "\x1b[0m:\x1b[1;36m");
@@ -169,10 +178,11 @@ int	main(void)
 
 	signal(SIGINT, signal_handler);
 	print_header();
-	prompt = get_prompt();
 	while (1)
 	{
+		prompt = get_prompt();
 		buff = readline(prompt);
+		free(prompt);
 		add_history(buff);
 		eval(buff);
 	}
