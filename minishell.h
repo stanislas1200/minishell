@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 15:41:15 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/14 10:32:53 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/14 11:42:47 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,8 @@ typedef struct command_t {
 void	cd(char *path);
 
 void	signal_handler(int signum);
+
+//utils
+void	cperror(char *error, char *arg);
 
 #endif

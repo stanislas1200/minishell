@@ -6,11 +6,11 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/14 10:32:05 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/14 11:43:07 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	cd(char *path)
 {
@@ -27,7 +27,7 @@ void	cd(char *path)
 			free(absolute_path);
 		}
 		else
-			perror("malloc"); // Nécéssaire ?
+			perror("malloc");
 	}
 	else
 		perror("getcwd");
@@ -35,6 +35,6 @@ void	cd(char *path)
 	{
 		state = chdir(path);
 		if (state == -1)
-			perror("cd"); //mettre un meilleur message d'érreur (avec le dossier)
+			cperror("cd", path);
 	}
 }
