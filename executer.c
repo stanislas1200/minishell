@@ -12,39 +12,9 @@
 
 #include "minishell.h"
 
-void	runSystemCommand(char *cmd, char **arr)
+int	execute_cmd(t_ASTNode *node)
 {
-	pid_t childPid;
-	//FORK
-	if ((childPid = fork()) < 0)
-	{
-		perror("fork error");
-		exit(1);
-	}
-	else if (childPid == 0) { // Child run cmd
-		// EXECVP
-		if (execvp(cmd, arr) < 0) {
-			perror("execvp error");
-			exit(1);
-		}
-	}
-	else { // Parent
-		// BG
-		// if (bg) {
-		// 	printf("Child %d running in background\n", childPid);
-		// 	return;
-		// }
-		// FG
-		// else {
-			signal(SIGINT, SIG_IGN);
-			waitpid(childPid, NULL, 0);
-			signal(SIGINT, signal_handler);
-			return;
-		// }
-	}
-}
-int	execute_simple_command(t_ASTNode *node)
-{
+	
 	// Count the number of arguments
 	int num_args = 0;
 	t_ASTNode *arg_node = node->right;
@@ -71,53 +41,84 @@ int	execute_simple_command(t_ASTNode *node)
 	}
 	arr[i] = NULL;
 
-	// Execute the command
-	// runSystemCommand(node->data, arr);
-	execvp(node->data, arr);
-	return -1;
+    // Fork a new process
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        free(arr);
+        return -1;
+    } else if (pid == 0) {
+        // Child process: execute the command
+        execvp(node->data, arr);
+        perror("execvp");
+        free(arr);
+        exit(1); // Exit the child process on execvp error
+    } else {
+        // Parent process: wait for the child to complete
+        int status;
+        waitpid(pid, &status, 0);
+        free(arr);
+        return (WEXITSTATUS(status)); // Return the exit status of the child
+    }
+	return (0);
 }
 
-int execute_pipe(t_ASTNode *node) {
-	int fd[2];
-	pid_t pid;
-	
-	// Create a pipe
-	if (pipe(fd) == -1) {
-		perror("pipe");
-		return -1;
-	}
-	
-	// Fork a child process
-	pid = fork();
-	if (pid == -1) {
-		perror("fork");
-		return -1;
-	} else if (pid == 0) {
-		// Child process (right side of the pipe)
-		close(fd[1]); // Close write end of the pipe
-		dup2(fd[0], STDIN_FILENO); // Redirect stdin to pipe read end
-		close(fd[0]); // Close pipe read end
+int	execute_pipe(t_ASTNode *node)
+{int pipefd[2];
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+        return -1;
+    }
 
-		// Execute the right side of the pipe
-		printf("right side of the pipe execute %s\n", node->right->data);
-		execute_ast_node(node->right);
+    pid_t left_pid, right_pid;
+    left_pid = fork();
+    if (left_pid == -1) {
+        perror("fork");
+        return -1;
+    } else if (left_pid == 0) {
+        // Child process (left side of the pipe)
+        close(pipefd[0]); // Close read end of the pipe
+        dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
+        close(pipefd[1]); // Close pipe write end
 
-		exit(0);
-	} else {
-		// Parent process (left side of the pipe)
-		printf("left side of the pipe\n execute %s\n", node->left->data);
-		close(fd[0]); // Close read end of the pipe
-		dup2(fd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
-		close(fd[1]); // Close pipe write end
+        execute_ast_node(node->left);
 
-		// Execute the left side of the pipe
-		execute_ast_node(node->left);
+        exit(0);
+    } else {
+        right_pid = fork();
+        if (right_pid == -1) {
+            perror("fork");
+            return -1;
+        } else if (right_pid == 0) {
+            // Child process (right side of the pipe)
+            close(pipefd[1]); // Close write end of the pipe
+            dup2(pipefd[0], STDIN_FILENO); // Redirect stdin to pipe read end
+            close(pipefd[0]); // Close pipe read end
 
-		// Wait for the child process to complete
-		// wait(NULL);
-	}
-	
+            execute_ast_node(node->right);
+
+            exit(0);
+        } else {
+            // Parent process: close both ends of the pipe
+            close(pipefd[0]);
+            close(pipefd[1]);
+
+            // Wait for both child processes to complete
+            waitpid(left_pid, NULL, 0);
+            waitpid(right_pid, NULL, 0);
+        }
+    }
+
 	return (0);
+}
+
+void	execute_job(t_ASTNode *node)
+{
+	// printf("\nexecute_job : %s\n", node->data);
+	if (node->type == CHAR_PIPE)
+		execute_pipe(node);
+	else if (node->type == TOKEN)
+		execute_cmd(node);
 }
 
 int	execute_ast_node(t_ASTNode *node)
@@ -125,14 +126,11 @@ int	execute_ast_node(t_ASTNode *node)
 	if (node == NULL) {
 		return 0;
 	}
-	
-	if (node->type == TOKEN)
-	{
-		return execute_simple_command(node);
-	}
-	else if (node->type == CHAR_PIPE) {
-		return execute_pipe(node);
-	}
+	// ADD NODE TYPE
+	// FG
+		execute_job(node);
+		// execute_ast_node(node->right);
+	// BG 
 	
 	return (0);
 }
