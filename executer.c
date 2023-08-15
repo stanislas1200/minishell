@@ -45,8 +45,7 @@ int	execute_cmd(t_ASTNode *node)
     pid_t pid = fork();
     if (pid == -1) {
         perror("fork");
-        free(arr);
-        return -1;
+        return (free(arr), -1);
     } else if (pid == 0) {
         // Child process: execute the command
         execvp(node->data, arr);
