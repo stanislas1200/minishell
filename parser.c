@@ -138,6 +138,41 @@ t_ASTNode	*job_command(t_token *token)
 	return (NULL);
 }
 
+t_ASTNode *redirection_append(t_token **token) {
+    t_ASTNode *left = command_simple(token);
+    if (!left) {
+        return NULL;
+    }
+
+    if ((*token) && (*token)->type == CHAR_OUTPUTR) {
+		*token = (*token)->next;
+		if (!(*token) || (*token)->type != CHAR_OUTPUTR)
+			return NULL;
+		*token = (*token)->next;
+		if (!(*token))
+			return NULL;
+        t_ASTNode *node = malloc(sizeof(t_ASTNode));
+        if (!node) {
+            // Handle memory allocation failure
+            return NULL;
+        }
+
+        node->type = 3;
+        node->data = ft_strdup((*token)->data);
+        node->left = left;
+
+        // Move the token pointer to the next token
+        *token = (*token)->next;
+
+        // Parse the right side of the append operator
+        node->right = parse_top(*token);
+
+        return node;
+    }
+
+    return NULL;
+}
+
 t_ASTNode	*parse_top(t_token *token)
 {
 	if (!token)
@@ -147,6 +182,10 @@ t_ASTNode	*parse_top(t_token *token)
 	
 	if ((token = save, node = job_pipe(&token)) != NULL)	// <command> | <job>
 		return node;
+
+    if ((token = save, node = redirection_append(&token)) != NULL) { // <command> >> <filename>
+        return node;
+    }
 
 	if ((token = save, node = job_command(token)) != NULL)	// <command>
 		return node;

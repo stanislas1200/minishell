@@ -33,7 +33,7 @@ int	execute_cmd(t_ASTNode *node)
 	// Check for input/output redirection
 	int redirection = 0;
 	char *path = NULL;
-	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR) {
+	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3) {
 		redirection = node->type;
 		path = node->data;
 		node = node->left;
@@ -97,6 +97,18 @@ int	execute_cmd(t_ASTNode *node)
 			close(fd);
 		}
 
+		// Handle output redirection (>>)
+		if (redirection == 3) {
+			printf("output append path: %s\n", path);
+			int fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
+			if (fd == -1) {
+				perror("open");
+				exit(1);
+			}
+			dup2(fd, STDOUT_FILENO);
+			close(fd);
+		}
+
 		if (execute_builtin(node, arr))
 		{
 			execvp(node->data, arr);
@@ -113,6 +125,7 @@ int	execute_cmd(t_ASTNode *node)
 	}
 	return (0);
 }
+
 
 int	execute_pipe(t_ASTNode *node)
 {
@@ -169,7 +182,7 @@ void	execute_job(t_ASTNode *node)
 		execute_pipe(node);
 	else if (node->type == TOKEN)
 		execute_cmd(node);
-	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR)
+	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3)
 		execute_cmd(node);
 	
 }
