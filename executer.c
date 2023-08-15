@@ -12,6 +12,21 @@
 
 #include "minishell.h"
 
+void	pwd(void)
+{
+	char	cwd[1024];
+	if (getcwd(cwd, sizeof(cwd)))
+		printf("%s\n", cwd);
+	else
+		("getcwd", NULL, 1);
+}
+int	execute_builtin(t_ASTNode *node)
+{
+	if (ft_strncmp(node->data, "pwd", ft_strlen("pwd")) == 0)
+			return (pwd(), 0);
+	return (1);
+}
+
 int	execute_cmd(t_ASTNode *node)
 {
 	
@@ -48,16 +63,17 @@ int	execute_cmd(t_ASTNode *node)
         return (free(arr), -1);
     } else if (pid == 0) {
         // Child process: execute the command
-        execvp(node->data, arr);
-        perror("execvp");
+		if (execute_builtin(node))
+			{
+				execvp(node->data, arr);
+				perror("execvp");
+			}
         free(arr);
         exit(1); // Exit the child process on execvp error
     } else {
         // Parent process: wait for the child to complete
         int status;
-		signal(SIGINT, SIG_IGN);
-		waitpid(pid, &status, 0);
-		signal(SIGINT, signal_handler);
+        waitpid(pid, &status, 0);
         free(arr);
         return (WEXITSTATUS(status)); // Return the exit status of the child
     }
@@ -81,7 +97,6 @@ int	execute_pipe(t_ASTNode *node)
         close(pipefd[0]); // Close read end of the pipe
         dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
         close(pipefd[1]); // Close pipe write end
-
         execute_ast_node(node->left);
 
         exit(0);
@@ -135,4 +150,3 @@ int	execute_ast_node(t_ASTNode *node)
 	
 	return (0);
 }
-
