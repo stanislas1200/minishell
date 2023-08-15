@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/15 20:29:37 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 21:48:11 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,7 +199,7 @@ int	main(void)
 		else if (ft_strncmp(buff, "cd", ft_strlen("cd")) == 0)
 			cd(ft_split(&buff[3], ' '));
 		else if (ft_strncmp(buff, "echo", ft_strlen("echo")) == 0)
-			echo(&buff[5], 0);
+			echo(&buff[5], NULL);
 		else
 			eval(buff);
 	}

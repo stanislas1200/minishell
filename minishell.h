@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 15:41:15 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/15 21:17:07 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 21:41:12 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,17 +40,23 @@ typedef struct command_t {
 //builtin
 void	cd(char **paths);
 void	pwd(void);
-void	echo(char *str, char option);
+void	echo(char *str, char *option);
 void	env(char **envp);
-char	**dup_env(char **envp);
 void	export(char ***envp, char **args);
+
+//builtin_2
+void	unset(char ***envp, char **args);
 void	export2(char ***envp, char *var, int i, int append);
-int		valid_identifier(char *var);
-void	add_to_env(char ***envp, char *str);
+
+//builtin_tool1
+char	**dup_env(char **envp);
 void	delete_from_env(char ***envp, int del);
 char	*ft_getenv(char **env, char *str);
 int		ft_getindexenv(char **env, char *str);
-void	unset(char ***envp, char **args);
+void	add_to_env(char ***envp, char *str);
+
+//builtin_tool2
+int		valid_identifier(char *var);
 void	check_identifier(char **envp, char *var, int *i, int *append);
 char	*plus_remover(char *str);
 

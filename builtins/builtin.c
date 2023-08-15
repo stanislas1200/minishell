@@ -6,20 +6,18 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/15 21:32:40 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 21:47:58 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	echo(char *str, char option)
+void	echo(char *str, char *option)
 {
-	if (str && option == 'n')
+	if (str && option && ft_strncmp(option, "-n", 2) == 0)
 		printf("%s", str);
-	if (str && option == 0)
+	else if (str)
 		printf("%s\n", str);
-	else if (option == 0)
-		printf("\n");
 }
 
 void	cd(char **paths)
