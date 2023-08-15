@@ -112,7 +112,7 @@ t_lexer	*lexer_build(char *str)
 				token->data[j++] = CHAR_DQUOTE;
 				state = DQUOTE;
 			}
-			else if (str[i] == CHAR_PIPE)
+			else if (str[i] == CHAR_PIPE || str[i] == CHAR_INPUTR || str[i] == CHAR_OUTPUTR)
 			{
 				// End current token and start a new one
 				if (j > 0) // If there is a token to end
@@ -128,9 +128,9 @@ t_lexer	*lexer_build(char *str)
 				}
 
 				// Pipe token
-				token->data[0] = CHAR_PIPE;
+				token->data[0] = str[i];
 				token->data[1] = 0;
-				token->type = CHAR_PIPE;
+				token->type = str[i];
 				// Next token
 				token->next = malloc(sizeof(t_token));
 				if (!token->next)

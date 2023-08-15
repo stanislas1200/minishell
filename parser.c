@@ -24,7 +24,7 @@ t_ASTNode *command_simple(t_token **token) {
 	}
 
 	node->type = TOKEN;
-	node->data = strdup((*token)->data);
+	node->data = ft_strdup((*token)->data);
 	node->left = NULL;
 	node->right = NULL;
 
@@ -32,7 +32,7 @@ t_ASTNode *command_simple(t_token **token) {
 	*token = (*token)->next;
 
 	// Process command arguments if available
-	while (*token && (*token)->type != CHAR_PIPE) {
+	while (*token && (*token)->type == TOKEN) {
 		t_ASTNode *arg_node = malloc(sizeof(t_ASTNode));
 		if (!arg_node) {
 			// Handle memory allocation failure
@@ -40,7 +40,7 @@ t_ASTNode *command_simple(t_token **token) {
 		}
 
 		arg_node->type = ARG;
-		arg_node->data = strdup((*token)->data);
+		arg_node->data = ft_strdup((*token)->data);
 		arg_node->left = NULL;
 		arg_node->right = NULL;
 
@@ -77,27 +77,61 @@ t_ASTNode *job_pipe(t_token **token) {
 		}
 
 		node->type = CHAR_PIPE;
-		node->data = strdup((*token)->data);
+		node->data = ft_strdup((*token)->data);
 		node->left = left;
 
 		// Move the token pointer to the next token
 		*token = (*token)->next;
 
 		// Recursively parse the right side of the pipe
-		node->right = job_pipe(token);
+		node->right = parse_top(*token);
 
 		return node;
 	}
 
-	return left;
+	return (free(left), NULL);
+}
+
+t_ASTNode	*redirection(t_token **token)
+{
+	// Check left side of the redirection operator
+	t_ASTNode *right = command_simple(token);
+	// Check if the token is a redirection operator
+	if (!(*token) || ((*token)->type != CHAR_INPUTR && (*token)->type != CHAR_OUTPUTR))
+		return NULL;
+
+	// Save the token type
+	int type = (*token)->type;
+
+	// Move the token pointer to the next token
+	*token = (*token)->next;
+	if (!(*token) || (*token)->type != TOKEN)
+		return NULL;
+
+	// Create a new node for the redirection operator
+	t_ASTNode	*node = malloc(sizeof(t_ASTNode));
+	if (!node) {
+		// Handle memory allocation failure
+		return NULL;
+	}
+
+	// Set the node's data and type
+	node->type = type;
+	node->data = ft_strdup((*token)->data);
+	node->left = NULL;
+	node->right = right;
+
+	return (node);
 }
 
 t_ASTNode	*job_command(t_token *token)
 {
 	t_token *save = token;
 	t_ASTNode *node = NULL;
-	
-	if ((token = save, node = command_simple(&token)) != NULL)
+
+	if ((token = save, node = redirection(&token)) != NULL)		// <simple command> <|> <filename>
+		return node;
+	if ((token = save, node = command_simple(&token)) != NULL)	// <simple command>
 		return node;
 
 	return (NULL);
@@ -108,12 +142,11 @@ t_ASTNode	*parse_top(t_token *token)
 	t_token *save = token;
 	t_ASTNode *node = NULL;
 	
-	if ((token = save, node = job_pipe(&token)) != NULL)
+	if ((token = save, node = job_pipe(&token)) != NULL)	// <command> | <job>
 		return node;
 
-	if ((token = save, node = job_command(token)) != NULL)
+	if ((token = save, node = job_command(token)) != NULL)	// <command>
 		return node;
-
 	return (NULL);
 }
 
