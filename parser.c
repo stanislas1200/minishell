@@ -95,7 +95,7 @@ t_ASTNode *job_pipe(t_token **token) {
 t_ASTNode	*redirection(t_token **token)
 {
 	// Check left side of the redirection operator
-	t_ASTNode *right = command_simple(token);
+	t_ASTNode *left = command_simple(token);
 	// Check if the token is a redirection operator
 	if (!(*token) || ((*token)->type != CHAR_INPUTR && (*token)->type != CHAR_OUTPUTR))
 		return NULL;
@@ -118,8 +118,9 @@ t_ASTNode	*redirection(t_token **token)
 	// Set the node's data and type
 	node->type = type;
 	node->data = ft_strdup((*token)->data);
-	node->left = NULL;
-	node->right = right;
+	node->left = left;
+	// Recursively parse the right side of the pipe
+	node->right = parse_top((*token)->next);
 
 	return (node);
 }
@@ -139,6 +140,8 @@ t_ASTNode	*job_command(t_token *token)
 
 t_ASTNode	*parse_top(t_token *token)
 {
+	if (!token)
+		return (NULL);
 	t_token *save = token;
 	t_ASTNode *node = NULL;
 	
@@ -158,7 +161,7 @@ t_ASTNode	*parse(t_lexer *lexer)
 	token = lexer->tokens;
 
 	tree = parse_top(token);
-	// print_ast(tree);
+	print_ast(tree);
 	return (tree);
 }
 
@@ -184,3 +187,6 @@ void print_ast(t_ASTNode *root)
 	printf("Abstract Syntax Tree:\n");
 	print_ast_node(root, 0);
 }
+
+
+/* CHECK  AFTER REDIRECTION */

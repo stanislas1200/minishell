@@ -81,7 +81,8 @@ int	execute_cmd(t_ASTNode *node)
 }
 
 int	execute_pipe(t_ASTNode *node)
-{int pipefd[2];
+{
+    int pipefd[2];
     if (pipe(pipefd) == -1) {
         perror("pipe");
         return -1;
@@ -124,7 +125,6 @@ int	execute_pipe(t_ASTNode *node)
             waitpid(right_pid, NULL, 0);
         }
     }
-
 	return (0);
 }
 
