@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c utils.c ./builtins/builtin.c
+SRCS = main.c utils.c ./builtins/builtin.c lexer.c parser.c executer.c
 
 OBJS_DIR = ./objects/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
