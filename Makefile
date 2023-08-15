@@ -6,7 +6,7 @@
 #    By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/15 00:10:58 by dspilleb         ###   ########.fr        #
+#    Updated: 2023/08/15 22:00:14 by dspilleb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
 
 SHELL = bash
 NAME = minishell
-GCC = gcc -Wall -Wextra -Werror -g -fsanitize=address
+GCC = gcc -Wall -Wextra -Werror -g #-fsanitize=address
 
 RED = \033[1;31m
 GREEN = \033[1;32m

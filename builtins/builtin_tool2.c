@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 00:07:18 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/15 21:33:21 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 23:19:59 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,4 +79,40 @@ char	*plus_remover(char *str)
 	}
 	new_str[j] = '\0';
 	return (new_str);
+}
+
+void	update_old_pwd(char ***envp, char *path, int update)
+{
+	char	*tmp;
+
+	if (update)
+	{
+		tmp = ft_strjoin("OLDPWD=", ft_getenv(*envp, "PWD"));
+		if (!tmp)
+			return ;
+		export2(envp, tmp, 6, 0);
+		free(tmp);
+		update_pwd(envp);
+	}
+	else if (update == 0 && path && ft_strncmp(path, "-", 2) == 0)
+	{
+		if (chdir(ft_getenv(*envp, "OLDPWD")) == -1)
+			ft_putstr_fd("cd: OLDPWD not set\n", 2);
+		update_old_pwd(envp, ft_getenv(*envp, "PWD"), 1);
+	}
+}
+
+void	update_pwd(char ***envp)
+{
+	char	*tmp;
+	char	cwd[1024];
+
+	if (getcwd(cwd, sizeof(cwd)))
+	{
+		tmp = ft_strjoin("PWD=", cwd);
+		if (!tmp)
+			return ;
+		export2(envp, tmp, 3, 0);
+		free(tmp);
+	}
 }

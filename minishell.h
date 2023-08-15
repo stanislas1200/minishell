@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 15:41:15 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/15 21:41:12 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 23:17:47 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ typedef struct command_t {
 } command_t;
 
 //builtin
-void	cd(char **paths);
+void	cd(char ***envp, char **paths);
 void	pwd(void);
-void	echo(char *str, char *option);
+void	echo(char **args);
 void	env(char **envp);
 void	export(char ***envp, char **args);
 
@@ -59,6 +59,8 @@ void	add_to_env(char ***envp, char *str);
 int		valid_identifier(char *var);
 void	check_identifier(char **envp, char *var, int *i, int *append);
 char	*plus_remover(char *str);
+void	update_pwd(char ***envp);
+void	update_old_pwd(char ***envp, char *path, int update);
 
 void	signal_handler(int signum);
 

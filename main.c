@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/15 21:48:11 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 23:17:51 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,7 @@ int	main(void)
 	int i = 0;
 
 	envp = dup_env(__environ);
+	update_pwd(&envp);
 	signal(SIGINT, signal_handler);
 	print_header();
 	while (1)
@@ -188,18 +189,18 @@ int	main(void)
 		buff = readline(prompt);
 		free (prompt);
 		add_history(buff);
-		if (ft_strncmp(buff, "export", ft_strlen("export")) == 0)
-			export(&envp, ft_split(&buff[7], ' '));
-		else if (ft_strncmp(buff, "env", ft_strlen("env")) == 0)
+		if (buff && ft_strncmp(buff, "export", ft_strlen("export")) == 0)
+			export(&envp, ft_split(&buff[6], ' '));
+		else if (buff && ft_strncmp(buff, "env", ft_strlen("env")) == 0)
 			env(envp);
-		else if (ft_strncmp(buff, "unset", ft_strlen("unset")) == 0)
-			unset(&envp, ft_split(&buff[6], ' '));
-		else if (ft_strncmp(buff, "pwd", ft_strlen("pwd")) == 0)
+		else if (buff && ft_strncmp(buff, "unset", ft_strlen("unset")) == 0)
+			unset(&envp, ft_split(&buff[5], ' '));
+		else if (buff && ft_strncmp(buff, "pwd", ft_strlen("pwd")) == 0)
 			pwd();
-		else if (ft_strncmp(buff, "cd", ft_strlen("cd")) == 0)
-			cd(ft_split(&buff[3], ' '));
-		else if (ft_strncmp(buff, "echo", ft_strlen("echo")) == 0)
-			echo(&buff[5], NULL);
+		else if (buff && ft_strncmp(buff, "cd", ft_strlen("cd")) == 0)
+			cd(&envp, ft_split(&buff[2], ' '));
+		else if (buff && ft_strncmp(buff, "echo", ft_strlen("echo")) == 0)
+			echo(ft_split(&buff[4], ' '));
 		else
 			eval(buff);
 	}

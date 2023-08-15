@@ -6,29 +6,59 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/15 21:47:58 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 23:21:27 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	echo(char *str, char *option)
+void	echo(char **args)
 {
-	if (str && option && ft_strncmp(option, "-n", 2) == 0)
-		printf("%s", str);
-	else if (str)
-		printf("%s\n", str);
+	int	i;
+	int	flag;
+
+	flag = 0;
+	i = -1;
+	while (args[++i])
+	{
+		if (i == 0 && ft_strncmp(args[i], "-n", 3) == 0)
+			flag = 1;
+		else
+		{
+			if ((i > 0 && !flag) || (i != 1 && flag))
+				printf(" ");
+			printf("%s", args[i]);
+		}
+	}
+	if (!flag)
+		printf("\n");
+	free_matrix(args);
 }
 
-void	cd(char **paths)
+void	cd(char ***envp, char **paths)
 {
+	int	update;
+
+	update = 0;
 	if (matrix_len(paths) > 1)
-	{
-		ft_putstr_fd(R, 2);
 		ft_putstr_fd("cd: too many arguments\n", 2);
+	if (paths[0] && ft_strncmp(paths[0], "~", 2) \
+	&& ft_strncmp(paths[0], "-", 2))
+	{
+		if (chdir(paths[0]) == -1)
+			cperror("cd", paths[0], 1);
+		else
+			update = 1;
 	}
-	if (paths[0] && chdir(paths[0]) == -1)
-		cperror("cd", "path", 1);
+	else if (!paths[0] || ft_strncmp(paths[0], "~", 2) == 0 \
+	&& ft_strncmp(paths[0], "-", 2))
+	{
+		if (chdir(ft_getenv(*envp, "HOME")) == -1)
+			ft_putstr_fd("cd: HOME not set\n", 2);
+		else
+			update = 1;
+	}
+	update_old_pwd(envp, paths[0], update);
 	free_matrix(paths);
 }
 
@@ -39,7 +69,7 @@ void	pwd(void)
 	if (getcwd(cwd, sizeof(cwd)))
 		printf("%s\n", cwd);
 	else
-		("getcwd", NULL, 1);
+		cperror("getcwd", NULL, 1);
 }
 
 void	env(char **envp)
