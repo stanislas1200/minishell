@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/15 00:41:46 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 20:29:37 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,15 +189,15 @@ int	main(void)
 		free (prompt);
 		add_history(buff);
 		if (ft_strncmp(buff, "export", ft_strlen("export")) == 0)
-			envp = export(envp, &buff[7]);
+			export(&envp, ft_split(&buff[7], ' '));
 		else if (ft_strncmp(buff, "env", ft_strlen("env")) == 0)
 			env(envp);
 		else if (ft_strncmp(buff, "unset", ft_strlen("unset")) == 0)
-			envp = unset(envp, &buff[6]);
+			unset(&envp, ft_split(&buff[6], ' '));
 		else if (ft_strncmp(buff, "pwd", ft_strlen("pwd")) == 0)
 			pwd();
 		else if (ft_strncmp(buff, "cd", ft_strlen("cd")) == 0)
-			cd(&buff[3]);
+			cd(ft_split(&buff[3], ' '));
 		else if (ft_strncmp(buff, "echo", ft_strlen("echo")) == 0)
 			echo(&buff[5], 0);
 		else

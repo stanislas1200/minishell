@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/15 00:09:54 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 21:32:40 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,16 @@ void	echo(char *str, char option)
 		printf("\n");
 }
 
-void	cd(char *path)
+void	cd(char **paths)
 {
-	if (chdir(path) == -1)
+	if (matrix_len(paths) > 1)
+	{
+		ft_putstr_fd(R, 2);
+		ft_putstr_fd("cd: too many arguments\n", 2);
+	}
+	if (paths[0] && chdir(paths[0]) == -1)
 		cperror("cd", "path", 1);
+	free_matrix(paths);
 }
 
 void	pwd(void)
@@ -47,29 +53,21 @@ void	env(char **envp)
 		printf("%s\n", envp[i++]);
 }
 
-char	**export(char **envp, char *var)
+void	export(char ***envp, char **args)
 {
 	char	**tmp;
 	int		i;
+	int		j;
 	int		append;
 
-	i = -1;
-	append = 0;
-	if (valid_identifier(var) == 1)
+	j = -1;
+	while (args[++j])
 	{
-		cperror("export", var, 0);
-		ft_putstr_fd("not a valid identifier\n", 2);
-		return (envp);
+		i = -1;
+		append = 0;
+		check_identifier(*envp, args[j], &i, &append);
+		if (i > -1)
+			export2(envp, args[j], i, append);
 	}
-	while (var[++i] != '=')
-		if (var[i] == '+')
-			append = 1;
-	tmp = export2(envp, var, i, append);
-	if (tmp)
-		return (tmp);
-	else
-	{
-		cperror("export", "malloc", 1);
-		return (envp);
-	}
+	free_matrix(args);
 }

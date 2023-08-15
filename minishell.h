@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 15:41:15 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/14 23:49:50 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/15 21:17:07 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,19 +38,21 @@ typedef struct command_t {
 } command_t;
 
 //builtin
-void	cd(char *path);
+void	cd(char **paths);
 void	pwd(void);
 void	echo(char *str, char option);
 void	env(char **envp);
 char	**dup_env(char **envp);
-char	**export(char **envp, char *var);
-char	**export2(char **envp, char *var, int i, int append);
+void	export(char ***envp, char **args);
+void	export2(char ***envp, char *var, int i, int append);
 int		valid_identifier(char *var);
-char	**add_to_env(char **envp, char *str);
-char	**delete_from_env(char **envp, int del);
+void	add_to_env(char ***envp, char *str);
+void	delete_from_env(char ***envp, int del);
 char	*ft_getenv(char **env, char *str);
 int		ft_getindexenv(char **env, char *str);
-char	**unset(char **envp, char *var);
+void	unset(char ***envp, char **args);
+void	check_identifier(char **envp, char *var, int *i, int *append);
+char	*plus_remover(char *str);
 
 void	signal_handler(int signum);
 
