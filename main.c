@@ -77,10 +77,16 @@ int	main(void)
 	{
 		prompt = get_prompt();
 		buff = readline(prompt);
+		if (!buff)
+		{
+			printf("\n");
+			print_exit_message();
+			break ;
+		}
 		free(prompt);
 		add_history(buff);
 		lexer = lexer_build(buff);
-		lexer_print(lexer); /* DEBUG */
+		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
 			ast_root = parse(lexer);
 		execute_ast_node(ast_root);

@@ -125,7 +125,7 @@ t_ASTNode	*parse(t_lexer *lexer)
 	token = lexer->tokens;
 
 	tree = parse_top(token);
-	print_ast(tree);
+	// print_ast(tree);
 	return (tree);
 }
 

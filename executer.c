@@ -55,7 +55,9 @@ int	execute_cmd(t_ASTNode *node)
     } else {
         // Parent process: wait for the child to complete
         int status;
-        waitpid(pid, &status, 0);
+		signal(SIGINT, SIG_IGN);
+		waitpid(pid, &status, 0);
+		signal(SIGINT, signal_handler);
         free(arr);
         return (WEXITSTATUS(status)); // Return the exit status of the child
     }
