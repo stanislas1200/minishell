@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/13 15:41:15 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/14 10:32:53 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/14 11:42:47 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,6 @@
 # define Y "\x1b[1;33m"
 # define M "\x1b[1;35m"
 # define C "\x1b[0m"
-
-enum e_TOKEN_TYPE
-{
-	CHAR_NULL = 0,
-	CHAR_CHAR = -1,
-	CHAR_SPACE = ' ',
-	CHAR_PIPE = '|',
-	CHAR_QUOTE = '\'',
-	CHAR_DQUOTE = '\"',
-	TOKEN = -1,
-	ARG = -2
-};
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -70,10 +58,25 @@ typedef struct t_ASTNode // Abstract Syntax Tree Node
 	struct t_ASTNode	*right;
 }	t_ASTNode;
 
+enum e_TOKEN_TYPE
+{
+	CHAR_NULL = 0,
+	CHAR_CHAR = -1,
+	CHAR_SPACE = ' ',
+	CHAR_PIPE = '|',
+	CHAR_QUOTE = '\'',
+	CHAR_DQUOTE = '\"',
+	TOKEN = -1,
+	ARG = -2
+};
+
 //builtin
 void	cd(char *path);
 
 void	signal_handler(int signum);
+
+//utils
+void	cperror(char *error, char *arg);
 
 /* LEXING -> PARSING -> EXECUTING*/
 t_lexer	*lexer_build(char *str);
