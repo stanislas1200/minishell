@@ -35,9 +35,10 @@ void	signal_handler(int signum)
 	{
 		printf("\n");
 		// printf("\33[2K\r");
-		// rl_replace_line("", 0);
+		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		rl_redisplay();
+		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
@@ -87,9 +88,10 @@ int	main(void)
 		free(prompt);
 		add_history(buff);
 		lexer = lexer_build(buff);
-		// lexer_print(lexer); /* DEBUG */
+		lexer_print(lexer); /* DEBUG */
 		if (lexer)
 			ast_root = parse(lexer);
+		print_ast(ast_root);	/* DEBUG */
 		execute_ast_node(ast_root);
 		// eval(buff);
 	}

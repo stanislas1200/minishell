@@ -33,6 +33,7 @@ int	execute_cmd(t_ASTNode *node)
 	// Check for input/output redirection
 	int redirection = 0;
 	char *path = NULL;
+	t_ASTNode *save = node;
 	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3) {
 		redirection = node->type;
 		path = node->data;
@@ -75,7 +76,6 @@ int	execute_cmd(t_ASTNode *node)
 		
 		// Handle input redirection (<)
 		if (redirection == CHAR_INPUTR) {
-			printf("input path: %s\n", path);
 			int fd = open(path, O_RDONLY);
 			if (fd == -1) {
 				perror("open");
@@ -87,8 +87,19 @@ int	execute_cmd(t_ASTNode *node)
 
 		// Handle output redirection (>)
 		if (redirection == CHAR_OUTPUTR) {
-			printf("output path: %s\n", path);
-			int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+			int fd = 0;
+			if (!save->right || (save->right->type != CHAR_OUTPUTR))
+				fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+			while (save->right && (save->right->type == CHAR_OUTPUTR))
+			{
+				if (fd > 0)
+					close(fd);
+				fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+				path = save->right->data;
+				save = save->right;
+				if (!save->right || (save->right->type != CHAR_OUTPUTR))
+					fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+			}
 			if (fd == -1) {
 				perror("open");
 				exit(1);
@@ -99,8 +110,19 @@ int	execute_cmd(t_ASTNode *node)
 
 		// Handle output redirection (>>)
 		if (redirection == 3) {
-			printf("output append path: %s\n", path);
-			int fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
+			int fd = 0;
+			if (!save->right || (save->right->type != 3))
+				fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
+			while (save->right && (save->right->type == 3))
+			{
+				if (fd > 0)
+					close(fd);
+				fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
+				path = save->right->data;
+				save = save->right;
+				if (!save->right || (save->right->type != 3))
+					fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
+			}
 			if (fd == -1) {
 				perror("open");
 				exit(1);

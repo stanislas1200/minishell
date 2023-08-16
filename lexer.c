@@ -171,9 +171,11 @@ void	lexer_print(t_lexer *lexer)
 	t_token	*token;
 
 	token = lexer->tokens;
+	printf(Y "lexer:\n" C);
 	while (token)
 	{
 		printf("type: %d, value: %s\n", token->type, token->data);
 		token = token->next;
 	}
+	printf("\n");
 }

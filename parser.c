@@ -17,6 +17,9 @@ t_ASTNode *job_pipe(t_token **token);
 t_ASTNode *parse_top(t_token *token);
 
 t_ASTNode	*command_simple(t_token **token) {
+	if (!*token || (*token)->type != TOKEN) {
+		return (NULL);
+	}
 	t_ASTNode	*node = malloc(sizeof(t_ASTNode));
 	if (!node)
 	{
@@ -110,7 +113,6 @@ t_ASTNode	*redirection(t_token **token)
 	// Check if the token is a redirection operator
 	if (!(*token) || ((*token)->type != CHAR_INPUTR && (*token)->type != CHAR_OUTPUTR))
 		return (NULL);
-
 	// Save the token type
 	int type = (*token)->type;
 
@@ -118,7 +120,6 @@ t_ASTNode	*redirection(t_token **token)
 	*token = (*token)->next;
 	if (!(*token) || (*token)->type != TOKEN)
 		return (NULL);
-
 	// Create a new node for the redirection operator
 	t_ASTNode	*node = malloc(sizeof(t_ASTNode));
 	if (!node) {
@@ -153,11 +154,6 @@ t_ASTNode	*redirection_append(t_token **token)
 {
 	t_ASTNode	*left = command_simple(token);
 
-	if (!left)
-	{
-		return (NULL);
-	}
-
 	if ((*token) && (*token)->type == CHAR_OUTPUTR) {
 		*token = (*token)->next;
 		if (!(*token) || (*token)->type != CHAR_OUTPUTR)
@@ -175,11 +171,8 @@ t_ASTNode	*redirection_append(t_token **token)
 		node->data = ft_strdup((*token)->data);
 		node->left = left;
 
-		// Move the token pointer to the next token
-		*token = (*token)->next;
-
 		// Parse the right side of the append operator
-		node->right = parse_top(*token);
+		node->right = parse_top((*token)->next);
 
 		return (node);
 	}
@@ -216,7 +209,6 @@ t_ASTNode	*parse(t_lexer *lexer)
 	token = lexer->tokens;
 
 	tree = parse_top(token);
-	print_ast(tree);
 	return (tree);
 }
 
@@ -237,11 +229,30 @@ void	print_ast_node(t_ASTNode *node, int indent)
 	print_ast_node(node->right, indent + 1);
 }
 
-void	print_ast(t_ASTNode *root)
-{
-	printf("Abstract Syntax Tree:\n");
-	print_ast_node(root, 0);
+void print_ast_tree_vertical(t_ASTNode *node, int level) {
+    if (node != NULL) {
+        print_ast_tree_vertical(node->right, level + 1);
+
+        for (int i = 0; i < level; i++) {
+            printf("    ");
+        }
+		printf(M "|-- " C);
+		if (node->type == CHAR_PIPE)
+			printf(Y "%s" C, node->data);
+		else if ( node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR | node->type == 3)
+			printf(G "%c " C, node->type == 3 ? 'A' : node->type);
+        printf("%s\n", node->data);
+
+        print_ast_tree_vertical(node->left, level + 1);
+    }
 }
 
+void	print_ast(t_ASTNode *root)
+{
+	printf(Y "Abstract Syntax Tree:\n" C);
+	print_ast_node(root, 0);
+	printf("\n");
+	print_ast_tree_vertical(root, 0);
+}
 
 /* CHECK  AFTER REDIRECTION */
