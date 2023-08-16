@@ -180,6 +180,36 @@ t_ASTNode	*redirection_append(t_token **token)
 	return (NULL);
 }
 
+t_ASTNode	*redirection_heredoc(t_token **token)
+{
+	t_ASTNode	*left = command_simple(token);
+
+	if ((*token) && (*token)->type == CHAR_INPUTR) {
+		*token = (*token)->next;
+		if (!(*token) || (*token)->type != CHAR_INPUTR)
+			return NULL;
+		*token = (*token)->next;
+		if (!(*token))
+			return NULL;
+		t_ASTNode *node = malloc(sizeof(t_ASTNode));
+		if (!node) {
+			// Handle memory allocation failure
+			return (NULL);
+		}
+
+		node->type = 4;
+		node->data = ft_strdup((*token)->data);
+		node->left = left;
+
+		// Parse the right side of the append operator
+		node->right = parse_top((*token)->next);
+
+		return (node);
+	}
+
+	return (NULL);
+}
+
 t_ASTNode	*parse_top(t_token *token)
 {
 	t_token		*save;
@@ -194,6 +224,9 @@ t_ASTNode	*parse_top(t_token *token)
 		return (node);
 
 	if ((token = save, node = redirection_append(&token)) != NULL) // <command> >> <filename>
+		return (node);
+	
+	if ((token = save, node = redirection_heredoc(&token)) != NULL) // <command> << <filename>
 		return (node);
 
 	if ((token = save, node = job_command(token)) != NULL)	// <command>
@@ -241,6 +274,8 @@ void print_ast_tree_vertical(t_ASTNode *node, int level) {
 			printf(Y "%s" C, node->data);
 		else if ( node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR | node->type == 3)
 			printf(G "%c " C, node->type == 3 ? 'A' : node->type);
+		else if (node->type == 4)
+			printf(R "H " C);
         printf("%s\n", node->data);
 
         print_ast_tree_vertical(node->left, level + 1);

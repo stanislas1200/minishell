@@ -34,7 +34,8 @@ int	execute_cmd(t_ASTNode *node)
 	int redirection = 0;
 	char *path = NULL;
 	t_ASTNode *save = node;
-	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3) {
+	printf("node->type = %d\n", node->type);
+	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4) {
 		redirection = node->type;
 		path = node->data;
 		node = node->left;
@@ -83,6 +84,40 @@ int	execute_cmd(t_ASTNode *node)
 			}
 			dup2(fd, STDIN_FILENO);
 			close(fd);
+		}
+
+		// Handle input redirection (<<) heredoc /* DEV */ // TODO handle multiple heredoc cat<<EOF<<EOF output last EOF
+		if (redirection == 4) {
+			printf("heredoc\n");
+			int fd[2];
+			char *buffer = NULL;
+			char *text = NULL;
+			char *temp = NULL;
+			pipe(fd);
+			while (1)
+			{
+				buffer = readline(G "> " C);
+				if (strcmp(buffer, path) == 0)
+					break;
+				if (text == NULL) {
+					text = ft_strdup(buffer);
+				} else {
+					char *temp = ft_strjoin(text, buffer);
+					free(text);
+					text = temp;
+				}
+
+				text = ft_strjoin(text, "\n");
+				free(buffer);
+			}
+			// Write the text to the pipe
+			write(fd[1], text, strlen(text));
+			// Close the write end of the pipe
+			close(fd[1]);
+
+			// Redirect STDIN_FILENO to the read end of the pipe
+			dup2(fd[0], STDIN_FILENO);
+			close(fd[0]);
 		}
 
 		// Handle output redirection (>)
@@ -204,7 +239,7 @@ void	execute_job(t_ASTNode *node)
 		execute_pipe(node);
 	else if (node->type == TOKEN)
 		execute_cmd(node);
-	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3)
+	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
 		execute_cmd(node);
 	
 }
