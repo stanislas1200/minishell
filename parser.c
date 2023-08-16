@@ -16,11 +16,12 @@ t_ASTNode *command_simple(t_token **token);
 t_ASTNode *job_pipe(t_token **token);
 t_ASTNode *parse_top(t_token *token);
 
-t_ASTNode *command_simple(t_token **token) {
-	t_ASTNode *node = malloc(sizeof(t_ASTNode));
-	if (!node) {
+t_ASTNode	*command_simple(t_token **token) {
+	t_ASTNode	*node = malloc(sizeof(t_ASTNode));
+	if (!node)
+	{
 		// Handle memory allocation failure
-		return NULL;
+		return (NULL);
 	}
 
 	node->type = TOKEN;
@@ -32,8 +33,11 @@ t_ASTNode *command_simple(t_token **token) {
 	*token = (*token)->next;
 
 	// Process command arguments if available
-	while (*token && (*token)->type == TOKEN) {
-		t_ASTNode *arg_node = malloc(sizeof(t_ASTNode));
+	while (*token && (*token)->type == TOKEN)
+	{
+		t_ASTNode	*arg_node;
+
+		arg_node = malloc(sizeof(t_ASTNode));
 		if (!arg_node) {
 			// Handle memory allocation failure
 			return NULL;
@@ -45,10 +49,13 @@ t_ASTNode *command_simple(t_token **token) {
 		arg_node->right = NULL;
 
 		// Append the argument node to the right of the command node
-		if (!node->right) {
+		if (!node->right)
+		{
 			node->right = arg_node;
-		} else {
-			t_ASTNode *temp = node->right;
+		}
+		else
+		{
+			t_ASTNode	*temp = node->right;
 			while (temp->right) {
 				temp = temp->right;
 			}
@@ -59,21 +66,25 @@ t_ASTNode *command_simple(t_token **token) {
 		*token = (*token)->next;
 	}
 
-	return node;
+	return (node);
 }
 
 
-t_ASTNode *job_pipe(t_token **token) {
-	t_ASTNode *left = command_simple(token);
-	if (!left) {
-		return NULL;
+t_ASTNode *job_pipe(t_token **token)
+{
+	t_ASTNode	*left = command_simple(token);
+
+	if (!left)
+	{
+		return (NULL);
 	}
 
 	if ((*token) && (*token)->type == CHAR_PIPE) {
 		t_ASTNode *node = malloc(sizeof(t_ASTNode));
-		if (!node) {
+		if (!node)
+		{
 			// Handle memory allocation failure
-			return NULL;
+			return (NULL);
 		}
 
 		node->type = CHAR_PIPE;
@@ -86,7 +97,7 @@ t_ASTNode *job_pipe(t_token **token) {
 		// Recursively parse the right side of the pipe
 		node->right = parse_top(*token);
 
-		return node;
+		return (node);
 	}
 
 	return (free(left), NULL);
@@ -98,7 +109,7 @@ t_ASTNode	*redirection(t_token **token)
 	t_ASTNode *left = command_simple(token);
 	// Check if the token is a redirection operator
 	if (!(*token) || ((*token)->type != CHAR_INPUTR && (*token)->type != CHAR_OUTPUTR))
-		return NULL;
+		return (NULL);
 
 	// Save the token type
 	int type = (*token)->type;
@@ -106,13 +117,13 @@ t_ASTNode	*redirection(t_token **token)
 	// Move the token pointer to the next token
 	*token = (*token)->next;
 	if (!(*token) || (*token)->type != TOKEN)
-		return NULL;
+		return (NULL);
 
 	// Create a new node for the redirection operator
 	t_ASTNode	*node = malloc(sizeof(t_ASTNode));
 	if (!node) {
 		// Handle memory allocation failure
-		return NULL;
+		return (NULL);
 	}
 
 	// Set the node's data and type
@@ -128,67 +139,72 @@ t_ASTNode	*redirection(t_token **token)
 t_ASTNode	*job_command(t_token *token)
 {
 	t_token *save = token;
-	t_ASTNode *node = NULL;
+	t_ASTNode *node = (NULL);
 
 	if ((token = save, node = redirection(&token)) != NULL)		// <simple command> <|> <filename>
-		return node;
+		return (node);
 	if ((token = save, node = command_simple(&token)) != NULL)	// <simple command>
-		return node;
+		return (node);
 
 	return (NULL);
 }
 
-t_ASTNode *redirection_append(t_token **token) {
-    t_ASTNode *left = command_simple(token);
-    if (!left) {
-        return NULL;
-    }
+t_ASTNode	*redirection_append(t_token **token)
+{
+	t_ASTNode	*left = command_simple(token);
 
-    if ((*token) && (*token)->type == CHAR_OUTPUTR) {
+	if (!left)
+	{
+		return (NULL);
+	}
+
+	if ((*token) && (*token)->type == CHAR_OUTPUTR) {
 		*token = (*token)->next;
 		if (!(*token) || (*token)->type != CHAR_OUTPUTR)
 			return NULL;
 		*token = (*token)->next;
 		if (!(*token))
 			return NULL;
-        t_ASTNode *node = malloc(sizeof(t_ASTNode));
-        if (!node) {
-            // Handle memory allocation failure
-            return NULL;
-        }
+		t_ASTNode *node = malloc(sizeof(t_ASTNode));
+		if (!node) {
+			// Handle memory allocation failure
+			return (NULL);
+		}
 
-        node->type = 3;
-        node->data = ft_strdup((*token)->data);
-        node->left = left;
+		node->type = 3;
+		node->data = ft_strdup((*token)->data);
+		node->left = left;
 
-        // Move the token pointer to the next token
-        *token = (*token)->next;
+		// Move the token pointer to the next token
+		*token = (*token)->next;
 
-        // Parse the right side of the append operator
-        node->right = parse_top(*token);
+		// Parse the right side of the append operator
+		node->right = parse_top(*token);
 
-        return node;
-    }
+		return (node);
+	}
 
-    return NULL;
+	return (NULL);
 }
 
 t_ASTNode	*parse_top(t_token *token)
 {
+	t_token		*save;
+	t_ASTNode	*node;
+
 	if (!token)
 		return (NULL);
-	t_token *save = token;
-	t_ASTNode *node = NULL;
-	
-	if ((token = save, node = job_pipe(&token)) != NULL)	// <command> | <job>
-		return node;
+	save = token;
+	node = NULL;
 
-    if ((token = save, node = redirection_append(&token)) != NULL) { // <command> >> <filename>
-        return node;
-    }
+	if ((token = save, node = job_pipe(&token)) != NULL)	// <command> | <job>
+		return (node);
+
+	if ((token = save, node = redirection_append(&token)) != NULL) // <command> >> <filename>
+		return (node);
 
 	if ((token = save, node = job_command(token)) != NULL)	// <command>
-		return node;
+		return (node);
 	return (NULL);
 }
 
@@ -205,15 +221,15 @@ t_ASTNode	*parse(t_lexer *lexer)
 }
 
 
-void print_ast_node(t_ASTNode *node, int indent)
+void	print_ast_node(t_ASTNode *node, int indent)
 {
 	if (node == NULL)
-		return;
+		return ;
 
 	// Print the current node's data with indentation
 	for (int i = 0; i < indent; i++)
 		printf("    ");
-	
+
 	printf("Type: %d, Data: %s\n", node->type, node->data);
 
 	// Recursively print left and right subtrees
@@ -221,7 +237,7 @@ void print_ast_node(t_ASTNode *node, int indent)
 	print_ast_node(node->right, indent + 1);
 }
 
-void print_ast(t_ASTNode *root)
+void	print_ast(t_ASTNode *root)
 {
 	printf("Abstract Syntax Tree:\n");
 	print_ast_node(root, 0);

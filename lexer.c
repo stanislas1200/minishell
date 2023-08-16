@@ -55,12 +55,12 @@ t_lexer	*lexer_build(char *str)
 	int		j;			// Index for copying data to token
 	int		size;	// Size of input string
 	int		state;		// State of the lexer
-	
+
 	// 1. Check if input string is valid
 	if (!str)
 		return (NULL);
 	size = strlen(str);
-	
+
 	// 2. Create a new lexer
 	lexer = malloc(sizeof(t_lexer));
 	if (!lexer)
@@ -68,20 +68,20 @@ t_lexer	*lexer_build(char *str)
 	lexer->tokens = malloc(sizeof(t_token));
 	if (!lexer->tokens)
 		return (free(lexer), NULL);
-	
+
 	// 3. Create a new token
 	token = lexer->tokens;
-	
+
 	// 4. Initialize token properties
 	if (token_init(token, size))
 		return (free(lexer->tokens), free(lexer), NULL);
-	
+
 	i = -1;
 	j = 0;
-	
+
 	state = GENERAL;
 	while (str[++i])
-	{	
+	{
 		// Handle different character types
 		if (state == GENERAL)
 		{
@@ -148,15 +148,15 @@ t_lexer	*lexer_build(char *str)
 		}
 		else if (state == QUOTE)
 		{
-				token->data[j++] = str[i];
-				if (str[i] == CHAR_QUOTE)
-					state = GENERAL;
+			token->data[j++] = str[i];
+			if (str[i] == CHAR_QUOTE)
+				state = GENERAL;
 		}
 		else if (state == DQUOTE)
 		{
-				token->data[j++] = str[i];
-				if (str[i] == CHAR_DQUOTE)
-					state = GENERAL;
+			token->data[j++] = str[i];
+			if (str[i] == CHAR_DQUOTE)
+				state = GENERAL;
 		}
 	}
 	token->data[j] = 0;
