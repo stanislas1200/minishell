@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/15 23:17:51 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/17 15:36:59 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,125 +29,20 @@ void	print_exit_message(void)
 	printf("                   		unexpected shutdown!\n");
 }
 
-int	parse(const char *cmdline, struct command_t *cmd)
-{
-	static char arry[MAXLINE]; // local copy of command line
-	const char delims[10] = " \t\r\n"; // argument delimiters (white-space)
-	char *line = arry; // pointer that traverses command line
-	char *token; // pointer to the end of the current argument
-	char *endline; // pointer to the end of the cmdline string
-	int is_bg; // background job?
-
-	if (cmdline == NULL) {
-		printf(R "exit\n");
-		exit(1);
-	}
-	strncpy(line, cmdline, MAXLINE);
-	endline = line + strlen(line);
-
-	// initialize arguments
-	cmd->argc = 0;
-
-	while (line < endline)
-	{
-		// skip delimiters
-		line += strspn(line, delims);
-		if (line >= endline) break;
-
-		// Find token delimiter
-		token = line + strcspn(line, delims);
-
-		// terminate the token
-		*token = '\0';
-
-		// save the token
-		cmd->argv[cmd->argc++] = line;
-
-		// Check full
-		if (cmd->argc >= MAXARGS-1) break;
-		line = token + 1;
-	}
-
-	//end NULL
-	cmd->argv[cmd->argc] = NULL;
-
-	if (cmd->argc == 0)  // ignore blank line
-		return 0;
-
-	cmd->builtin = NONE;
-
-	// should the job run in the background?
-	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)
-		cmd->argv[--cmd->argc] = NULL;
-
-	return is_bg;
-}
-
-void	runSystemCommand(struct command_t *cmd, int bg)
-{
-	pid_t childPid;
-	//FORK
-	if ((childPid = fork()) < 0)
-	{
-		perror("fork error");
-		exit(1);
-	}
-	else if (childPid == 0) { // Child run cmd
-		// EXECVP
-		if (execvp(cmd->argv[0], cmd->argv) < 0) {
-			perror("execvp error");
-			exit(1);
-		}
-	}
-	else { // Parent
-		// BG
-		if (bg) {
-			printf("Child %d running in background\n", childPid);
-			return;
-		}
-		// FG
-		else {
-			signal(SIGINT, SIG_IGN);
-			waitpid(childPid, NULL, 0);
-			signal(SIGINT, signal_handler);
-			return;
-		}
-	}
-}
-
-void	eval(char *cmdLine)
-{
-	int bg;
-	struct command_t cmd;
-
-	bg = parse(cmdLine, &cmd); // parse command line into command structure
-	if (bg == -1) // parsing error
-		return;
-	if (cmd.argv[0] == NULL) // ignore empty lines
-		return;
-	if (strcmp(cmd.argv[0], "exit") == 0) { // exit command
-		print_exit_message();
-		exit(0);
-	}
-	if (cmd.builtin == NONE)
-		runSystemCommand(&cmd, bg);
-	// else
-	// 	runBuiltinCommand(&cmd);
-}
-
-
 void	signal_handler(int signum)
 {
 	if (signum == SIGINT)
 	{
 		printf("\n");
+		// printf("\33[2K\r");
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
+		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
-void	*get_prompt()
+void	*get_prompt(void)
 {
 	char		*str;
 	char		cwd[1024];
@@ -174,10 +69,10 @@ void	*get_prompt()
 
 int	main(void)
 {
-	char	*buff;
-	char	*prompt;
-	char	**envp;
-	int i = 0;
+	char		*buff;
+	char		*prompt;
+	t_lexer		*lexer;
+	t_ASTNode	*ast_root;
 
 	envp = dup_env(__environ);
 	update_pwd(&envp);
@@ -187,22 +82,21 @@ int	main(void)
 	{
 		prompt = get_prompt();
 		buff = readline(prompt);
-		free (prompt);
+		if (!buff)
+		{
+			printf("\n");
+			print_exit_message();
+			break ;
+		}
+		free(prompt);
 		add_history(buff);
-		if (buff && ft_strncmp(buff, "export", ft_strlen("export")) == 0)
-			export(&envp, ft_split(&buff[6], ' '));
-		else if (buff && ft_strncmp(buff, "env", ft_strlen("env")) == 0)
-			env(envp);
-		else if (buff && ft_strncmp(buff, "unset", ft_strlen("unset")) == 0)
-			unset(&envp, ft_split(&buff[5], ' '));
-		else if (buff && ft_strncmp(buff, "pwd", ft_strlen("pwd")) == 0)
-			pwd();
-		else if (buff && ft_strncmp(buff, "cd", ft_strlen("cd")) == 0)
-			cd(&envp, ft_split(&buff[2], ' '));
-		else if (buff && ft_strncmp(buff, "echo", ft_strlen("echo")) == 0)
-			echo(ft_split(&buff[4], ' '));
-		else
-			eval(buff);
+		lexer = lexer_build(buff);
+		lexer_print(lexer); /* DEBUG */
+		if (lexer)
+			ast_root = parse(lexer);
+		print_ast(ast_root);	/* DEBUG */
+		execute_ast_node(ast_root);
+		// eval(buff);
 	}
 	return (0);
 }
