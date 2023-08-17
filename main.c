@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/17 17:33:52 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/17 18:19:07 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	main(int ac, char **av, char **envv)
 		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
 			ast_root = parse(lexer, &envp);
-		// print_ast(ast_root);	/* DEBUG */
+		print_ast(ast_root);	/* DEBUG */
 		execute_ast_node(ast_root);
 	}
 	return (0);

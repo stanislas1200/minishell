@@ -12,22 +12,33 @@
 
 #include "minishell.h"
 
-t_ASTNode	*command_simple(t_token **token, char ***env) {
-	if (!*token || (*token)->type != TOKEN) {
-		return (NULL);
-	}
-	t_ASTNode	*node = malloc(sizeof(t_ASTNode));
-	if (!node)
-	{
-		// Handle memory allocation failure
-		return (NULL);
-	}
+t_ASTNode	*new_node(int t, char *d, char ***env)
+{
+	t_ASTNode	*node;
 
-	node->type = TOKEN;
-	node->data = ft_strdup((*token)->data);
+	node = malloc(sizeof(t_ASTNode));
+	if (!node)
+		return (NULL);
+	node->type = t;
+	node->data = ft_strdup(d);
 	node->left = NULL;
 	node->right = NULL;
 	node->env = env;
+
+	return (node);
+}
+
+t_ASTNode	*command_simple(t_token **token, char ***env)
+{
+	t_ASTNode	*node;
+	// Check token
+	if (!*token || (*token)->type != TOKEN)
+		return (NULL); // TODO
+
+	// Init token
+	node = new_node(TOKEN, (*token)->data, env);
+	if (!node)
+		return (NULL); // TODO
 
 	// Move the token pointer to the next token
 	*token = (*token)->next;

@@ -69,6 +69,9 @@ int	execute_cmd(t_ASTNode *node)
 	}
 	arr[i] = NULL;
 
+
+	if (!execute_builtin(node, arr))
+		return 0;
 	// Fork a new process
 	pid_t pid = fork();
 	if (pid == -1) {
@@ -175,12 +178,8 @@ int	execute_cmd(t_ASTNode *node)
 			close(fd);
 		}
 
-
-		if (!execute_builtin(node, arr))
-		{
-			execvp(node->data, arr);
-			perror("execvp");
-		}
+		execvp(node->data, arr);
+		perror("execvp");
 		free(arr);
 		exit(1); // Exit the child process on execvp error
 	}
