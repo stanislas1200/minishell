@@ -1,36 +1,55 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtin.c                                          :+:      :+:    :+:   */
+/*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 04:00:20 by dspilleb         ###   ########.fr       */
+/*   Created: 2023/08/17 03:21:48 by dspilleb          #+#    #+#             */
+/*   Updated: 2023/08/17 04:00:27 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-
-void	pwd(void)
+void	echo(char **args)
 {
-	char	cwd[1024];
+	int	i;
+	int	flag;
+	int	count;
 
-	if (getcwd(cwd, sizeof(cwd)))
-		printf("%s\n", cwd);
-	else
-		cperror("getcwd", NULL, 1);
+	count = 0;
+	flag = 0;
+	i = -1;
+	while (args[++i])
+	{
+		if (is_option(args[i], 'n') == 0)
+			flag = 1;
+		else
+		{
+			if (count == 1)
+				printf(" ");
+			printf("%s", args[i]);
+			count = 1;
+		}
+	}
+	if (!flag)
+		printf("\n");
+	free_matrix(args);
 	exit(0);
 }
 
-void	env(char **envp)
+int	is_option(char *str, char option)
 {
 	int	i;
 
 	i = 0;
-	while (envp && envp[i])
-		printf("%s\n", envp[i++]);
-	exit(0);
+	if (str[0] != '-')
+		return (1);
+	while (str[++i])
+		if (str[i] != option)
+			return (1);
+	if (i == 1)
+		return (1);
+	return (0);
 }
-
