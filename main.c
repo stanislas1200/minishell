@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/17 15:36:59 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/14 10:33:34 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
- #include "minishell.h"
+#include "minishell.h"
 
 void	print_header(void)
 {
@@ -35,18 +35,18 @@ void	signal_handler(int signum)
 	{
 		printf("\n");
 		// printf("\33[2K\r");
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		// rl_replace_line("", 0);
+		// rl_on_new_line();
+		// rl_redisplay();
+		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
 void	*get_prompt(void)
 {
-	char		*str;
-	char		cwd[1024];
-	char		*user;
+	char	*str;
+	char	cwd[1024];
+	char	*user;
 
 	str = malloc(1024);
 	if (!str)
@@ -55,7 +55,6 @@ void	*get_prompt(void)
 	user = getenv("USER");
 	if (!getcwd(cwd, sizeof(cwd)) || !user)
 	{
-		cperror("getcwd", NULL, 1);
 		free(str);
 		return (NULL);
 	}
@@ -74,8 +73,6 @@ int	main(void)
 	t_lexer		*lexer;
 	t_ASTNode	*ast_root;
 
-	envp = dup_env(__environ);
-	update_pwd(&envp);
 	signal(SIGINT, signal_handler);
 	print_header();
 	while (1)
