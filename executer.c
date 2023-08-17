@@ -69,10 +69,10 @@ int	execute_cmd(t_ASTNode *node)
 	}
 	arr[i] = NULL;
 
-
 	if (!execute_builtin(node, arr))
 		return 0;
 	// Fork a new process
+	
 	pid_t pid = fork();
 	if (pid == -1) {
 		perror("fork");
@@ -80,7 +80,7 @@ int	execute_cmd(t_ASTNode *node)
 	} else if (pid == 0) {
 		// Child process: execute the command
 		
-		// Handle input redirection (<)
+		// Handle input redirection (<) // TODO multiple 
 		if (redirection == CHAR_INPUTR) {
 			int fd = open(path, O_RDONLY);
 			if (fd == -1) {
@@ -177,7 +177,6 @@ int	execute_cmd(t_ASTNode *node)
 			dup2(fd, STDOUT_FILENO);
 			close(fd);
 		}
-
 		execvp(node->data, arr);
 		perror("execvp");
 		free(arr);
@@ -191,6 +190,11 @@ int	execute_cmd(t_ASTNode *node)
 		waitpid(pid, &status, 0);
 		signal(SIGINT, signal_handler);
 		free(arr);
+		/* DEV TEST */
+		while (save->right && (save->right->type == '>'))
+			save = save->right;
+		if (save->right->type == '|');
+			execute_ast_node(save->right); /* dev test*/
 		return (WEXITSTATUS(status)); // Return the exit status of the child
 	}
 	return (0);
@@ -252,7 +256,6 @@ int	execute_pipe(t_ASTNode *node)
 
 void	execute_job(t_ASTNode *node)
 {
-	// printf("\nexecute_job : %s\n", node->data);
 	if (node->type == CHAR_PIPE)
 		execute_pipe(node);
 	else if (node->type == TOKEN)

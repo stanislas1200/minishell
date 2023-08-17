@@ -49,7 +49,6 @@ t_ASTNode	*command_simple(t_token **token, char ***env, int type)
 	return (node);
 }
 
-
 t_ASTNode	*job_pipe(t_token **token, char ***env)
 {
 	t_ASTNode	*left;
@@ -80,8 +79,8 @@ t_ASTNode	*job_pipe(t_token **token, char ***env)
 
 t_ASTNode	*redirection(t_token **token, char ***env)
 {
-	t_ASTNode	*left;
 	int			type;
+	t_ASTNode	*left;
 	t_ASTNode	*node;
 
 	// Check left side of the redirection operator
@@ -104,7 +103,16 @@ t_ASTNode	*redirection(t_token **token, char ***env)
 	// Set the node's left
 	node->left = left;
 	// Recursively parse the right side of the pipe
-	node->right = parse_top((*token)->next, env);
+	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+	{
+		printf(G "pipe\n");
+		*token = (*token)->next;
+		t_ASTNode	*new_root = new_node('|', (*token)->data, env);
+		node->right = new_root;
+		new_root->right = parse_top((*token)->next, env);
+	}
+	else
+		node->right = parse_top((*token)->next, env);
 
 	return (node);
 }
@@ -117,9 +125,10 @@ t_ASTNode	*job_command(t_token *token, char ***env)
 	save = token;
 	node = NULL;
 
-	if ((token = save, node = redirection(&token, env)) != NULL)		// <simple command> <|> <filename>
+	if ((node = redirection(&token, env)) != NULL)		// <simple command> <|> <filename>
 		return (node);
-	if ((token = save, node = command_simple(&token, env, TOKEN)) != NULL)	// <simple command>
+	token = save;
+	if ((node = command_simple(&token, env, TOKEN)) != NULL)	// <simple command>
 		return (node);
 
 	return (NULL);
@@ -127,28 +136,25 @@ t_ASTNode	*job_command(t_token *token, char ***env)
 
 t_ASTNode	*redirection_append(t_token **token, char ***env)
 {
-	t_ASTNode	*left = command_simple(token, env, TOKEN);
+	t_ASTNode	*left;
+	t_ASTNode	*node;
 
-	if ((*token) && (*token)->type == CHAR_OUTPUTR) {
+	left = command_simple(token, env, TOKEN);
+	if ((*token) && (*token)->type == CHAR_OUTPUTR)
+	{
 		*token = (*token)->next;
 		if (!(*token) || (*token)->type != CHAR_OUTPUTR)
-			return NULL;
+			return (NULL);
 		*token = (*token)->next;
 		if (!(*token))
-			return NULL;
-		t_ASTNode *node = malloc(sizeof(t_ASTNode));
-		if (!node) {
-			// Handle memory allocation failure
 			return (NULL);
-		}
-
-		node->type = 3;
-		node->data = ft_strdup((*token)->data);
+		node = new_node(3, (*token)->data, env);
+		if (!node)
+			return (NULL);
 		node->left = left;
 
 		// Parse the right side of the append operator
 		node->right = parse_top((*token)->next, env);
-		node->env = env;
 
 		return (node);
 	}
@@ -158,28 +164,26 @@ t_ASTNode	*redirection_append(t_token **token, char ***env)
 
 t_ASTNode	*redirection_heredoc(t_token **token, char ***env)
 {
-	t_ASTNode	*left = command_simple(token, env, TOKEN);
+	t_ASTNode	*left;
+	t_ASTNode	*node;
 
-	if ((*token) && (*token)->type == CHAR_INPUTR) {
+	left = command_simple(token, env, TOKEN);
+	if ((*token) && (*token)->type == CHAR_INPUTR)
+	{
 		*token = (*token)->next;
 		if (!(*token) || (*token)->type != CHAR_INPUTR)
-			return NULL;
+			return (NULL);
 		*token = (*token)->next;
 		if (!(*token))
-			return NULL;
-		t_ASTNode *node = malloc(sizeof(t_ASTNode));
-		if (!node) {
-			// Handle memory allocation failure
 			return (NULL);
-		}
+		node = new_node(4, (*token)->data, env);
+		if (!node)
+			return (NULL);
 
-		node->type = 4;
-		node->data = ft_strdup((*token)->data);
 		node->left = left;
 
 		// Parse the right side of the append operator
 		node->right = parse_top((*token)->next, env);
-	node->env = env;
 
 		return (node);
 	}
@@ -197,16 +201,16 @@ t_ASTNode	*parse_top(t_token *token, char ***env)
 	save = token;
 	node = NULL;
 
-	if ((token = save, node = job_pipe(&token, env)) != NULL)	// <command> | <job>
+	if ((node = job_pipe(&token, env)) != NULL)	// <command> | <job>
 		return (node);
-
-	if ((token = save, node = redirection_append(&token, env)) != NULL) // <command> >> <filename>
+	token = save;
+	if ((node = redirection_append(&token, env)) != NULL) // <command> >> <filename>
 		return (node);
-	
-	if ((token = save, node = redirection_heredoc(&token, env)) != NULL) // <command> << <filename>
+	token = save;
+	if ((node = redirection_heredoc(&token, env)) != NULL) // <command> << <filename>
 		return (node);
-
-	if ((token = save, node = job_command(token, env)) != NULL)	// <command>
+	token = save;
+	if ((node = job_command(token, env)) != NULL)	// <command>
 		return (node);
 	return (NULL);
 }
@@ -222,7 +226,8 @@ t_ASTNode	*parse(t_lexer *lexer, char ***env)
 	return (tree);
 }
 
-
+ /* Debug */
+ 
 void	print_ast_node(t_ASTNode *node, int indent)
 {
 	if (node == NULL)
