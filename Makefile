@@ -6,11 +6,20 @@
 #    By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/15 22:00:14 by dspilleb         ###   ########.fr        #
+#    Updated: 2023/08/17 03:43:51 by dspilleb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c utils.c ./builtins/builtin.c ./builtins/builtin_2.c ./builtins/builtin_tool1.c ./builtins/builtin_tool2.c
+SRCS =	main.c env_utils.c\
+			builtins/builtin.c\
+			builtins/builtin_tools.c\
+			builtins/cd.c\
+			builtins/echo.c\
+			builtins/exit.c\
+			builtins/export.c\
+			builtins/export2.c\
+			builtins/unset.c\
+
 
 OBJS_DIR = ./objects/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))

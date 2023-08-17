@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtin_2.c                                        :+:      :+:    :+:   */
+/*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 13:36:56 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/15 21:26:56 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/17 04:00:36 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,30 +33,35 @@ void	unset(char ***envp, char **args)
 				delete_from_env(envp, i);
 		}
 	}
+	free_matrix(args);
+	exit(0);
 }
 
-void	export2(char ***envp, char *var, int i, int append)
+void	delete_from_env(char ***envp, int del)
 {
-	char	*tmp;
-	int		ret;
+	char	**new_env;
+	int		i;
+	int		j;
 
-	ret = ft_getindexenv(*envp, var);
-	if (ret != -1 && append == 0 || ret != -1 && append == 1)
+	i = matrix_len(*envp);
+	new_env = malloc(sizeof(char *) * (i));
+	if (!new_env)
+		return ;
+	i = -1;
+	j = 0;
+	while ((*envp)[++i])
 	{
-		if (ret != -1 && append == 0)
-			tmp = ft_strdup(var);
-		else
-			tmp = ft_strjoin((*envp)[ret], &var[++i]);
-		free((*envp)[ret]);
-		(*envp)[ret] = tmp;
+		if (i != del)
+		{
+			new_env[j] = ft_strdup((*envp)[i]);
+			if (!new_env[j++])
+			{
+				free_matrix(new_env);
+				return ;
+			}
+		}
 	}
-	else if (ret == -1 && append == 1)
-	{
-		tmp = plus_remover(var);
-		if (tmp)
-			add_to_env(envp, tmp);
-		free(tmp);
-	}
-	else
-		add_to_env(envp, var);
+	new_env[j] = NULL;
+	free_matrix(*envp);
+	*envp = new_env;
 }
