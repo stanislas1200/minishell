@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/17 16:09:00 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/17 17:33:52 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,15 +66,16 @@ void	*get_prompt(void)
 	return (str);
 }
 
-int	main(void)
+int	main(int ac, char **av, char **envv)
 {
 	char		*buff;
 	char		*prompt;
+	char		**envp;
 	t_lexer		*lexer;
 	t_ASTNode	*ast_root;
 
-	// envp = dup_env(__environ);
-	// update_pwd(&envp);
+	envp = dup_env(envv);
+	update_pwd(&envp);
 	signal(SIGINT, signal_handler);
 	print_header();
 	while (1)
@@ -90,12 +91,11 @@ int	main(void)
 		free(prompt);
 		add_history(buff);
 		lexer = lexer_build(buff);
-		lexer_print(lexer); /* DEBUG */
+		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
-			ast_root = parse(lexer);
-		print_ast(ast_root);	/* DEBUG */
+			ast_root = parse(lexer, &envp);
+		// print_ast(ast_root);	/* DEBUG */
 		execute_ast_node(ast_root);
-		// eval(buff);
 	}
 	return (0);
 }

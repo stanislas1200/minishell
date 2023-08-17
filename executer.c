@@ -16,9 +16,17 @@
 int	execute_builtin(t_ASTNode *node, char **arr)
 {
 	if (ft_strncmp(node->data, "pwd", ft_strlen("pwd")) == 0)
-			return (pwd(), 0);
+		return (pwd(), 0);
+	if (ft_strncmp(node->data, "cd", ft_strlen("cd")) == 0)
+		return (cd(node->env, arr), 0);
 	if (ft_strncmp(node->data, "echo", ft_strlen("echo")) == 0)
 		return (echo(arr), 0);
+	if (ft_strncmp(node->data, "env", ft_strlen("env")) == 0)
+		return (env(*node->env), 0);
+	if (ft_strncmp(node->data, "export", ft_strlen("export")) == 0)
+		return (export(node->env, arr), 0);
+	if (ft_strncmp(node->data, "unset", ft_strlen("unset")) == 0)
+		return (unset(node->env, arr), 0);
 	return (1);
 }
 
@@ -95,7 +103,8 @@ int	execute_cmd(t_ASTNode *node)
 					buffer = readline(G "> " C);
 					if (strcmp(buffer, path) == 0)
 						break;
-					if (text == NULL) {
+					if (text == NULL)
+					{
 						text = ft_strdup(buffer);
 					} else {
 						char *temp = ft_strjoin(text, buffer);
@@ -166,16 +175,19 @@ int	execute_cmd(t_ASTNode *node)
 			close(fd);
 		}
 
-		if (execute_builtin(node, arr))
+
+		if (!execute_builtin(node, arr))
 		{
 			execvp(node->data, arr);
 			perror("execvp");
 		}
 		free(arr);
 		exit(1); // Exit the child process on execvp error
-	} else {
+	}
+	else
+	{
 		// Parent process: wait for the child to complete
-		int status;
+		int	status;
 		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
 		signal(SIGINT, signal_handler);
@@ -188,8 +200,10 @@ int	execute_cmd(t_ASTNode *node)
 
 int	execute_pipe(t_ASTNode *node)
 {
-	int pipefd[2];
-	if (pipe(pipefd) == -1) {
+	int	pipefd[2];
+
+	if (pipe(pipefd) == -1)
+	{
 		perror("pipe");
 		return -1;
 	}

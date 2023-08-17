@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 04:00:33 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/17 17:12:21 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	export(char ***envp, char **args)
 	int		append;
 	int		exit_code;
 
-	j = -1;
+	j = 0;
 	exit_code = 0;
 	while (args[++j])
 	{
@@ -34,7 +34,7 @@ void	export(char ***envp, char **args)
 	}
 	sort_env(*envp);
 	free_matrix(args);
-	exit(exit_code);
+	// return(exit_code);
 }
 
 void	export2(char ***envp, char *var, int i, int append)

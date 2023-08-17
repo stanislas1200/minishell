@@ -64,8 +64,9 @@ typedef struct t_lexer
 
 typedef struct t_ASTNode // Abstract Syntax Tree Node
 {
-	int				type;
-	char			*data;
+	int					type;
+	char				*data;
+	char				***env;
 	struct t_ASTNode	*left;
 	struct t_ASTNode	*right;
 }	t_ASTNode;
@@ -120,7 +121,8 @@ long	ft_long_atoi(const char *nptr);
 
 /* LEXING -> PARSING -> EXECUTING*/
 t_lexer	*lexer_build(char *str);
-t_ASTNode	*parse(t_lexer *lexer);
+t_ASTNode	*parse(t_lexer *lexer, char ***env);
+t_ASTNode	*parse_top(t_token *token, char ***env);
 int	execute_ast_node(t_ASTNode *node);
 
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 13:36:56 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 04:00:36 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/17 17:45:36 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	unset(char ***envp, char **args)
 	int		len;
 	char	**ret;
 
-	j = -1;
+	j = 0;
 	while (args[++j])
 	{
 		len = 0;
@@ -34,7 +34,7 @@ void	unset(char ***envp, char **args)
 		}
 	}
 	free_matrix(args);
-	exit(0);
+	// exit(0);
 }
 
 void	delete_from_env(char ***envp, int del)

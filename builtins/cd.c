@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 04:00:24 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/17 17:50:33 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@ void	cd(char ***envp, char **paths)
 	int	state;
 
 	state = 0;
-	if (matrix_len(paths) > 1)
+	if (matrix_len(paths) > 2)
 	{
 		ft_putstr_fd("cd: too many arguments\n", 2);
 		state = 1;
 	}
-	else if (paths[0] && ft_strncmp(paths[0], "-", 2) == 0)
+	else if (paths[1] && ft_strncmp(paths[1], "-", 2) == 0)
 	{
 		if (chdir(ft_getenv(*envp, "OLDPWD")) == -1)
 		{
@@ -35,7 +35,7 @@ void	cd(char ***envp, char **paths)
 	else
 		state = cd2(envp, paths);
 	free_matrix(paths);
-	exit(state);
+	//exit(state);
 }
 
 int	cd2(char ***envp, char **paths)
@@ -44,7 +44,7 @@ int	cd2(char ***envp, char **paths)
 
 	state = 0;
 
-	if (!paths[0] || ft_strncmp(paths[0], "~", 2) == 0)
+	if (!paths[1] || ft_strncmp(paths[1], "~", 2) == 0)
 	{
 		if (chdir(ft_getenv(*envp, "HOME")) == -1)
 		{
@@ -52,17 +52,17 @@ int	cd2(char ***envp, char **paths)
 			ft_putstr_fd("cd: HOME not set\n", 2);
 		}
 		else
-			update_old_pwd(envp, paths[0]);
+			update_old_pwd(envp, paths[1]);
 	}
-	else if (paths[0])
+	else if (paths[1])
 	{
-		if (chdir(paths[0]) == -1)
+		if (chdir(paths[1]) == -1)
 		{
 			state = 1;
-			cperror("cd", paths[0], 1);
+			cperror("cd", paths[1], 1);
 		}
 		else
-			update_old_pwd(envp, paths[0]);
+			update_old_pwd(envp, paths[1]);
 	}
 	return (state);
 }

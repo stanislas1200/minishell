@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:21:48 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 15:54:42 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/17 16:51:28 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	echo(char **args)
 	if (!flag)
 		printf("\n");
 	free_matrix(args);
-	exit(0);
+	// return(0);
 }
 
 int	is_option(char *str, char option)

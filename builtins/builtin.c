@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 04:00:20 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/17 17:58:09 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	pwd(void)
 		printf("%s\n", cwd);
 	else
 		cperror("getcwd", NULL, 1);
-	exit(0);
+	// exit(0);
 }
 
 void	env(char **envp)
@@ -31,6 +31,6 @@ void	env(char **envp)
 	i = 0;
 	while (envp && envp[i])
 		printf("%s\n", envp[i++]);
-	exit(0);
+	// return(0);
 }
 
