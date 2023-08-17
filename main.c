@@ -6,11 +6,11 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/17 15:46:15 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/17 16:09:00 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
- #include "minishell.h"
+#include "minishell.h"
 
 void	print_header(void)
 {
@@ -44,9 +44,9 @@ void	signal_handler(int signum)
 
 void	*get_prompt(void)
 {
-	char		*str;
-	char		cwd[1024];
-	char		*user;
+	char	*str;
+	char	cwd[1024];
+	char	*user;
 
 	str = malloc(1024);
 	if (!str)
@@ -55,7 +55,6 @@ void	*get_prompt(void)
 	user = getenv("USER");
 	if (!getcwd(cwd, sizeof(cwd)) || !user)
 	{
-		cperror("getcwd", NULL, 1);
 		free(str);
 		return (NULL);
 	}

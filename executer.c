@@ -88,21 +88,27 @@ int	execute_cmd(t_ASTNode *node)
 			char *text = NULL;
 			char *temp = NULL;
 			pipe(fd);
-			while (1)
+			while (save && (save->type == 4))
 			{
-				buffer = readline(G "> " C);
-				if (strcmp(buffer, path) == 0)
-					break;
-				if (text == NULL) {
-					text = ft_strdup(buffer);
-				} else {
-					char *temp = ft_strjoin(text, buffer);
-					free(text);
-					text = temp;
-				}
+				while (1)
+				{
+					buffer = readline(G "> " C);
+					if (strcmp(buffer, path) == 0)
+						break;
+					if (text == NULL) {
+						text = ft_strdup(buffer);
+					} else {
+						char *temp = ft_strjoin(text, buffer);
+						free(text);
+						text = temp;
+					}
 
-				text = ft_strjoin(text, "\n");
-				free(buffer);
+					text = ft_strjoin(text, "\n");
+					free(buffer);
+				}
+				if (save->right && (save->right->type == 4))
+					text = NULL;
+				save = save->right;
 			}
 			// Write the text to the pipe
 			write(fd[1], text, strlen(text));
@@ -201,9 +207,12 @@ int	execute_pipe(t_ASTNode *node)
 		execute_ast_node(node->left);
 
 		exit(0);
-	} else {
+	}
+	else
+	{
 		right_pid = fork();
-		if (right_pid == -1) {
+		if (right_pid == -1)
+		{
 			perror("fork");
 			return -1;
 		} else if (right_pid == 0) {
