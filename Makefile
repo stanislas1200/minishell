@@ -6,23 +6,20 @@
 #    By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/17 15:38:46 by sgodin           ###   ########.fr        #
+#    Updated: 2023/08/17 15:48:03 by sgodin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS =	main.c\
-		lexer.c\
-		parser.c\ 
-		executer.c\
-			env_utils.c\
-				builtins/builtin.c\
-				builtins/builtin_tools.c\
-				builtins/cd.c\
-				builtins/echo.c\
-				builtins/exit.c\
-				builtins/export.c\
-				builtins/export2.c\
-				builtins/unset.c\
+SRCS = main.c lexer.c parser.c executer.c \
+		env_utils.c\
+						builtins/builtin.c\
+						builtins/builtin_tools.c\
+						builtins/cd.c\
+						builtins/echo.c\
+						builtins/exit.c\
+						builtins/export.c\
+						builtins/export2.c\
+						builtins/unset.c\
 
 OBJS_DIR = ./objects/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))

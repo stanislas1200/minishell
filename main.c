@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/17 15:36:59 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/17 15:46:15 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,10 @@ void	signal_handler(int signum)
 	{
 		printf("\n");
 		// printf("\33[2K\r");
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		// rl_replace_line("", 0);
+		// rl_on_new_line();
+		// rl_redisplay();
+		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
@@ -74,8 +74,8 @@ int	main(void)
 	t_lexer		*lexer;
 	t_ASTNode	*ast_root;
 
-	envp = dup_env(__environ);
-	update_pwd(&envp);
+	// envp = dup_env(__environ);
+	// update_pwd(&envp);
 	signal(SIGINT, signal_handler);
 	print_header();
 	while (1)

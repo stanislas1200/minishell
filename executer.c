@@ -13,18 +13,12 @@
 #include "minishell.h"
 #include <fcntl.h>
 
-void	pwd(void)
-{
-	char	cwd[1024];
-	if (getcwd(cwd, sizeof(cwd)))
-		printf("%s\n", cwd);
-	else
-		("getcwd", NULL, 1);
-}
 int	execute_builtin(t_ASTNode *node, char **arr)
 {
 	if (ft_strncmp(node->data, "pwd", ft_strlen("pwd")) == 0)
 			return (pwd(), 0);
+	if (ft_strncmp(node->data, "echo", ft_strlen("echo")) == 0)
+		return (echo(arr), 0);
 	return (1);
 }
 
@@ -176,7 +170,9 @@ int	execute_cmd(t_ASTNode *node)
 	} else {
 		// Parent process: wait for the child to complete
 		int status;
+		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
+		signal(SIGINT, signal_handler);
 		free(arr);
 		return (WEXITSTATUS(status)); // Return the exit status of the child
 	}
