@@ -34,13 +34,15 @@ void	signal_handler(int signum)
 	if (signum == SIGINT)
 	{
 		printf("\n");
+		// printf("\33[2K\r");
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
+		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
-void	*get_prompt()
+void	*get_prompt(void)
 {
 	char	*str;
 	char	cwd[1024];
@@ -66,10 +68,10 @@ void	*get_prompt()
 
 int	main(void)
 {
-	char	*buff;
-	char	*prompt;
-	t_lexer	*lexer;
-	t_ASTNode *ast_root;
+	char		*buff;
+	char		*prompt;
+	t_lexer		*lexer;
+	t_ASTNode	*ast_root;
 
 	signal(SIGINT, signal_handler);
 	print_header();
@@ -86,9 +88,10 @@ int	main(void)
 		free(prompt);
 		add_history(buff);
 		lexer = lexer_build(buff);
-		// lexer_print(lexer); /* DEBUG */
+		lexer_print(lexer); /* DEBUG */
 		if (lexer)
 			ast_root = parse(lexer);
+		print_ast(ast_root);	/* DEBUG */
 		execute_ast_node(ast_root);
 		// eval(buff);
 	}

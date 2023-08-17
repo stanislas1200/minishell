@@ -66,6 +66,8 @@ enum e_TOKEN_TYPE
 	CHAR_PIPE = '|',
 	CHAR_QUOTE = '\'',
 	CHAR_DQUOTE = '\"',
+	CHAR_INPUTR = '<',
+	CHAR_OUTPUTR = '>',
 	TOKEN = -1,
 	ARG = -2
 };

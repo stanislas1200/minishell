@@ -55,12 +55,12 @@ t_lexer	*lexer_build(char *str)
 	int		j;			// Index for copying data to token
 	int		size;	// Size of input string
 	int		state;		// State of the lexer
-	
+
 	// 1. Check if input string is valid
 	if (!str)
 		return (NULL);
 	size = strlen(str);
-	
+
 	// 2. Create a new lexer
 	lexer = malloc(sizeof(t_lexer));
 	if (!lexer)
@@ -68,20 +68,20 @@ t_lexer	*lexer_build(char *str)
 	lexer->tokens = malloc(sizeof(t_token));
 	if (!lexer->tokens)
 		return (free(lexer), NULL);
-	
+
 	// 3. Create a new token
 	token = lexer->tokens;
-	
+
 	// 4. Initialize token properties
 	if (token_init(token, size))
 		return (free(lexer->tokens), free(lexer), NULL);
-	
+
 	i = -1;
 	j = 0;
-	
+
 	state = GENERAL;
 	while (str[++i])
-	{	
+	{
 		// Handle different character types
 		if (state == GENERAL)
 		{
@@ -112,7 +112,7 @@ t_lexer	*lexer_build(char *str)
 				token->data[j++] = CHAR_DQUOTE;
 				state = DQUOTE;
 			}
-			else if (str[i] == CHAR_PIPE)
+			else if (str[i] == CHAR_PIPE || str[i] == CHAR_INPUTR || str[i] == CHAR_OUTPUTR)
 			{
 				// End current token and start a new one
 				if (j > 0) // If there is a token to end
@@ -128,9 +128,9 @@ t_lexer	*lexer_build(char *str)
 				}
 
 				// Pipe token
-				token->data[0] = CHAR_PIPE;
+				token->data[0] = str[i];
 				token->data[1] = 0;
-				token->type = CHAR_PIPE;
+				token->type = str[i];
 				// Next token
 				token->next = malloc(sizeof(t_token));
 				if (!token->next)
@@ -148,15 +148,15 @@ t_lexer	*lexer_build(char *str)
 		}
 		else if (state == QUOTE)
 		{
-				token->data[j++] = str[i];
-				if (str[i] == CHAR_QUOTE)
-					state = GENERAL;
+			token->data[j++] = str[i];
+			if (str[i] == CHAR_QUOTE)
+				state = GENERAL;
 		}
 		else if (state == DQUOTE)
 		{
-				token->data[j++] = str[i];
-				if (str[i] == CHAR_DQUOTE)
-					state = GENERAL;
+			token->data[j++] = str[i];
+			if (str[i] == CHAR_DQUOTE)
+				state = GENERAL;
 		}
 	}
 	token->data[j] = 0;
@@ -171,9 +171,11 @@ void	lexer_print(t_lexer *lexer)
 	t_token	*token;
 
 	token = lexer->tokens;
+	printf(Y "lexer:\n" C);
 	while (token)
 	{
 		printf("type: %d, value: %s\n", token->type, token->data);
 		token = token->next;
 	}
+	printf("\n");
 }
