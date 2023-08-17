@@ -35,10 +35,10 @@ void	signal_handler(int signum)
 	{
 		printf("\n");
 		// printf("\33[2K\r");
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		// rl_replace_line("", 0);
+		// rl_on_new_line();
+		// rl_redisplay();
+		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
