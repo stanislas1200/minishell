@@ -27,6 +27,8 @@ int	execute_builtin(t_ASTNode *node, char **arr)
 		return (export(node->env, arr), 0);
 	if (ft_strncmp(node->data, "unset", ft_strlen("unset")) == 0)
 		return (unset(node->env, arr), 0);
+	if (ft_strncmp(node->data, "exit", ft_strlen("exit")) == 0)
+		return (ft_exit(*node->env, arr), 0);
 	return (1);
 }
 

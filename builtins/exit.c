@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/16 22:04:16 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 04:00:30 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/17 06:02:44 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,13 @@ void	ft_exit(char **envp, char **args)
 	errno = 0;
 	exit_code = 0;
 	printf(R "exit\n");
-	if (matrix_len(args) > 1)
+	if (matrix_len(args) > 2)
 	{
 		ft_putstr_fd("exit: too many arguments\n", 2);
 		exit_code = 1;
 	}
-	else if (matrix_len(args) == 1)
-		exit_code = check_exit(args[0]);
+	else if (matrix_len(args) == 2)
+		exit_code = check_exit(args[1]);
 	free_matrix(envp);
 	free_matrix(args);
 	exit(exit_code);
@@ -51,12 +51,9 @@ int	check_exit(char *str)
 	else
 	{
 		if (number > 255)
-			number %= 256;
-		if (number < 0)
-		{
-			number %= 256;
-			number *= -1;
-		}
+			number = number % 256;
+		else if (number < 0)
+			number = 255 - (((number * -1) - 1) % 256);
 		return (number);
 	}
 }

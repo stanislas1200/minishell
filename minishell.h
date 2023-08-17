@@ -125,15 +125,6 @@ t_ASTNode	*parse(t_lexer *lexer, char ***env);
 t_ASTNode	*parse_top(t_token *token, char ***env);
 int	execute_ast_node(t_ASTNode *node);
 
-
-enum e_NODE_TYPE // Node Type Enum (for AST) using bitwise operators to allow for multiple types per node
-{
-	NODE_PIPE = (1 << 0),
-	NODE_ARGUMENT = (1 << 1),
-
-	NODE_DATA = (1 << 2),
-} NodeType;
-
 /* DEBUG */
 void lexer_print(t_lexer *lexer);
 void print_ast(t_ASTNode *root);
