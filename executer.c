@@ -15,18 +15,20 @@
 
 int	execute_builtin(t_ASTNode *node, char **arr)
 {
-	if (ft_strncmp(node->data, "pwd", ft_strlen("pwd")) == 0)
+	if (ft_strncmp(node->data, "pwd", ft_strlen("pwd") + 1) == 0)
 		return (pwd(), 0);
-	if (ft_strncmp(node->data, "cd", ft_strlen("cd")) == 0)
+	if (ft_strncmp(node->data, "cd", ft_strlen("cd") + 1) == 0)
 		return (cd(node->env, arr), 0);
-	if (ft_strncmp(node->data, "echo", ft_strlen("echo")) == 0)
+	if (ft_strncmp(node->data, "echo", ft_strlen("echo") + 1) == 0)
 		return (echo(arr), 0);
-	if (ft_strncmp(node->data, "env", ft_strlen("env")) == 0)
+	if (ft_strncmp(node->data, "env", ft_strlen("env") + 1) == 0)
 		return (env(*node->env), 0);
-	if (ft_strncmp(node->data, "export", ft_strlen("export")) == 0)
+	if (ft_strncmp(node->data, "export", ft_strlen("export") + 1) == 0)
 		return (export(node->env, arr), 0);
-	if (ft_strncmp(node->data, "unset", ft_strlen("unset")) == 0)
+	if (ft_strncmp(node->data, "unset", ft_strlen("unset") + 1) == 0)
 		return (unset(node->env, arr), 0);
+	if (ft_strncmp(node->data, "exit", ft_strlen("exit") + 1) == 0)
+		return (ft_exit(*node->env, arr), 0);
 	return (1);
 }
 

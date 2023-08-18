@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 17:58:09 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/18 11:13:42 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
 
 void	pwd(void)
 {
@@ -20,7 +19,7 @@ void	pwd(void)
 	if (getcwd(cwd, sizeof(cwd)))
 		printf("%s\n", cwd);
 	else
-		cperror("getcwd", NULL, 1);
+		cperror("getcwd", NULL, NULL, 1);
 	// exit(0);
 }
 
@@ -33,4 +32,3 @@ void	env(char **envp)
 		printf("%s\n", envp[i++]);
 	// return(0);
 }
-

@@ -6,11 +6,13 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 00:07:18 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 03:57:41 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/18 13:15:43 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	print_sort_env(char **envp);
 
 int	valid_identifier(char *var)
 {
@@ -41,10 +43,7 @@ void	check_identifier(char **envp, char *var, int *i, int *append)
 	j = -1;
 	ret = valid_identifier(var);
 	if (ret == 1)
-	{
-		cperror("export", var, 0);
-		ft_putstr_fd(": not a valid identifier\n", 2);
-	}
+		cperror("export", var, "not a valid identifier", 0);
 	else if (ret == 0)
 	{
 		while (var[++j] && var[j] != '=')
@@ -54,4 +53,18 @@ void	check_identifier(char **envp, char *var, int *i, int *append)
 	}
 	else
 		*i = -2;
+}
+
+void	export_no_arg(char **envp)
+{
+	char	**tmp;
+
+	tmp = dup_env(envp);
+	if (!tmp)
+		cperror("export", "malloc", NULL, 1);
+	else
+	{
+		print_sort_env(tmp);
+		free_matrix(tmp);
+	}
 }
