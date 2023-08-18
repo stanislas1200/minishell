@@ -191,7 +191,7 @@ int	execute_cmd(t_ASTNode *node)
 		signal(SIGINT, signal_handler);
 		free(arr);
 		/* DEV TEST */
-		while (save->right && (save->right->type == '>'))
+		while (save->right && (save->right->type == '>' || save->right->type == '<' || save->right->type == 3 || save->right->type == 4))
 			save = save->right;
 		if (save->right->type == '|');
 			execute_ast_node(save->right); /* dev test*/

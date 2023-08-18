@@ -49,12 +49,13 @@ t_ASTNode	*command_simple(t_token **token, char ***env, int type)
 	return (node);
 }
 
-t_ASTNode	*job_pipe(t_token **token, char ***env)
+t_ASTNode	*job_pipe(t_token **token, char ***env, t_ASTNode *left)
 {
-	t_ASTNode	*left;
+	// t_ASTNode	*left;
 	t_ASTNode	*node;
 
-	left = command_simple(token, env, TOKEN);
+	if (!left)
+		left = command_simple(token, env, TOKEN);
 	if (!left)
 		return (NULL); // TODO
 
@@ -106,6 +107,9 @@ t_ASTNode	*redirection(t_token **token, char ***env)
 	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 	{
 		printf(G "pipe\n");
+		// node->right = parse_top((*token)->next, env);
+		// *token = (*token)->next;
+		// return (job_pipe(token, env, node));
 		*token = (*token)->next;
 		t_ASTNode	*new_root = new_node('|', (*token)->data, env);
 		node->right = new_root;
@@ -201,7 +205,7 @@ t_ASTNode	*parse_top(t_token *token, char ***env)
 	save = token;
 	node = NULL;
 
-	if ((node = job_pipe(&token, env)) != NULL)	// <command> | <job>
+	if ((node = job_pipe(&token, env, NULL)) != NULL)	// <command> | <job>
 		return (node);
 	token = save;
 	if ((node = redirection_append(&token, env)) != NULL) // <command> >> <filename>
@@ -215,6 +219,44 @@ t_ASTNode	*parse_top(t_token *token, char ***env)
 	return (NULL);
 }
 
+void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections
+{
+	t_ASTNode *node = *root;
+	t_ASTNode *prev = NULL; // Keep track of the previous node
+	t_ASTNode *prev_save = NULL; // Keep track of the previous node that is not a redirection
+	t_ASTNode *save = NULL;
+	
+	if (node == NULL)
+		return;
+	
+	while (node->right)
+	{
+		if (node->type != CHAR_OUTPUTR)
+			prev_save = node;
+		if (node->type == CHAR_OUTPUTR)
+		{
+			save = node;
+			while (node && node->type == CHAR_OUTPUTR)
+			{
+				prev = node;
+				node = node->right;
+				if (node && node->type == CHAR_PIPE)
+				{
+					prev->right = NULL;
+					node->left = save;
+					if (prev_save)
+						prev_save->right = node;
+					else
+						*root = node;
+					return ;
+				}
+			}
+
+		}
+		node = node->right;
+	}
+}
+
 t_ASTNode	*parse(t_lexer *lexer, char ***env)
 {
 	t_ASTNode	*tree;
@@ -223,11 +265,12 @@ t_ASTNode	*parse(t_lexer *lexer, char ***env)
 	token = lexer->tokens;
 
 	tree = parse_top(token, env);
+	reorder_tree(&tree);
 	return (tree);
 }
 
- /* Debug */
- 
+/* Debug */
+
 void	print_ast_node(t_ASTNode *node, int indent)
 {
 	if (node == NULL)
@@ -245,12 +288,12 @@ void	print_ast_node(t_ASTNode *node, int indent)
 }
 
 void print_ast_tree_vertical(t_ASTNode *node, int level) {
-    if (node != NULL) {
-        print_ast_tree_vertical(node->right, level + 1);
+	if (node != NULL) {
+		print_ast_tree_vertical(node->right, level + 1);
 
-        for (int i = 0; i < level; i++) {
-            printf("    ");
-        }
+		for (int i = 0; i < level; i++) {
+			printf("    ");
+		}
 		printf(M "|-- " C);
 		if (node->type == CHAR_PIPE)
 			printf(Y "%s" C, node->data);
@@ -258,10 +301,10 @@ void print_ast_tree_vertical(t_ASTNode *node, int level) {
 			printf(G "%c " C, node->type == 3 ? 'A' : node->type);
 		else if (node->type == 4)
 			printf(R "H " C);
-        printf("%s\n", node->data);
+		printf("%s\n", node->data);
 
-        print_ast_tree_vertical(node->left, level + 1);
-    }
+		print_ast_tree_vertical(node->left, level + 1);
+	}
 }
 
 void	print_ast(t_ASTNode *root)
