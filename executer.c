@@ -36,7 +36,6 @@ int	execute_cmd(t_ASTNode *node)
 	int redirection = 0;
 	char *path = NULL;
 	t_ASTNode *save = node;
-	printf("node->type = %d\n", node->type);
 	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4) {
 		redirection = node->type;
 		path = node->data;
@@ -219,6 +218,7 @@ int	execute_pipe(t_ASTNode *node)
 	} else if (left_pid == 0) {
 		// Child process (left side of the pipe)
 		close(pipefd[0]); // Close read end of the pipe
+		// if (node->left->type != 4)
 		dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
 		close(pipefd[1]); // Close pipe write end
 		execute_ast_node(node->left);

@@ -157,8 +157,23 @@ t_ASTNode	*redirection_append(t_token **token, char ***env)
 			return (NULL);
 		node->left = left;
 
-		// Parse the right side of the append operator
+	// Recursively parse the right side of the pipe
+	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+	{
+		printf(G "pipe\n");
+		// node->right = parse_top((*token)->next, env);
+		// *token = (*token)->next;
+		// return (job_pipe(token, env, node));
+		*token = (*token)->next;
+		t_ASTNode	*new_root = new_node('|', (*token)->data, env);
+		node->right = new_root;
+		new_root->right = parse_top((*token)->next, env);
+	}
+	else
 		node->right = parse_top((*token)->next, env);
+
+		// // Parse the right side of the append operator
+		// node->right = parse_top((*token)->next, env);
 
 		return (node);
 	}
@@ -186,8 +201,23 @@ t_ASTNode	*redirection_heredoc(t_token **token, char ***env)
 
 		node->left = left;
 
-		// Parse the right side of the append operator
+	// Recursively parse the right side of the pipe
+	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+	{
+		printf(G "pipe\n");
+		// node->right = parse_top((*token)->next, env);
+		// *token = (*token)->next;
+		// return (job_pipe(token, env, node));
+		*token = (*token)->next;
+		t_ASTNode	*new_root = new_node('|', (*token)->data, env);
+		node->right = new_root;
+		new_root->right = parse_top((*token)->next, env);
+	}
+	else
 		node->right = parse_top((*token)->next, env);
+
+		// // Parse the right side of the append operator
+		// node->right = parse_top((*token)->next, env);
 
 		return (node);
 	}
@@ -219,26 +249,32 @@ t_ASTNode	*parse_top(t_token *token, char ***env)
 	return (NULL);
 }
 
-void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections
+void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections && don't send data to the pipe
 {
 	t_ASTNode *node = *root;
 	t_ASTNode *prev = NULL; // Keep track of the previous node
 	t_ASTNode *prev_save = NULL; // Keep track of the previous node that is not a redirection
 	t_ASTNode *save = NULL;
+	// int			type = 0;
 	
 	if (node == NULL)
 		return;
 	
-	while (node->right)
+	while (node && node->right)
 	{
-		if (node->type != CHAR_OUTPUTR)
+
+		// if (node && !type && node->type != TOKEN && node->type != CHAR_PIPE)
+		// 	type = node->type; // replace && node->type != TOKEN && node->type != CHAR_PIPE by type
+		if (node && (node->type == TOKEN || node->type == CHAR_PIPE))
 			prev_save = node;
-		if (node->type == CHAR_OUTPUTR)
+		if (node && node->type != TOKEN && node->type != CHAR_PIPE)
 		{
 			save = node;
-			while (node && node->type == CHAR_OUTPUTR)
+			while (node && node->type != TOKEN && node->type != CHAR_PIPE)
 			{
 				prev = node;
+				if (!node->right)
+					return ;
 				node = node->right;
 				if (node && node->type == CHAR_PIPE)
 				{
@@ -265,6 +301,7 @@ t_ASTNode	*parse(t_lexer *lexer, char ***env)
 	token = lexer->tokens;
 
 	tree = parse_top(token, env);
+	print_ast_tree_vertical(tree, 0);
 	reorder_tree(&tree);
 	return (tree);
 }
