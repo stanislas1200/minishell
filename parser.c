@@ -249,6 +249,88 @@ t_ASTNode	*parse_top(t_token *token, char ***env)
 	return (NULL);
 }
 
+void remove_input(t_ASTNode *root)
+{
+	t_ASTNode *node = root;
+	t_ASTNode *prev = root; // Keep track of the previous node
+	t_ASTNode *cmd = NULL;
+
+	printf("remove_input %s\n", node->data);
+	while (node)
+	{
+		if (node->type == CHAR_INPUTR)
+		{
+			if (node->left)
+				cmd = node->left;
+			prev = node->right;
+			if (!prev){
+				node = cmd; return ;}
+			prev->left = cmd;
+			// free(node);
+			node = prev;
+		}
+		else
+			node = node->right;
+	}
+}
+
+t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
+{
+	t_ASTNode *cmd = NULL;
+	if (!*root)
+		return;
+
+	t_ASTNode *node = *root;
+	t_ASTNode *prev = NULL;
+
+	while (node)
+	{
+		if (node->type == CHAR_INPUTR)
+		{
+			if (node->left)
+				cmd = node->left;
+			if (prev)
+				prev->right = node->right;
+			else
+				*root = node->right;
+
+			t_ASTNode *temp = node;
+			node = node->right;
+			free(temp->data);
+			free(temp);
+		}
+		else
+		{
+			prev = node;
+			node = node->right;
+		}
+	}
+	return (cmd);
+}
+
+void check_eof(t_ASTNode **root)
+{
+	if (!*root)
+		return;
+
+	t_ASTNode *node = *root;
+
+	if (node->type == 4)
+	{
+		t_ASTNode *cmd = remove_all_input_nodes(&(node->left));
+		if (!node->left)
+			node->left = cmd;
+		else
+			node->left->left = cmd;
+		return; // No need to continue checking other branches
+	}
+
+	check_eof(&(node->right));
+}
+
+
+
+
 void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections && don't send data to the pipe
 {
 	t_ASTNode *node = *root;
@@ -265,18 +347,18 @@ void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections &&
 
 		// if (node && !type && node->type != TOKEN && node->type != CHAR_PIPE)
 		// 	type = node->type; // replace && node->type != TOKEN && node->type != CHAR_PIPE by type
-		if (node && (node->type == TOKEN || node->type == CHAR_PIPE))
+		if (node && (node->type == TOKEN || node->type == CHAR_PIPE || node->type == 4))
 			prev_save = node;
-		if (node && node->type != TOKEN && node->type != CHAR_PIPE)
+		if (node && node->type != TOKEN && node->type != CHAR_PIPE && node->type != 4)
 		{
 			save = node;
-			while (node && node->type != TOKEN && node->type != CHAR_PIPE)
+			while (node && node->type != TOKEN && node->type != CHAR_PIPE && node->type != 4)
 			{
 				prev = node;
 				if (!node->right)
 					return ;
 				node = node->right;
-				if (node && node->type == CHAR_PIPE)
+				if (node && (node->type == CHAR_PIPE || node->type == 4))
 				{
 					prev->right = NULL;
 					node->left = save;
@@ -301,8 +383,8 @@ t_ASTNode	*parse(t_lexer *lexer, char ***env)
 	token = lexer->tokens;
 
 	tree = parse_top(token, env);
-	print_ast_tree_vertical(tree, 0);
 	reorder_tree(&tree);
+	check_eof(&tree);
 	return (tree);
 }
 
