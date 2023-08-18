@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 03:55:50 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/18 12:53:33 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,7 @@ int	ft_getindexenv(char **env, char *str)
 
 	tmp = ft_strdup(str);
 	if (!tmp)
-	{
-		cperror("Malloc", NULL, 1);
-		return (-1);
-	}
+		return (cperror("Malloc", NULL, NULL, 1), -1);
 	len = 0;
 	while (tmp[len] && (tmp[len] != '=' && tmp[len] != '+'))
 		len++;
@@ -56,18 +53,39 @@ char	**dup_env(char **envp)
 
 	new_env = malloc(sizeof(char *) * (matrix_len(envp) + 1));
 	if (!new_env)
-		return (NULL);
+		return (cperror("dup_env", "malloc", NULL, 1), NULL);
 	i = -1;
 	while (envp[++i])
 	{
 		new_env[i] = ft_strdup(envp[i]);
 		if (!new_env[i])
 		{
-			cperror("dup_env", "malloc", 1);
+			cperror("dup_env", "malloc", NULL, 1);
 			free_matrix(new_env);
 			return (NULL);
 		}
 	}
 	new_env[i] = NULL;
 	return (new_env);
+}
+
+void	shell_lvl(char ***envp)
+{
+	char	*tmp;
+	int		num;
+	char	*original_value;
+
+	original_value = ft_getenv(*envp, "SHLVL");
+	if (!original_value)
+		export2(envp, "SHLVL=0", 5, 0);
+	else
+	{
+		num = ft_atoi(original_value);
+		num++;
+		tmp = ft_strjoin("SHLVL=", ft_itoa(num));
+		if (!tmp)
+			return (cperror("SHLVL", "malloc", NULL, 1));
+		export2(envp, tmp, 5, 0);
+		free(tmp);
+	}
 }

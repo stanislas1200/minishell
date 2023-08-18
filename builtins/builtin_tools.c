@@ -6,26 +6,32 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:36:58 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 05:59:52 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/18 11:07:16 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	cperror(char *error, char *arg, int p_err)
+void	cperror(char *func, char *arg, char *error, int p_err)
 {
 	ft_putstr_fd(R, 2);
-	if (error)
+	if (func)
 	{
-		ft_putstr_fd(error, 2);
+		ft_putstr_fd(func, 2);
 		ft_putstr_fd(": ", 2);
 	}
 	if (arg)
 	{
 		ft_putstr_fd(arg, 2);
-		ft_putstr_fd(": ", 2);
+		if (error || p_err)
+			ft_putstr_fd(": ", 2);
 	}
-	if (p_err == 1)
+	if (error)
+	{
+		ft_putstr_fd(error, 2);
+		ft_putstr_fd("\n", 2);
+	}
+	else if (p_err == 1)
 		perror("");
 }
 
