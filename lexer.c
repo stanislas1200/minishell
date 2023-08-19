@@ -29,13 +29,32 @@ int	token_init(t_token *token, int size)
 
 void	token_destroy(t_token *token)
 {
-	if (token != NULL)
-	{
+	if (!token)
+		return ;
+	if (token->data)
 		free(token->data);
-		token_destroy(token->next);
-		free(token);
-	}
+	token->data = NULL;
+	token_destroy(token->next);
+	free(token);
+	token = NULL;
 }
+
+void	lexer_destroy(t_lexer *lexer)
+{
+	if (!lexer)
+		return ;
+	token_destroy(lexer->tokens);
+	free(lexer);
+	lexer = NULL;
+}
+
+void	*malloc_error(t_lexer *lexer)
+{
+	perror(R "Error: " C "malloc" C);
+	lexer_destroy(lexer);
+	return (NULL);
+}
+
 
 /*
 ** Lexer Build Function
@@ -56,25 +75,28 @@ t_lexer	*lexer_build(char *str)
 	int		size;	// Size of input string
 	int		state;		// State of the lexer
 
+	lexer = NULL;
+	token = NULL;
+
 	// 1. Check if input string is valid
 	if (!str)
 		return (NULL);
-	size = strlen(str);
+	size = ft_strlen(str);
 
 	// 2. Create a new lexer
 	lexer = malloc(sizeof(t_lexer));
 	if (!lexer)
-		return (NULL);
-	lexer->tokens = malloc(sizeof(t_token));
-	if (!lexer->tokens)
-		return (free(lexer), NULL);
+		return (malloc_error(lexer));
 
 	// 3. Create a new token
+	lexer->tokens = malloc(sizeof(t_token));
+	if (!lexer->tokens)
+		return (malloc_error(lexer));
 	token = lexer->tokens;
 
 	// 4. Initialize token properties
 	if (token_init(token, size))
-		return (free(lexer->tokens), free(lexer), NULL);
+		return (malloc_error(lexer));
 
 	i = -1;
 	j = 0;
@@ -93,10 +115,10 @@ t_lexer	*lexer_build(char *str)
 					token->data[j] = 0;
 					token->next = malloc(sizeof(t_token));
 					if (!token->next)
-						return (token_destroy(lexer->tokens), free(lexer), NULL);
+						return (malloc_error(lexer));
 					token = token->next;
 					if (token_init(token, size - i))
-						return (token_destroy(lexer->tokens), free(lexer), NULL);
+						return (malloc_error(lexer));
 					j = 0;
 				}
 			}
@@ -120,10 +142,10 @@ t_lexer	*lexer_build(char *str)
 					token->data[j] = 0;
 					token->next = malloc(sizeof(t_token));
 					if (!token->next)
-						return (token_destroy(lexer->tokens), free(lexer), NULL);
+						return (malloc_error(lexer));
 					token = token->next;
 					if (token_init(token, size - i))
-						return (token_destroy(lexer->tokens), free(lexer), NULL);
+						return (malloc_error(lexer));
 					j = 0;
 				}
 
@@ -134,10 +156,10 @@ t_lexer	*lexer_build(char *str)
 				// Next token
 				token->next = malloc(sizeof(t_token));
 				if (!token->next)
-					return (token_destroy(lexer->tokens), free(lexer), NULL);
+					return (malloc_error(lexer));
 				token = token->next;
 				if (token_init(token, size - i))
-					return (token_destroy(lexer->tokens), free(lexer), NULL);
+					return (malloc_error(lexer));
 			}
 			else
 			{
@@ -146,16 +168,10 @@ t_lexer	*lexer_build(char *str)
 				token->type = TOKEN;
 			}
 		}
-		else if (state == QUOTE)
+		else if (state == QUOTE || state == DQUOTE)
 		{
 			token->data[j++] = str[i];
-			if (str[i] == CHAR_QUOTE)
-				state = GENERAL;
-		}
-		else if (state == DQUOTE)
-		{
-			token->data[j++] = str[i];
-			if (str[i] == CHAR_DQUOTE)
+			if ((str[i] == CHAR_QUOTE && state == QUOTE) || (str[i] == CHAR_DQUOTE && state == DQUOTE))
 				state = GENERAL;
 		}
 	}
