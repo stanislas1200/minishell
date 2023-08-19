@@ -123,10 +123,12 @@ t_ASTNode	*redirection(t_token **token, char ***env)
 	// Save the token type
 	type = (*token)->type;
 
-	// Move the token pointer to the next token
+	// Move the token pointer to the next token (the filename)
 	*token = (*token)->next;
-	if (!(*token) || (*token)->type != TOKEN)
-		return (free_node(left));
+	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
+		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
+	// if ((*token)->data[0] == '\n')
+	// 	return (printf(M "-minishell: " R "syntax error near unexpected token `newline'" C),free_node(left));
 	// Create a new node for the redirection operator
 	node = new_node(type, (*token)->data, env);
 	if (!node)
@@ -181,8 +183,8 @@ t_ASTNode	*redirection_append(t_token **token, char ***env)
 		if (!(*token) || (*token)->type != CHAR_OUTPUTR)
 			return (free_node(left));
 		*token = (*token)->next;
-		if (!(*token))
-			return (free_node(left));
+	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
+		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
 		node = new_node(3, (*token)->data, env);
 		if (!node)
 			return (free_node(left));
@@ -224,8 +226,8 @@ t_ASTNode	*redirection_heredoc(t_token **token, char ***env)
 		if (!(*token) || (*token)->type != CHAR_INPUTR)
 			return (free_node(left));
 		*token = (*token)->next;
-		if (!(*token))
-			return (free_node(left));
+	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
+		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
 		node = new_node(4, (*token)->data, env);
 		if (!node)
 			return (free_node(left));

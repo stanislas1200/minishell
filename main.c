@@ -26,7 +26,7 @@ void	print_header(void)
 void	print_exit_message(void)
 {
 	printf(R "Error: Shell has encountered an   \n");
-	printf("                   		unexpected shutdown!\n");
+	printf("                   		unexpected shutdown!\n" C);
 }
 
 void	signal_handler(int signum)
@@ -35,10 +35,10 @@ void	signal_handler(int signum)
 	{
 		printf("\n");
 		// printf("\33[2K\r");
-		// rl_replace_line("", 0);
-		// rl_on_new_line();
-		// rl_redisplay();
-		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
@@ -74,28 +74,52 @@ int	main(int ac, char **av, char **envv)
 	t_lexer		*lexer;
 	t_ASTNode	*ast_root;
 
-	envp = dup_env(envv);
-	update_pwd(&envp);
-	signal(SIGINT, signal_handler);
-	print_header();
+	// envp = dup_env(envv);
+	// update_pwd(&envp);
+	// signal(SIGINT, signal_handler);
+	// print_header();
 	while (1)
 	{
-		prompt = get_prompt();
-		buff = readline(prompt);
-		if (!buff)
+		buff = malloc(1024);
+		if (fgets(buff, 1024, stdin) == NULL)
 		{
 			printf("\n");
 			print_exit_message();
+			if (buff)
+				free(buff);
 			break ;
 		}
-		free(prompt);
-		add_history(buff);
 		lexer = lexer_build(buff);
-		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
-			ast_root = parse(lexer, &envp);
-		print_ast(ast_root);	/* DEBUG */
-		execute_ast_node(ast_root);
+		{
+			lexer_print(lexer); /* DEBUG */
+			ast_root = parse(lexer, &envp); // Parse lexer and build AST
+			lexer_destroy(lexer); // Free lexer memory
+			print_ast(ast_root); /* DEBUG */
+		// execute_ast_node(ast_root);
+			ast_destroy(ast_root); // Free AST memory
+		}
+		/* CLEAN */
+		free(buff);
 	}
+	// while (1)
+	// {
+	// 	prompt = get_prompt();
+	// 	buff = readline(prompt);
+	// 	if (!buff)
+	// 	{
+	// 		printf("\n");
+	// 		print_exit_message();
+	// 		break ;
+	// 	}
+	// 	free(prompt);
+	// 	add_history(buff);
+	// 	lexer = lexer_build(buff);
+	// 	lexer_print(lexer); /* DEBUG */
+	// 	if (lexer)
+	// 		ast_root = parse(lexer, &envp);
+	// 	print_ast(ast_root);	/* DEBUG */
+	// 	execute_ast_node(ast_root);
+	// }
 	return (0);
 }

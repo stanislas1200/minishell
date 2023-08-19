@@ -76,6 +76,8 @@ enum e_TOKEN_TYPE
 	CHAR_NULL = 0,
 	CHAR_CHAR = -1,
 	CHAR_SPACE = ' ',
+	CHAR_TAB = '\t',
+	CHAR_NEWLINE = '\n',
 	CHAR_PIPE = '|',
 	CHAR_QUOTE = '\'',
 	CHAR_DQUOTE = '\"',

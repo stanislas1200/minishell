@@ -107,7 +107,7 @@ t_lexer	*lexer_build(char *str)
 		// Handle different character types
 		if (state == GENERAL)
 		{
-			if (str[i] == CHAR_SPACE)
+			if (str[i] == CHAR_SPACE || str[i] == CHAR_TAB || str[i] == CHAR_NEWLINE)
 			{
 				// End current token and start a new one
 				if (j > 0) // If there is a token to end

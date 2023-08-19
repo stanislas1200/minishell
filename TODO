@@ -1,0 +1,15 @@
+
+cmd | // ask for input then redo prompt
+Handle malloc error for parser (terminate parser)
+Check job protection for parse
+Clean up parser
+Protect executer
+BG/FG
+No transfer to pipe  ????
+A lot more...
+
+/* DONE */
+cmd > // -bash: syntax error near unexpected token `newline'
+cmd < // -bash: syntax error near unexpected token `newline'
+cmd << // -bash: syntax error near unexpected token `newline'
+cmd >> // -bash: syntax error near unexpected token `newline'
