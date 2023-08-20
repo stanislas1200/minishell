@@ -36,12 +36,12 @@
 # include <errno.h>
 
 //builtins
-void	cd(char ***envp, char **paths);
-void	pwd(void);
-void	echo(char **args);
-void	env(char **envp);
-void	export(char ***envp, char **args);
-void	unset(char ***envp, char **args);
+int		cd(char ***envp, char **paths);
+int		pwd(void);
+int		echo(char **args);
+int		env(char **envp);
+int		export(char ***envp, char **args);
+int		unset(char ***envp, char **args);
 void	ft_exit(char **envp, char **args);
 
 void	export2(char ***envp, char *var, int i, int append);
