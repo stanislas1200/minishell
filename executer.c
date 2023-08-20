@@ -32,32 +32,143 @@ int	execute_builtin(t_ASTNode *node, char **arr)
 	return (1);
 }
 
+void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO : handle all in one
+{
+	// Handle output redirection (>) and (>>) append
+	if (redirection == 3 || redirection == CHAR_OUTPUTR)
+	{
+		int fd = 0;
+		if (redirection == 3)
+			fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
+		else
+			fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
+		{
+			if (save->right->type != redirection)
+			{
+				dup2(fd, STDOUT_FILENO);
+				close(fd);
+			}
+			execute_redirection(save->right, save->right->type, save->right->data);
+			return ;
+		}
+		else
+		{
+			if (save->right && save->right->type == 4)
+				execute_redirection(save->right, save->right->type, save->right->data);
+			dup2(fd, STDOUT_FILENO);
+			close(fd);
+		}
+	}
+	// Handle input redirection (<)  
+	if (redirection == CHAR_INPUTR) // TODO : handle with here doc ex: ls < file > R << EOF
+	{
+		int	fd;
+		
+		fd = open(path, O_RDONLY);
+		if (fd == -1)
+		{
+			printf("Error: %s: %s\n", path, strerror(errno));
+			exit(1) ;
+		}
+		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
+		{
+			if (save->right->type != redirection) // handle different redirections
+			{
+				
+				dup2(fd, STDIN_FILENO);
+				close(fd);
+			}
+			execute_redirection(save->right, save->right->type, save->right->data);
+			return ;
+		}
+		else
+		{
+			if (save->right && save->right->type == 4)
+				execute_redirection(save->right, save->right->type, save->right->data);
+			dup2(fd, STDIN_FILENO);
+			close(fd);
+		}
+	}
+
+	if (redirection == 4)
+	{
+		int fd[2];
+		char *buffer = NULL;
+		char *text = NULL;
+		char *temp = NULL;
+		pipe(fd);
+		while (1)
+		{
+			buffer = readline(G "> " C);
+			if (strcmp(buffer, path) == 0)
+				break;
+			if (text == NULL)
+			{
+				text = ft_strdup(buffer);
+			} else {
+				char *temp = ft_strjoin(text, buffer);
+				free(text);
+				text = temp;
+			}
+
+			text = ft_strjoin(text, "\n");
+			free(buffer);
+		}
+		
+		if (save->right && save->right->type != CHAR_PIPE)
+			execute_redirection(save->right, save->right->type, save->right->data);
+		else{
+		// Write the text to the pipe
+		write(fd[1], text, strlen(text));
+		// Close the write end of the pipe
+		close(fd[1]);
+
+		// Redirect STDIN_FILENO to the read end of the pipe
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		}
+
+	}
+
+}
+
 int	execute_cmd(t_ASTNode *node)
 {
 	// Check for input/output redirection
-	int redirection = 0;
-	char *path = NULL;
-	t_ASTNode *save = node;
-	printf("node->type = %d\n", node->type);
-	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4) {
+	int			redirection;
+	char		*path;
+	t_ASTNode	*save;
+	int			num_args;
+	t_ASTNode	*arg_node ;
+	char		**arr;
+
+	redirection = 0;
+	path = NULL;
+	save = node;
+
+	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
+	{
 		redirection = node->type;
 		path = node->data;
 		node = node->left;
 	}
 
 	// Count the number of arguments
-	int num_args = 0;
-	t_ASTNode *arg_node = node->right;
-	while (arg_node != NULL) {
+	num_args = 0;
+	arg_node = node->right;
+	while (arg_node)
+	{
 		num_args++;
 		arg_node = arg_node->right;
 	}
 
 	// Create an array to hold the command and arguments
-	char **arr = (char **)malloc((num_args + 2) * sizeof(char *));
-	if (!arr) {
+	arr = (char **)malloc((num_args + 2) * sizeof(char *));
+	if (!arr)
+	{
 		perror("malloc");
-		return -1;
+		return (-1);
 	}
 
 	// Fill in the array with the command and arguments
@@ -71,10 +182,10 @@ int	execute_cmd(t_ASTNode *node)
 	}
 	arr[i] = NULL;
 
-
 	if (!execute_builtin(node, arr))
 		return 0;
 	// Fork a new process
+	
 	pid_t pid = fork();
 	if (pid == -1) {
 		perror("fork");
@@ -82,104 +193,10 @@ int	execute_cmd(t_ASTNode *node)
 	} else if (pid == 0) {
 		// Child process: execute the command
 		
-		// Handle input redirection (<)
-		if (redirection == CHAR_INPUTR) {
-			int fd = open(path, O_RDONLY);
-			if (fd == -1) {
-				perror("open");
-				exit(1);
-			}
-			dup2(fd, STDIN_FILENO);
-			close(fd);
-		}
-
-		// Handle input redirection (<<) heredoc /* DEV */ // TODO handle multiple heredoc cat<<EOF<<EOF output last EOF
-		if (redirection == 4) {
-			printf("heredoc\n");
-			int fd[2];
-			char *buffer = NULL;
-			char *text = NULL;
-			char *temp = NULL;
-			pipe(fd);
-			while (save && (save->type == 4))
-			{
-				while (1)
-				{
-					buffer = readline(G "> " C);
-					if (strcmp(buffer, path) == 0)
-						break;
-					if (text == NULL)
-					{
-						text = ft_strdup(buffer);
-					} else {
-						char *temp = ft_strjoin(text, buffer);
-						free(text);
-						text = temp;
-					}
-
-					text = ft_strjoin(text, "\n");
-					free(buffer);
-				}
-				if (save->right && (save->right->type == 4))
-					text = NULL;
-				save = save->right;
-			}
-			// Write the text to the pipe
-			write(fd[1], text, strlen(text));
-			// Close the write end of the pipe
-			close(fd[1]);
-
-			// Redirect STDIN_FILENO to the read end of the pipe
-			dup2(fd[0], STDIN_FILENO);
-			close(fd[0]);
-		}
-
-		// Handle output redirection (>)
-		if (redirection == CHAR_OUTPUTR) {
-			int fd = 0;
-			if (!save->right || (save->right->type != CHAR_OUTPUTR))
-				fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-			while (save->right && (save->right->type == CHAR_OUTPUTR))
-			{
-				if (fd > 0)
-					close(fd);
-				fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-				path = save->right->data;
-				save = save->right;
-				if (!save->right || (save->right->type != CHAR_OUTPUTR))
-					fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-			}
-			if (fd == -1) {
-				perror("open");
-				exit(1);
-			}
-			dup2(fd, STDOUT_FILENO);
-			close(fd);
-		}
-
-		// Handle output redirection (>>)
-		if (redirection == 3) {
-			int fd = 0;
-			if (!save->right || (save->right->type != 3))
-				fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
-			while (save->right && (save->right->type == 3))
-			{
-				if (fd > 0)
-					close(fd);
-				fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
-				path = save->right->data;
-				save = save->right;
-				if (!save->right || (save->right->type != 3))
-					fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
-			}
-			if (fd == -1) {
-				perror("open");
-				exit(1);
-			}
-			dup2(fd, STDOUT_FILENO);
-			close(fd);
-		}
-
+		execute_redirection(save, redirection, path); // Execute redirection if needed
+		if (node->type != TOKEN)
+			{execute_ast_node(node); // Execute the command if it's not a cmd
+			exit(1);}
 		execvp(node->data, arr);
 		perror("execvp");
 		free(arr);
@@ -193,6 +210,11 @@ int	execute_cmd(t_ASTNode *node)
 		waitpid(pid, &status, 0);
 		signal(SIGINT, signal_handler);
 		free(arr);
+		/* DEV TEST */ // move to execute_redirection
+		while (save->right && (save->right->type == '>' || save->right->type == '<' || save->right->type == 3 || save->right->type == 4))
+			save = save->right;
+		if (save->right && save->right->type == '|')
+			execute_ast_node(save->right); /* dev test*/
 		return (WEXITSTATUS(status)); // Return the exit status of the child
 	}
 	return (0);
@@ -217,6 +239,7 @@ int	execute_pipe(t_ASTNode *node)
 	} else if (left_pid == 0) {
 		// Child process (left side of the pipe)
 		close(pipefd[0]); // Close read end of the pipe
+		// if (node->left->type != 4)
 		dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
 		close(pipefd[1]); // Close pipe write end
 		execute_ast_node(node->left);
@@ -254,7 +277,6 @@ int	execute_pipe(t_ASTNode *node)
 
 void	execute_job(t_ASTNode *node)
 {
-	// printf("\nexecute_job : %s\n", node->data);
 	if (node->type == CHAR_PIPE)
 		execute_pipe(node);
 	else if (node->type == TOKEN)

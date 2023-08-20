@@ -25,8 +25,8 @@ void	print_header(void)
 
 void	print_exit_message(void)
 {
-	printf(R "Error: Shell has encountered an   \n");
-	printf("                   		unexpected shutdown!\n");
+	// printf(R "Error: Shell has encountered an   \n");
+	// printf("                   		unexpected shutdown!\n" C);
 }
 
 void	signal_handler(int signum)
@@ -34,7 +34,7 @@ void	signal_handler(int signum)
 	if (signum == SIGINT)
 	{
 		printf("\n");
-		// printf("\33[2K\r");
+		printf("\33[2K\r");
 		// rl_replace_line("", 0);
 		// rl_on_new_line();
 		// rl_redisplay();
@@ -66,6 +66,12 @@ void	*get_prompt(void)
 	return (str);
 }
 
+void sig()
+{
+	return ;
+}
+
+
 int	main(int ac, char **av, char **envv)
 {
 	char		*buff;
@@ -74,9 +80,10 @@ int	main(int ac, char **av, char **envv)
 	t_lexer		*lexer;
 	t_ASTNode	*ast_root;
 
-	envp = dup_env(envv);
-	update_pwd(&envp);
+	// envp = dup_env(envv);
+	// update_pwd(&envp);
 	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, sig);
 	print_header();
 	while (1)
 	{
@@ -94,8 +101,11 @@ int	main(int ac, char **av, char **envv)
 		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
 			ast_root = parse(lexer, &envp);
-		print_ast(ast_root);	/* DEBUG */
+		lexer_destroy(lexer); // Free lexer memory
+		// print_ast(ast_root);	/* DEBUG */
 		execute_ast_node(ast_root);
+		ast_destroy(ast_root); // Free AST memory
+		free(buff);
 	}
 	return (0);
 }
