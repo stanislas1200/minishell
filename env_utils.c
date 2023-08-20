@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 15:45:55 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 18:10:00 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,4 +99,7 @@ void	update_env(char ***envp)
 
 	shell_lvl(envp);
 	update_pwd(envp);
+	i = ft_getindexenv(*envp, "_=");
+	if (i != -1)
+		delete_from_env(envp, i);
 }

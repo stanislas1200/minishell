@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 16:44:37 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 17:24:57 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,7 @@ int	export(char ***envp, char **args)
 	}
 	if (j == 1)
 		export_no_arg(*envp);
-	free_matrix(args);
-	return(exit_code);
+	return (exit_code);
 }
 
 void	export2(char ***envp, char *var, int i, int append)

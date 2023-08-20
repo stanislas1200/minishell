@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/20 18:32:29 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/20 18:33:01 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,7 @@ int	main(int ac, char **av, char **envv)
 
 
 	envp = dup_env(envv);
-	update_pwd(&envp);
-	shell_lvl(&envp);
+	update_env(&envp);
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, sig);
 
