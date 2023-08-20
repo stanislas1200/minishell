@@ -80,8 +80,9 @@ int	main(int ac, char **av, char **envv)
 	t_lexer		*lexer;
 	t_ASTNode	*ast_root;
 
-	// envp = dup_env(envv);
-	// update_pwd(&envp);
+	envp = dup_env(envv);
+	update_pwd(&envp);
+  shell_lvl(&envp);
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, sig);
 	print_header();

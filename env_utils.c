@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 12:53:33 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 15:45:55 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,14 +71,15 @@ char	**dup_env(char **envp)
 
 void	shell_lvl(char ***envp)
 {
-	char	*tmp;
-	int		num;
-	char	*original_value;
+	static int	count;
+	char		*tmp;
+	int			num;
+	char		*original_value;
 
 	original_value = ft_getenv(*envp, "SHLVL");
 	if (!original_value)
 		export2(envp, "SHLVL=0", 5, 0);
-	else
+	else if (count == 0)
 	{
 		num = ft_atoi(original_value);
 		num++;
@@ -87,5 +88,15 @@ void	shell_lvl(char ***envp)
 			return (cperror("SHLVL", "malloc", NULL, 1));
 		export2(envp, tmp, 5, 0);
 		free(tmp);
+		count = 1;
 	}
+}
+
+void	update_env(char ***envp)
+{
+	int		i;
+	char	*tmp;
+
+	shell_lvl(envp);
+	update_pwd(envp);
 }

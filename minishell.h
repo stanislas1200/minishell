@@ -47,11 +47,17 @@ void	ft_exit(char **envp, char **args);
 void	export2(char ***envp, char *var, int i, int append);
 void	update_pwd(char ***envp);
 
+void	ft_execve(char **env, char *cmd, char **args);
+char	*find_command_path(char *all_paths, char *command);
+char	*create_command_path(char *path, char *command);
+void	delete_from_env(char ***envp, int del);
+
 //env_utils
 char	**dup_env(char **envp);
 char	*ft_getenv(char **env, char *str);
 int		ft_getindexenv(char **env, char *str);
 void	shell_lvl(char ***envp);
+void	update_env(char ***envp);
 
 //main
 void	signal_handler(int signum);
