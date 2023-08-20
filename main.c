@@ -25,8 +25,8 @@ void	print_header(void)
 
 void	print_exit_message(void)
 {
-	printf(R "Error: Shell has encountered an   \n");
-	printf("                   		unexpected shutdown!\n");
+	// printf(R "Error: Shell has encountered an   \n");
+	// printf("                   		unexpected shutdown!\n" C);
 }
 
 void	signal_handler(int signum)
@@ -34,7 +34,7 @@ void	signal_handler(int signum)
 	if (signum == SIGINT)
 	{
 		printf("\n");
-		// printf("\33[2K\r");
+		printf("\33[2K\r");
 		// rl_replace_line("", 0);
 		// rl_on_new_line();
 		// rl_redisplay();
@@ -56,8 +56,7 @@ void	*get_prompt(void)
 	if (!getcwd(cwd, sizeof(cwd)) || !user)
 	{
 		free(str);
-		cperror("getcwd", NULL, NULL, 1);
-		return (ft_strjoin("\x1b[0m\x1b[1;36m", "minishell\x1b[0m$ \0"));
+		return (NULL);
 	}
 	strcat(str, "\x1b[1;32m");
 	strcat(str, getenv("USER"));
@@ -66,6 +65,12 @@ void	*get_prompt(void)
 	strcat(str, "\x1b[0m$ \0");
 	return (str);
 }
+
+void sig()
+{
+	return ;
+}
+
 
 int	main(int ac, char **av, char **envv)
 {
@@ -77,8 +82,9 @@ int	main(int ac, char **av, char **envv)
 
 	envp = dup_env(envv);
 	update_pwd(&envp);
-	shell_lvl(&envp);
+  shell_lvl(&envp);
 	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, sig);
 	print_header();
 	while (1)
 	{
@@ -96,8 +102,11 @@ int	main(int ac, char **av, char **envv)
 		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
 			ast_root = parse(lexer, &envp);
-		print_ast(ast_root);	/* DEBUG */
+		lexer_destroy(lexer); // Free lexer memory
+		// print_ast(ast_root);	/* DEBUG */
 		execute_ast_node(ast_root);
+		ast_destroy(ast_root); // Free AST memory
+		free(buff);
 	}
 	return (0);
 }

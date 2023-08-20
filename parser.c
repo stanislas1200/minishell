@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-t_ASTNode	*new_node(int t, char *d, char ***env)
+t_ASTNode	*new_node(int t, char *d, char ***env) // TODO : handle error (malloc stop parsing)
 {
 	t_ASTNode	*node;
 
@@ -21,6 +21,8 @@ t_ASTNode	*new_node(int t, char *d, char ***env)
 		return (NULL);
 	node->type = t;
 	node->data = ft_strdup(d);
+	if (!node->data)
+		return (free(node), NULL);
 	node->left = NULL;
 	node->right = NULL;
 	node->env = env;
@@ -28,7 +30,36 @@ t_ASTNode	*new_node(int t, char *d, char ***env)
 	return (node);
 }
 
-t_ASTNode	*command_simple(t_token **token, char ***env)
+void *free_node(t_ASTNode *node)
+{
+	if (!node)
+		return (NULL);
+	if (node->left)
+		free_node(node->left);
+	if (node->right)
+		free_node(node->right);
+	if (node->data)
+		free(node->data);
+	node->data = NULL;
+	free(node);
+	node = NULL;
+	return (NULL);
+}
+
+void	ast_destroy(t_ASTNode *node)
+{
+	if (!node)
+		return ;
+	ast_destroy(node->left);
+	ast_destroy(node->right);
+	if (node->data)
+		free(node->data);
+	node->data = NULL;
+	free(node);
+	node = NULL;
+}
+
+t_ASTNode	*command_simple(t_token **token, char ***env, int type)
 {
 	t_ASTNode	*node;
 	// Check token
@@ -36,73 +67,35 @@ t_ASTNode	*command_simple(t_token **token, char ***env)
 		return (NULL); // TODO
 
 	// Init token
-	node = new_node(TOKEN, (*token)->data, env);
+	node = new_node(type, (*token)->data, env);
 	if (!node)
 		return (NULL); // TODO
 
-	// Move the token pointer to the next token
-	*token = (*token)->next;
-
-	// Process command arguments if available
-	while (*token && (*token)->type == TOKEN)
-	{
-		t_ASTNode	*arg_node;
-
-		arg_node = malloc(sizeof(t_ASTNode));
-		if (!arg_node) {
-			// Handle memory allocation failure
-			return NULL;
-		}
-
-		arg_node->type = ARG;
-		arg_node->data = ft_strdup((*token)->data);
-		arg_node->left = NULL;
-		arg_node->right = NULL;
-		node->env = env;
-
-		// Append the argument node to the right of the command node
-		if (!node->right)
-		{
-			node->right = arg_node;
-		}
-		else
-		{
-			t_ASTNode	*temp = node->right;
-			while (temp->right) {
-				temp = temp->right;
-			}
-			temp->right = arg_node;
-		}
-
-		// Move the token pointer to the next token
+	// Move to the next
+	if (*token && (*token)->type == TOKEN)
 		*token = (*token)->next;
-	}
+	// Get Arg if Arg
+	node->right = command_simple(token, env, ARG);
 
 	return (node);
 }
 
-
-t_ASTNode *job_pipe(t_token **token, char ***env)
+t_ASTNode	*job_pipe(t_token **token, char ***env, t_ASTNode *left)
 {
-	t_ASTNode	*left = command_simple(token, env);
+	// t_ASTNode	*left;
+	t_ASTNode	*node;
 
 	if (!left)
+		left = command_simple(token, env, TOKEN);
+	if (!left)
+		return (NULL); // TODO
+
+	if ((*token) && (*token)->type == CHAR_PIPE)
 	{
-		return (NULL);
-	}
-
-	if ((*token) && (*token)->type == CHAR_PIPE) {
-		t_ASTNode *node = malloc(sizeof(t_ASTNode));
+		node = new_node(CHAR_PIPE, (*token)->data, env);
 		if (!node)
-		{
-			// Handle memory allocation failure
-			return (NULL);
-		}
-
-		node->type = CHAR_PIPE;
-		node->data = ft_strdup((*token)->data);
+			return (free_node(left));
 		node->left = left;
-		node->env = env;
 
 		// Move the token pointer to the next token
 		*token = (*token)->next;
@@ -113,49 +106,66 @@ t_ASTNode *job_pipe(t_token **token, char ***env)
 		return (node);
 	}
 
-	return (free(left), NULL);
+	return (free_node(left));
 }
 
 t_ASTNode	*redirection(t_token **token, char ***env)
 {
+	int			type;
+	t_ASTNode	*left;
+	t_ASTNode	*node;
+
 	// Check left side of the redirection operator
-	t_ASTNode *left = command_simple(token, env);
+	left = command_simple(token, env, TOKEN);
 	// Check if the token is a redirection operator
 	if (!(*token) || ((*token)->type != CHAR_INPUTR && (*token)->type != CHAR_OUTPUTR))
-		return (NULL);
+		return (free_node(left));
 	// Save the token type
-	int type = (*token)->type;
+	type = (*token)->type;
 
-	// Move the token pointer to the next token
+	// Move the token pointer to the next token (the filename)
 	*token = (*token)->next;
-	if (!(*token) || (*token)->type != TOKEN)
-		return (NULL);
+	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
+		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
+	// if ((*token)->data[0] == '\n')
+	// 	return (printf(M "-minishell: " R "syntax error near unexpected token `newline'" C),free_node(left));
 	// Create a new node for the redirection operator
-	t_ASTNode	*node = malloc(sizeof(t_ASTNode));
-	if (!node) {
-		// Handle memory allocation failure
-		return (NULL);
-	}
+	node = new_node(type, (*token)->data, env);
+	if (!node)
+		return (free_node(left));
 
-	// Set the node's data and type
-	node->type = type;
-	node->data = ft_strdup((*token)->data);
+	// Set the node's left
 	node->left = left;
 	// Recursively parse the right side of the pipe
-	node->right = parse_top((*token)->next, env);
-	node->env = env;
+	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+	{
+		printf(G "pipe\n");
+		// node->right = parse_top((*token)->next, env);
+		// *token = (*token)->next;
+		// return (job_pipe(token, env, node));
+		*token = (*token)->next;
+		t_ASTNode	*new_root = new_node('|', (*token)->data, env);
+		node->right = new_root;
+		new_root->right = parse_top((*token)->next, env);
+	}
+	else
+		node->right = parse_top((*token)->next, env);
 
 	return (node);
 }
 
 t_ASTNode	*job_command(t_token *token, char ***env)
 {
-	t_token *save = token;
-	t_ASTNode *node = (NULL);
+	t_token		*save;
+	t_ASTNode	*node;
 
-	if ((token = save, node = redirection(&token, env)) != NULL)		// <simple command> <|> <filename>
+	save = token;
+	node = NULL;
+
+	if ((node = redirection(&token, env)) != NULL)		// <simple command> <|> <filename>
 		return (node);
-	if ((token = save, node = command_simple(&token, env)) != NULL)	// <simple command>
+	token = save;
+	if ((node = command_simple(&token, env, TOKEN)) != NULL)	// <simple command>
 		return (node);
 
 	return (NULL);
@@ -163,64 +173,89 @@ t_ASTNode	*job_command(t_token *token, char ***env)
 
 t_ASTNode	*redirection_append(t_token **token, char ***env)
 {
-	t_ASTNode	*left = command_simple(token, env);
+	t_ASTNode	*left;
+	t_ASTNode	*node;
 
-	if ((*token) && (*token)->type == CHAR_OUTPUTR) {
+	left = command_simple(token, env, TOKEN);
+	if ((*token) && (*token)->type == CHAR_OUTPUTR)
+	{
 		*token = (*token)->next;
 		if (!(*token) || (*token)->type != CHAR_OUTPUTR)
-			return NULL;
+			return (free_node(left));
 		*token = (*token)->next;
-		if (!(*token))
-			return NULL;
-		t_ASTNode *node = malloc(sizeof(t_ASTNode));
-		if (!node) {
-			// Handle memory allocation failure
-			return (NULL);
-		}
-
-		node->type = 3;
-		node->data = ft_strdup((*token)->data);
+	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
+		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
+		node = new_node(3, (*token)->data, env);
+		if (!node)
+			return (free_node(left));
 		node->left = left;
 
-		// Parse the right side of the append operator
-		node->right = parse_top((*token)->next, env);
-		node->env = env;
+		// Recursively parse the right side of the pipe
+		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+		{
+			printf(G "pipe\n");
+			// node->right = parse_top((*token)->next, env);
+			// *token = (*token)->next;
+			// return (job_pipe(token, env, node));
+			*token = (*token)->next;
+			t_ASTNode	*new_root = new_node('|', (*token)->data, env);
+			node->right = new_root;
+			new_root->right = parse_top((*token)->next, env);
+		}
+		else
+			node->right = parse_top((*token)->next, env);
 
-		return (node);
+			// // Parse the right side of the append operator
+			// node->right = parse_top((*token)->next, env);
+
+			return (node);
 	}
 
-	return (NULL);
+	return (free_node(left));
 }
 
 t_ASTNode	*redirection_heredoc(t_token **token, char ***env)
 {
-	t_ASTNode	*left = command_simple(token, env);
+	t_ASTNode	*left;
+	t_ASTNode	*node;
 
-	if ((*token) && (*token)->type == CHAR_INPUTR) {
+	left = command_simple(token, env, TOKEN);
+	if ((*token) && (*token)->type == CHAR_INPUTR)
+	{
 		*token = (*token)->next;
 		if (!(*token) || (*token)->type != CHAR_INPUTR)
-			return NULL;
+			return (free_node(left));
 		*token = (*token)->next;
-		if (!(*token))
-			return NULL;
-		t_ASTNode *node = malloc(sizeof(t_ASTNode));
-		if (!node) {
-			// Handle memory allocation failure
-			return (NULL);
-		}
+	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
+		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
+		node = new_node(4, (*token)->data, env);
+		if (!node)
+			return (free_node(left));
 
-		node->type = 4;
-		node->data = ft_strdup((*token)->data);
 		node->left = left;
 
-		// Parse the right side of the append operator
-		node->right = parse_top((*token)->next, env);
-	node->env = env;
+		// Recursively parse the right side of the pipe
+		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+		{
+			printf(G "pipe\n");
+			// node->right = parse_top((*token)->next, env);
+			// *token = (*token)->next;
+			// return (job_pipe(token, env, node));
+			*token = (*token)->next;
+			t_ASTNode	*new_root = new_node('|', (*token)->data, env);
+			node->right = new_root;
+			new_root->right = parse_top((*token)->next, env);
+		}
+		else
+			node->right = parse_top((*token)->next, env);
 
-		return (node);
-	}
+			// // Parse the right side of the append operator
+			// node->right = parse_top((*token)->next, env);
 
-	return (NULL);
+			return (node);
+		}
+
+	return (free_node(left));
 }
 
 t_ASTNode	*parse_top(t_token *token, char ***env)
@@ -233,18 +268,122 @@ t_ASTNode	*parse_top(t_token *token, char ***env)
 	save = token;
 	node = NULL;
 
-	if ((token = save, node = job_pipe(&token, env)) != NULL)	// <command> | <job>
+	if ((node = job_pipe(&token, env, NULL)) != NULL)	// <command> | <job>
 		return (node);
-
-	if ((token = save, node = redirection_append(&token, env)) != NULL) // <command> >> <filename>
+	token = save;
+	if ((node = redirection_append(&token, env)) != NULL) // <command> >> <filename>
 		return (node);
-	
-	if ((token = save, node = redirection_heredoc(&token, env)) != NULL) // <command> << <filename>
+	token = save;
+	if ((node = redirection_heredoc(&token, env)) != NULL) // <command> << <filename>
 		return (node);
-
-	if ((token = save, node = job_command(token, env)) != NULL)	// <command>
+	token = save;
+	if ((node = job_command(token, env)) != NULL)	// <command>
 		return (node);
 	return (NULL);
+}
+
+t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
+{
+	t_ASTNode *cmd = NULL;
+	if (!*root)
+		return (NULL);
+
+	t_ASTNode *node = *root;
+	t_ASTNode *prev = NULL;
+
+	while (node)
+	{
+		if (node->type == CHAR_INPUTR)
+		{
+			if (node->left)
+				cmd = node->left;
+			if (prev)
+				prev->right = node->right;
+			else
+				*root = node->right;
+
+			t_ASTNode *temp = node;
+			node = node->right;
+			temp->right = NULL;
+			free(temp->data);
+			temp->data = NULL;
+			free(temp);
+			temp = NULL;
+		}
+		else
+		{
+			prev = node;
+			node = node->right;
+		}
+	}
+	return (cmd);
+}
+
+void check_eof(t_ASTNode **root)
+{
+	if (!*root)
+		return;
+
+	t_ASTNode *node = *root;
+
+	if (node->type == 4)
+	{
+		t_ASTNode *cmd = remove_all_input_nodes(&(node->left));
+		if (!node->left)
+			node->left = cmd;
+		// else
+		// 	node->left->left = cmd;
+		return; // No need to continue checking other branches
+	}
+
+	check_eof(&(node->right));
+}
+
+
+
+
+void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections && don't send data to the pipe
+{
+	t_ASTNode *node = *root;
+	t_ASTNode *prev = NULL; // Keep track of the previous node
+	t_ASTNode *prev_save = NULL; // Keep track of the previous node that is not a redirection
+	t_ASTNode *save = NULL;
+	// int			type = 0;
+	
+	if (node == NULL)
+		return;
+	
+	while (node && node->right)
+	{
+
+		// if (node && !type && node->type != TOKEN && node->type != CHAR_PIPE)
+		// 	type = node->type; // replace && node->type != TOKEN && node->type != CHAR_PIPE by type
+		if (node && (node->type == TOKEN || node->type == CHAR_PIPE || node->type == 4))
+			prev_save = node;
+		if (node && node->type != TOKEN && node->type != CHAR_PIPE && node->type != 4)
+		{
+			save = node;
+			while (node && node->type != TOKEN && node->type != CHAR_PIPE && node->type != 4)
+			{
+				prev = node;
+				if (!node->right)
+					return ;
+				node = node->right;
+				if (node && (node->type == CHAR_PIPE || node->type == 4))
+				{
+					prev->right = NULL;
+					node->left = save;
+					if (prev_save)
+						prev_save->right = node;
+					else
+						*root = node;
+					return ;
+				}
+			}
+
+		}
+		node = node->right;
+	}
 }
 
 t_ASTNode	*parse(t_lexer *lexer, char ***env)
@@ -255,9 +394,12 @@ t_ASTNode	*parse(t_lexer *lexer, char ***env)
 	token = lexer->tokens;
 
 	tree = parse_top(token, env);
+	reorder_tree(&tree);
+	check_eof(&tree);
 	return (tree);
 }
 
+/* Debug */
 
 void	print_ast_node(t_ASTNode *node, int indent)
 {
@@ -276,12 +418,12 @@ void	print_ast_node(t_ASTNode *node, int indent)
 }
 
 void print_ast_tree_vertical(t_ASTNode *node, int level) {
-    if (node != NULL) {
-        print_ast_tree_vertical(node->right, level + 1);
+	if (node != NULL) {
+		print_ast_tree_vertical(node->right, level + 1);
 
-        for (int i = 0; i < level; i++) {
-            printf("    ");
-        }
+		for (int i = 0; i < level; i++) {
+			printf("    ");
+		}
 		printf(M "|-- " C);
 		if (node->type == CHAR_PIPE)
 			printf(Y "%s" C, node->data);
@@ -289,14 +431,16 @@ void print_ast_tree_vertical(t_ASTNode *node, int level) {
 			printf(G "%c " C, node->type == 3 ? 'A' : node->type);
 		else if (node->type == 4)
 			printf(R "H " C);
-        printf("%s\n", node->data);
+		printf("%s\n", node->data);
 
-        print_ast_tree_vertical(node->left, level + 1);
-    }
+		print_ast_tree_vertical(node->left, level + 1);
+	}
 }
 
 void	print_ast(t_ASTNode *root)
 {
+	if (root == NULL)
+		return (printf("Empty tree\n"), (void)NULL);
 	printf(Y "Abstract Syntax Tree:\n" C);
 	print_ast_node(root, 0);
 	printf("\n");
