@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 13:36:56 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 16:45:05 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 18:11:00 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ int	unset(char ***envp, char **args)
 				delete_from_env(envp, i);
 		}
 	}
-	free_matrix(args);
 	return (0);
 }
 

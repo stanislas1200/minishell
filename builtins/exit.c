@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/16 22:04:16 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 13:12:07 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 17:54:41 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,9 @@ int	is_numeric(char *str)
 	while (str[++i])
 	{
 		if (!((str[i] >= '0' && str[i] <= '9') || \
-		str[i] == '-' || str[i] == '+'))
+		(str[i] == '-' || str[i] == '+')))
 			return (EXIT_FAILURE);
-		if (str[i] == '-' || str[i] == '+' && (i != 0 || !str[i + 1]))
+		if ((str[i] == '-' || str[i] == '+') && (i != 0 || !str[i + 1]))
 			return (EXIT_FAILURE);
 	}
 	if (i == 0)
