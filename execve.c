@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execve.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 17:18:44 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 19:13:19 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,6 @@ void	ft_execve(char **env, char *cmd, char **args)
 
 	cmd_path = find_command_path(ft_getenv(env, "PATH"), cmd);
 	execve(cmd_path, args, env);
-	cperror("execve", NULL, NULL, 1);
+	cperror("execve", cmd, NULL, 1);
 	exit(1);
 }

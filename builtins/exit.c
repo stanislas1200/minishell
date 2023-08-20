@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/16 22:04:16 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 17:54:41 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 19:33:15 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,7 @@ void	ft_exit(char **envp, char **args)
 	}
 	else if (matrix_len(args) == 2)
 		exit_code = check_exit(args[1]);
-	free_matrix(envp);
-	free_matrix(args);
+// TODO : free mon loulou
 	exit(exit_code);
 }
 

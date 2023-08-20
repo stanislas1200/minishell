@@ -66,7 +66,7 @@ void	*malloc_error(t_lexer *lexer)
 ** 5. Add token to lexer
 ** 6. Return lexer
 */
-t_lexer	*lexer_build(char *str)
+t_lexer	*lexer_build(char *str, t_data *data)
 {
 	t_lexer	*lexer;		// 2. Create a new lexer
 	t_token	*token;		// 3. Create a new token
@@ -176,8 +176,25 @@ t_lexer	*lexer_build(char *str)
 		}
 	}
 	token->data[j] = 0;
-
 	// 6. Return the lexer
+	token = lexer->tokens;
+	while (token)
+	{
+		if (token->data[0] == '$')
+		{
+			char	*var;
+			var = token->data;
+			var++;
+			char *new = ft_getenv(data->env, var);
+			free(token->data);
+			if (new)
+				token->data = ft_strdup(new);
+			else
+				token->data = ft_strdup("");
+
+		}
+		token = token->next;
+	}
 	return (lexer);
 }
 

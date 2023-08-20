@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 16:42:14 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 18:49:13 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ int	cd(char ***envp, char **paths)
 	}
 	else
 		state = cd2(envp, paths);
-	free_matrix(paths);
 	return (state);
 }
 

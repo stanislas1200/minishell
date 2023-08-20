@@ -113,7 +113,7 @@ int			matrix_len(char **str);
 long		ft_long_atoi(const char *nptr);
 
 // Lexer
-t_lexer		*lexer_build(char *str);
+t_lexer		*lexer_build(char *str, t_data *data);
 void		lexer_destroy(t_lexer *lexer);
 
 // Parser

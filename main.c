@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/20 18:33:01 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/20 19:14:48 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ int	main(int ac, char **av, char **envv)
 		}
 		free(prompt);
 		add_history(buff);
-		lexer = lexer_build(buff);
+		lexer = lexer_build(buff, data);
 		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
 			ast_root = parse(lexer, data);

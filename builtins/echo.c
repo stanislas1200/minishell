@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:21:48 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 16:47:19 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 19:29:24 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	echo(char **args)
 	{
 		if (is_option(args[i], 'n') == 0)
 			flag = 1;
-		else
+		else if (ft_strlen(args[i]) > 0)
 		{
 			if (count == 1)
 				printf(" ");
@@ -37,7 +37,6 @@ int	echo(char **args)
 	}
 	if (!flag)
 		printf("\n");
-	free_matrix(args);
 	return (0);
 }
 
