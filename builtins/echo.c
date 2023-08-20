@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:21:48 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 19:29:24 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/20 20:02:29 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	echo(char **args)
 	i = 0;
 	while (args[++i])
 	{
-		if (is_option(args[i], 'n') == 0)
+		if (is_option(args[i], 'n') == 0 && count == 0)
 			flag = 1;
 		else if (ft_strlen(args[i]) > 0)
 		{
