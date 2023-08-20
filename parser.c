@@ -58,7 +58,7 @@ void	ast_destroy(t_ASTNode *node)
 	node = NULL;
 }
 
-t_ASTNode	*command_simple(t_token **token, char ***env, int type)
+t_ASTNode	*command_simple(t_token **token, int type)
 {
 	t_ASTNode	*node;
 	// Check token
@@ -74,7 +74,7 @@ t_ASTNode	*command_simple(t_token **token, char ***env, int type)
 	if (*token && (*token)->type == TOKEN)
 		*token = (*token)->next;
 	// Get Arg if Arg
-	node->right = command_simple(token, env, ARG);
+	node->right = command_simple(token, ARG);
 
 	return (node);
 }
@@ -85,7 +85,7 @@ t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 	t_ASTNode	*node;
 
 	if (!left)
-		left = command_simple(token, env, TOKEN);
+		left = command_simple(token, TOKEN);
 	if (!left)
 		return (NULL); // TODO
 
@@ -115,7 +115,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	t_ASTNode	*node;
 
 	// Check left side of the redirection operator
-	left = command_simple(token, env, TOKEN);
+	left = command_simple(token, TOKEN);
 	// Check if the token is a redirection operator
 	if (!(*token) || ((*token)->type != CHAR_INPUTR && (*token)->type != CHAR_OUTPUTR))
 		return (free_node(left));
@@ -142,16 +142,16 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 	{
 		printf(G "pipe\n");
-		// node->right = parse_top((*token)->next, env);
+		// node->right = parse_top((*token)->next, data);
 		// *token = (*token)->next;
-		// return (job_pipe(token, env, node));
+		// return (job_pipe(token, data, node));
 		*token = (*token)->next;
 		t_ASTNode	*new_root = new_node('|', (*token)->data);
 		node->right = new_root;
-		new_root->right = parse_top((*token)->next, env);
+		new_root->right = parse_top((*token)->next, data);
 	}
 	else
-		node->right = parse_top((*token)->next, env);
+		node->right = parse_top((*token)->next, data);
 
 	return (node);
 }
@@ -167,7 +167,7 @@ t_ASTNode	*job_command(t_token *token, t_data *data)
 	if ((node = redirection(&token, data)) != NULL)		// <simple command> <|> <filename>
 		return (node);
 	token = save;
-	if ((node = command_simple(&token, data, TOKEN)) != NULL)	// <simple command>
+	if ((node = command_simple(&token, TOKEN)) != NULL)	// <simple command>
 		return (node);
 
 	return (NULL);
@@ -178,7 +178,7 @@ t_ASTNode	*redirection_append(t_token **token, t_data *data)
 	t_ASTNode	*left;
 	t_ASTNode	*node;
 
-	left = command_simple(token, env, TOKEN);
+	left = command_simple(token, TOKEN);
 	if ((*token) && (*token)->type == CHAR_OUTPUTR)
 	{
 		*token = (*token)->next;
@@ -199,19 +199,19 @@ t_ASTNode	*redirection_append(t_token **token, t_data *data)
 		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 		{
 			printf(G "pipe\n");
-			// node->right = parse_top((*token)->next, env);
+			// node->right = parse_top((*token)->next, data);
 			// *token = (*token)->next;
-			// return (job_pipe(token, env, node));
+			// return (job_pipe(token, data, node));
 			*token = (*token)->next;
 			t_ASTNode	*new_root = new_node('|', (*token)->data);
 			node->right = new_root;
-			new_root->right = parse_top((*token)->next, env);
+			new_root->right = parse_top((*token)->next, data);
 		}
 		else
-			node->right = parse_top((*token)->next, env);
+			node->right = parse_top((*token)->next, data);
 
 			// // Parse the right side of the append operator
-			// node->right = parse_top((*token)->next, env);
+			// node->right = parse_top((*token)->next, data);
 
 			return (node);
 	}
@@ -224,7 +224,7 @@ t_ASTNode	*redirection_heredoc(t_token **token, t_data *data)
 	t_ASTNode	*left;
 	t_ASTNode	*node;
 
-	left = command_simple(token, env, TOKEN);
+	left = command_simple(token, TOKEN);
 	if ((*token) && (*token)->type == CHAR_INPUTR)
 	{
 		*token = (*token)->next;
@@ -246,19 +246,19 @@ t_ASTNode	*redirection_heredoc(t_token **token, t_data *data)
 		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 		{
 			printf(G "pipe\n");
-			// node->right = parse_top((*token)->next, env);
+			// node->right = parse_top((*token)->next, data);
 			// *token = (*token)->next;
-			// return (job_pipe(token, env, node));
+			// return (job_pipe(token, data, node));
 			*token = (*token)->next;
 			t_ASTNode	*new_root = new_node('|', (*token)->data);
 			node->right = new_root;
-			new_root->right = parse_top((*token)->next, env);
+			new_root->right = parse_top((*token)->next, data);
 		}
 		else
-			node->right = parse_top((*token)->next, env);
+			node->right = parse_top((*token)->next, data);
 
 			// // Parse the right side of the append operator
-			// node->right = parse_top((*token)->next, env);
+			// node->right = parse_top((*token)->next, data);
 
 			return (node);
 		}

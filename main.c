@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/20 17:39:01 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/20 17:47:30 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int	main(int ac, char **av, char **envv)
 	data->env = envp;
 	data->last_exit = 0;
 	data->parse_end = 0;
-	print_header();
+	// print_header();
 	while (1)
 	{
 		prompt = get_prompt();
