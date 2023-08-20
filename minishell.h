@@ -111,44 +111,10 @@ enum e_TOKEN_TYPE
 	ARG = -2
 };
 
-//builtin_2
-void	unset(char ***envp, char **args);
-void	export2(char ***envp, char *var, int i, int append);
-int		cd2(char ***envp, char **paths);
-
-//builtin_tool1
-char	**dup_env(char **envp);
-void	delete_from_env(char ***envp, int del);
-char	*ft_getenv(char **env, char *str);
-int		ft_getindexenv(char **env, char *str);
-void	add_to_env(char ***envp, char *str);
-
-//builtin_tool2
-int		valid_identifier(char *var);
-void	check_identifier(char **envp, char *var, int *i, int *append);
-char	*plus_remover(char *str);
-void	update_pwd(char ***envp);
-void	update_old_pwd(char ***envp, char *path);
-void	ft_exit(char **envp, char **args);
-
-//builtin_tool3
-void	sort_env(char **envp);
-int		is_option(char *str, char option);
-int		check_exit(char *str);
-int		is_numeric(char *str);
-
-void	signal_handler(int signum);
-
-//utils
-void	cperror(char *error, char *arg, int p_err);
-void	free_matrix(char **str);
-int		matrix_len(char **str);
-long	ft_long_atoi(const char *nptr);
-
 /* LEXING -> PARSING -> EXECUTING */
 t_lexer		*lexer_build(char *str);
 void		lexer_destroy(t_lexer *lexer);
-=======
+
 /* LEXING -> PARSING -> EXECUTING*/
 t_lexer	*lexer_build(char *str);
 t_ASTNode	*parse(t_lexer *lexer, char ***env);
