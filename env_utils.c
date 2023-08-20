@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 12:53:33 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/18 15:58:32 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,14 +71,15 @@ char	**dup_env(char **envp)
 
 void	shell_lvl(char ***envp)
 {
-	char	*tmp;
-	int		num;
-	char	*original_value;
+	static int	count;
+	char		*tmp;
+	int			num;
+	char		*original_value;
 
 	original_value = ft_getenv(*envp, "SHLVL");
 	if (!original_value)
 		export2(envp, "SHLVL=0", 5, 0);
-	else
+	else if (count == 0)
 	{
 		num = ft_atoi(original_value);
 		num++;
@@ -86,6 +87,28 @@ void	shell_lvl(char ***envp)
 		if (!tmp)
 			return (cperror("SHLVL", "malloc", NULL, 1));
 		export2(envp, tmp, 5, 0);
+		free(tmp);
+		count = 1;
+	}
+}
+
+void	update_env(char ***envp, char *last_cmd)
+{
+	int		i;
+	char	*tmp;
+	char	*env_last_cmd;
+
+	shell_lvl(envp);
+	update_pwd(envp);
+	env_last_cmd = find_command_path(ft_getenv(*envp, "PATH"), last_cmd);
+	if (env_last_cmd)
+	{
+		i = ft_getindexenv(*envp, "_");
+		if (i != -1)
+			delete_from_env(envp, i);
+		tmp = ft_strjoin("_=", env_last_cmd);
+		if (tmp)
+			export2(envp, tmp, 1, 0);
 		free(tmp);
 	}
 }

@@ -179,9 +179,10 @@ int	execute_cmd(t_ASTNode *node)
 			dup2(fd, STDOUT_FILENO);
 			close(fd);
 		}
-
-		execvp(node->data, arr);
-		perror("execvp");
+		if (execute_builtin(node, arr) == 0)
+			exit(0);
+		exec_cmd(node->data, arr, *node->env);
+		cperror("execve", NULL, NULL, 1);
 		free(arr);
 		exit(1); // Exit the child process on execvp error
 	}

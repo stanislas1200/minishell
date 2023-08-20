@@ -56,7 +56,8 @@ void	*get_prompt(void)
 	if (!getcwd(cwd, sizeof(cwd)) || !user)
 	{
 		free(str);
-		return (NULL);
+		cperror("getcwd", NULL, NULL, 1);
+		return (ft_strjoin("\x1b[0m\x1b[1;36m", "minishell\x1b[0m$ \0"));
 	}
 	strcat(str, "\x1b[1;32m");
 	strcat(str, getenv("USER"));
@@ -76,6 +77,7 @@ int	main(int ac, char **av, char **envv)
 
 	envp = dup_env(envv);
 	update_pwd(&envp);
+	shell_lvl(&envp);
 	signal(SIGINT, signal_handler);
 	print_header();
 	while (1)
