@@ -3,18 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 17:12:21 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/18 13:15:36 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
+void	export_no_arg(char **envp);
+char	*plus_remover(char *str);
+void	export2(char ***envp, char *var, int i, int append);
+void	add_to_env(char ***envp, char *str);
+int		valid_identifier(char *var);
+void	check_identifier(char **envp, char *var, int *i, int *append);
+
 void	export(char ***envp, char **args)
 {
-	char	**tmp;
 	int		i;
 	int		j;
 	int		append;
@@ -32,7 +38,8 @@ void	export(char ***envp, char **args)
 		else if (i == -1)
 			exit_code = 1;
 	}
-	sort_env(*envp);
+	if (j == 1)
+		export_no_arg(*envp);
 	free_matrix(args);
 	// return(exit_code);
 }
@@ -92,7 +99,7 @@ void	add_to_env(char ***envp, char *str)
 	*envp = new_env;
 }
 
-void	sort_env(char **envp)
+void	print_sort_env(char **envp)
 {
 	int		i;
 	int		j;
@@ -100,7 +107,7 @@ void	sort_env(char **envp)
 	char	*tmp;
 
 	i = -1;
-	while (envp[++i])
+	while (envp && envp[++i])
 	{
 		j = -1;
 		while (envp[++j + 1])
@@ -116,6 +123,9 @@ void	sort_env(char **envp)
 			}
 		}
 	}
+	i = -1;
+	while (envp && envp[++i])
+		printf("declare -x %s\n", envp[i]);
 }
 
 char	*plus_remover(char *str)
@@ -131,7 +141,7 @@ char	*plus_remover(char *str)
 	new_str = malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (!new_str)
 	{
-		cperror("export", "malloc", 1);
+		cperror("export", "malloc", NULL, 1);
 		return (NULL);
 	}
 	while (str[++i])

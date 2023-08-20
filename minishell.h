@@ -35,14 +35,32 @@
 # include <limits.h>
 # include <errno.h>
 
-//export
+//builtins
 void	cd(char ***envp, char **paths);
 void	pwd(void);
 void	echo(char **args);
 void	env(char **envp);
 void	export(char ***envp, char **args);
+void	unset(char ***envp, char **args);
+void	ft_exit(char **envp, char **args);
 
+void	export2(char ***envp, char *var, int i, int append);
+void	update_pwd(char ***envp);
 
+//env_utils
+char	**dup_env(char **envp);
+char	*ft_getenv(char **env, char *str);
+int		ft_getindexenv(char **env, char *str);
+void	shell_lvl(char ***envp);
+
+//main
+void	signal_handler(int signum);
+
+//builtin_tools
+void	cperror(char *func, char *arg, char *error, int p_err);
+void	free_matrix(char **str);
+int		matrix_len(char **str);
+long	ft_long_atoi(const char *nptr);
 typedef struct command_t {
 	char *argv[MAXARGS]; // argv for execve()
 	int argc; // nb of args
@@ -124,19 +142,13 @@ long	ft_long_atoi(const char *nptr);
 /* LEXING -> PARSING -> EXECUTING */
 t_lexer		*lexer_build(char *str);
 void		lexer_destroy(t_lexer *lexer);
+=======
+/* LEXING -> PARSING -> EXECUTING*/
+t_lexer	*lexer_build(char *str);
 t_ASTNode	*parse(t_lexer *lexer, char ***env);
 t_ASTNode	*parse_top(t_token *token, char ***env);
 void		ast_destroy(t_ASTNode *node);
 int			execute_ast_node(t_ASTNode *node);
-
-
-enum e_NODE_TYPE // Node Type Enum (for AST) using bitwise operators to allow for multiple types per node
-{
-	NODE_PIPE = (1 << 0),
-	NODE_ARGUMENT = (1 << 1),
-
-	NODE_DATA = (1 << 2),
-} NodeType;
 
 /* DEBUG */
 void lexer_print(t_lexer *lexer);

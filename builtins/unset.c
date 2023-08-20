@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 13:36:56 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/17 17:45:36 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/18 13:09:55 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	delete_from_env(char ***envp, int del);
 
 void	unset(char ***envp, char **args)
 {
@@ -46,7 +48,7 @@ void	delete_from_env(char ***envp, int del)
 	i = matrix_len(*envp);
 	new_env = malloc(sizeof(char *) * (i));
 	if (!new_env)
-		return ;
+		return (cperror("unset", "malloc", NULL, 1));
 	i = -1;
 	j = 0;
 	while ((*envp)[++i])
