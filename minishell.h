@@ -121,11 +121,13 @@ void	free_matrix(char **str);
 int		matrix_len(char **str);
 long	ft_long_atoi(const char *nptr);
 
-/* LEXING -> PARSING -> EXECUTING*/
-t_lexer	*lexer_build(char *str);
+/* LEXING -> PARSING -> EXECUTING */
+t_lexer		*lexer_build(char *str);
+void		lexer_destroy(t_lexer *lexer);
 t_ASTNode	*parse(t_lexer *lexer, char ***env);
 t_ASTNode	*parse_top(t_token *token, char ***env);
-int	execute_ast_node(t_ASTNode *node);
+void		ast_destroy(t_ASTNode *node);
+int			execute_ast_node(t_ASTNode *node);
 
 
 enum e_NODE_TYPE // Node Type Enum (for AST) using bitwise operators to allow for multiple types per node

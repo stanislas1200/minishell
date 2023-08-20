@@ -286,7 +286,7 @@ t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
 {
 	t_ASTNode *cmd = NULL;
 	if (!*root)
-		return;
+		return (NULL);
 
 	t_ASTNode *node = *root;
 	t_ASTNode *prev = NULL;
@@ -440,7 +440,7 @@ void print_ast_tree_vertical(t_ASTNode *node, int level) {
 void	print_ast(t_ASTNode *root)
 {
 	if (root == NULL)
-		return (printf("Empty tree\n"));
+		return (printf("Empty tree\n"), (void)NULL);
 	printf(Y "Abstract Syntax Tree:\n" C);
 	print_ast_node(root, 0);
 	printf("\n");

@@ -25,8 +25,8 @@ void	print_header(void)
 
 void	print_exit_message(void)
 {
-	printf(R "Error: Shell has encountered an   \n");
-	printf("                   		unexpected shutdown!\n" C);
+	// printf(R "Error: Shell has encountered an   \n");
+	// printf("                   		unexpected shutdown!\n" C);
 }
 
 void	signal_handler(int signum)
@@ -34,11 +34,11 @@ void	signal_handler(int signum)
 	if (signum == SIGINT)
 	{
 		printf("\n");
-		// printf("\33[2K\r");
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		printf("\33[2K\r");
+		// rl_replace_line("", 0);
+		// rl_on_new_line();
+		// rl_redisplay();
+		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
@@ -66,6 +66,12 @@ void	*get_prompt(void)
 	return (str);
 }
 
+void sig()
+{
+	return ;
+}
+
+
 int	main(int ac, char **av, char **envv)
 {
 	char		*buff;
@@ -76,50 +82,30 @@ int	main(int ac, char **av, char **envv)
 
 	// envp = dup_env(envv);
 	// update_pwd(&envp);
-	// signal(SIGINT, signal_handler);
-	// print_header();
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, sig);
+	print_header();
 	while (1)
 	{
-		buff = malloc(1024);
-		if (fgets(buff, 1024, stdin) == NULL)
+		prompt = get_prompt();
+		buff = readline(prompt);
+		if (!buff)
 		{
 			printf("\n");
 			print_exit_message();
-			if (buff)
-				free(buff);
 			break ;
 		}
+		free(prompt);
+		add_history(buff);
 		lexer = lexer_build(buff);
+		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
-		{
-			lexer_print(lexer); /* DEBUG */
-			ast_root = parse(lexer, &envp); // Parse lexer and build AST
-			lexer_destroy(lexer); // Free lexer memory
-			print_ast(ast_root); /* DEBUG */
-		// execute_ast_node(ast_root);
-			ast_destroy(ast_root); // Free AST memory
-		}
-		/* CLEAN */
+			ast_root = parse(lexer, &envp);
+		lexer_destroy(lexer); // Free lexer memory
+		// print_ast(ast_root);	/* DEBUG */
+		execute_ast_node(ast_root);
+		ast_destroy(ast_root); // Free AST memory
 		free(buff);
 	}
-	// while (1)
-	// {
-	// 	prompt = get_prompt();
-	// 	buff = readline(prompt);
-	// 	if (!buff)
-	// 	{
-	// 		printf("\n");
-	// 		print_exit_message();
-	// 		break ;
-	// 	}
-	// 	free(prompt);
-	// 	add_history(buff);
-	// 	lexer = lexer_build(buff);
-	// 	lexer_print(lexer); /* DEBUG */
-	// 	if (lexer)
-	// 		ast_root = parse(lexer, &envp);
-	// 	print_ast(ast_root);	/* DEBUG */
-	// 	execute_ast_node(ast_root);
-	// }
 	return (0);
 }

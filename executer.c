@@ -134,28 +134,39 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 int	execute_cmd(t_ASTNode *node)
 {
 	// Check for input/output redirection
-	int redirection = 0;
-	char *path = NULL;
-	t_ASTNode *save = node;
-	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4) {
+	int			redirection;
+	char		*path;
+	t_ASTNode	*save;
+	int			num_args;
+	t_ASTNode	*arg_node ;
+	char		**arr;
+
+	redirection = 0;
+	path = NULL;
+	save = node;
+
+	if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
+	{
 		redirection = node->type;
 		path = node->data;
 		node = node->left;
 	}
 
 	// Count the number of arguments
-	int num_args = 0;
-	t_ASTNode *arg_node = node->right;
-	while (arg_node != NULL) {
+	num_args = 0;
+	arg_node = node->right;
+	while (arg_node)
+	{
 		num_args++;
 		arg_node = arg_node->right;
 	}
 
 	// Create an array to hold the command and arguments
-	char **arr = (char **)malloc((num_args + 2) * sizeof(char *));
-	if (!arr) {
+	arr = (char **)malloc((num_args + 2) * sizeof(char *));
+	if (!arr)
+	{
 		perror("malloc");
-		return -1;
+		return (-1);
 	}
 
 	// Fill in the array with the command and arguments
@@ -200,7 +211,7 @@ int	execute_cmd(t_ASTNode *node)
 		/* DEV TEST */ // move to execute_redirection
 		while (save->right && (save->right->type == '>' || save->right->type == '<' || save->right->type == 3 || save->right->type == 4))
 			save = save->right;
-		if (save->right->type == '|');
+		if (save->right && save->right->type == '|')
 			execute_ast_node(save->right); /* dev test*/
 		return (WEXITSTATUS(status)); // Return the exit status of the child
 	}
