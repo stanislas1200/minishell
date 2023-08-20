@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:21:48 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 13:12:18 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 16:47:19 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int		is_option(char *str, char option);
 
-void	echo(char **args)
+int	echo(char **args)
 {
 	int	i;
 	int	flag;
@@ -38,7 +38,7 @@ void	echo(char **args)
 	if (!flag)
 		printf("\n");
 	free_matrix(args);
-	// return(0);
+	return (0);
 }
 
 int	is_option(char *str, char option)

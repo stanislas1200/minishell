@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 13:15:36 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 16:44:37 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	add_to_env(char ***envp, char *str);
 int		valid_identifier(char *var);
 void	check_identifier(char **envp, char *var, int *i, int *append);
 
-void	export(char ***envp, char **args)
+int	export(char ***envp, char **args)
 {
 	int		i;
 	int		j;
@@ -41,7 +41,7 @@ void	export(char ***envp, char **args)
 	if (j == 1)
 		export_no_arg(*envp);
 	free_matrix(args);
-	// return(exit_code);
+	return(exit_code);
 }
 
 void	export2(char ***envp, char *var, int i, int append)

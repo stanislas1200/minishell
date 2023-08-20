@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 13:36:56 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 13:09:55 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 16:45:05 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	delete_from_env(char ***envp, int del);
 
-void	unset(char ***envp, char **args)
+int	unset(char ***envp, char **args)
 {
 	int		i;
 	int		j;
@@ -36,7 +36,7 @@ void	unset(char ***envp, char **args)
 		}
 	}
 	free_matrix(args);
-	// exit(0);
+	return (0);
 }
 
 void	delete_from_env(char ***envp, int del)
