@@ -140,7 +140,6 @@ int		is_numeric(char *str);
 void	signal_handler(int signum);
 
 //utils
-void	cperror(char *error, char *arg, int p_err);
 void	free_matrix(char **str);
 int		matrix_len(char **str);
 long	ft_long_atoi(const char *nptr);
@@ -148,7 +147,7 @@ long	ft_long_atoi(const char *nptr);
 /* LEXING -> PARSING -> EXECUTING */
 t_lexer		*lexer_build(char *str);
 void		lexer_destroy(t_lexer *lexer);
-=======
+
 /* LEXING -> PARSING -> EXECUTING*/
 t_lexer	*lexer_build(char *str);
 t_ASTNode	*parse(t_lexer *lexer, char ***env);
