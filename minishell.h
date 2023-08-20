@@ -35,65 +35,33 @@
 # include <limits.h>
 # include <errno.h>
 
-//builtins
-void	cd(char ***envp, char **paths);
-void	pwd(void);
-void	echo(char **args);
-void	env(char **envp);
-void	export(char ***envp, char **args);
-void	unset(char ***envp, char **args);
-void	ft_exit(char **envp, char **args);
-
-void	export2(char ***envp, char *var, int i, int append);
-void	update_pwd(char ***envp);
-
-void	ft_execve(char **env, char *cmd, char **args);
-char	*find_command_path(char *all_paths, char *command);
-char	*create_command_path(char *path, char *command);
-void	delete_from_env(char ***envp, int del);
-
-//env_utils
-char	**dup_env(char **envp);
-char	*ft_getenv(char **env, char *str);
-int		ft_getindexenv(char **env, char *str);
-void	shell_lvl(char ***envp);
-void	update_env(char ***envp);
-
-//main
-void	signal_handler(int signum);
-
-//builtin_tools
-void	cperror(char *func, char *arg, char *error, int p_err);
-void	free_matrix(char **str);
-int		matrix_len(char **str);
-long	ft_long_atoi(const char *nptr);
-typedef struct command_t {
-	char *argv[MAXARGS]; // argv for execve()
-	int argc; // nb of args
-	enum builtin_t { NONE, QUIT, JOBS, BG, FG, KILL, HELP } builtin; // type of builtin command
-} command_t;
-
-
+// Structure
 typedef struct t_token
 {
 	int				type;
 	char			*data;
 	struct t_token	*next;
-} t_token;
+}	t_token;
 
 typedef struct t_lexer
 {
 	t_token	*tokens;
-} t_lexer;
+}	t_lexer;
 
 typedef struct t_ASTNode // Abstract Syntax Tree Node
 {
 	int					type;
 	char				*data;
-	char				***env;
 	struct t_ASTNode	*left;
 	struct t_ASTNode	*right;
 }	t_ASTNode;
+
+typedef struct t_data
+{
+	int		parse_end;
+	char	**env;
+	int		last_exit;
+}	t_data;
 
 enum e_TOKEN_TYPE
 {
@@ -111,19 +79,53 @@ enum e_TOKEN_TYPE
 	ARG = -2
 };
 
-/* LEXING -> PARSING -> EXECUTING */
+//builtins
+void		cd(char ***envp, char **paths);
+void		pwd(void);
+void		echo(char **args);
+void		env(char **envp);
+void		export(char ***envp, char **args);
+void		unset(char ***envp, char **args);
+void		ft_exit(char **envp, char **args);
+
+void		export2(char ***envp, char *var, int i, int append);
+void		update_pwd(char ***envp);
+
+void		ft_execve(char **env, char *cmd, char **args);
+char		*find_command_path(char *all_paths, char *command);
+char		*create_command_path(char *path, char *command);
+void		delete_from_env(char ***envp, int del);
+
+//env_utils
+char		**dup_env(char **envp);
+char		*ft_getenv(char **env, char *str);
+int			ft_getindexenv(char **env, char *str);
+void		shell_lvl(char ***envp);
+void		update_env(char ***envp);
+
+//main
+void		signal_handler(int signum);
+
+//builtin_tools
+void		cperror(char *func, char *arg, char *error, int p_err);
+void		free_matrix(char **str);
+int			matrix_len(char **str);
+long		ft_long_atoi(const char *nptr);
+
+// Lexer
 t_lexer		*lexer_build(char *str);
 void		lexer_destroy(t_lexer *lexer);
 
-/* LEXING -> PARSING -> EXECUTING*/
-t_lexer	*lexer_build(char *str);
-t_ASTNode	*parse(t_lexer *lexer, char ***env);
-t_ASTNode	*parse_top(t_token *token, char ***env);
+// Parser
+t_ASTNode	*parse(t_lexer *lexer, t_data *data);
+t_ASTNode	*parse_top(t_token *token, t_data *data);
 void		ast_destroy(t_ASTNode *node);
-int			execute_ast_node(t_ASTNode *node);
+
+// Executer
+int			execute_ast_node(t_ASTNode *node, t_data *data);
 
 /* DEBUG */
-void lexer_print(t_lexer *lexer);
-void print_ast(t_ASTNode *root);
+void		lexer_print(t_lexer *lexer);
+void		print_ast(t_ASTNode *root);
 
 #endif

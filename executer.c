@@ -13,22 +13,22 @@
 #include "minishell.h"
 #include <fcntl.h>
 
-int	execute_builtin(t_ASTNode *node, char **arr)
+int	execute_builtin(t_ASTNode *node, char **arr, t_data *data)
 {
 	if (ft_strncmp(node->data, "pwd", ft_strlen("pwd") + 1) == 0)
 		return (pwd(), 0);
 	if (ft_strncmp(node->data, "cd", ft_strlen("cd") + 1) == 0)
-		return (cd(node->env, arr), 0);
+		return (cd(&data->env, arr), 0);
 	if (ft_strncmp(node->data, "echo", ft_strlen("echo") + 1) == 0)
 		return (echo(arr), 0);
 	if (ft_strncmp(node->data, "env", ft_strlen("env") + 1) == 0)
-		return (env(*node->env), 0);
+		return (env(data->env), 0);
 	if (ft_strncmp(node->data, "export", ft_strlen("export") + 1) == 0)
-		return (export(node->env, arr), 0);
+		return (export(&data->env, arr), 0);
 	if (ft_strncmp(node->data, "unset", ft_strlen("unset") + 1) == 0)
-		return (unset(node->env, arr), 0);
+		return (unset(&data->env, arr), 0);
 	if (ft_strncmp(node->data, "exit", ft_strlen("exit") + 1) == 0)
-		return (ft_exit(*node->env, arr), 0);
+		return (ft_exit(data->env, arr), 0);
 	return (1);
 }
 
@@ -75,7 +75,6 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 		{
 			if (save->right->type != redirection) // handle different redirections
 			{
-				
 				dup2(fd, STDIN_FILENO);
 				close(fd);
 			}
@@ -133,7 +132,7 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 
 }
 
-int	execute_cmd(t_ASTNode *node)
+int	execute_cmd(t_ASTNode *node, t_data *data)
 {
 	// Check for input/output redirection
 	int			redirection;
@@ -182,7 +181,7 @@ int	execute_cmd(t_ASTNode *node)
 	}
 	arr[i] = NULL;
 
-	if (!execute_builtin(node, arr))
+	if (!execute_builtin(node, arr, data))
 		return 0;
 	// Fork a new process
 	
@@ -196,10 +195,10 @@ int	execute_cmd(t_ASTNode *node)
 		execute_redirection(save, redirection, path); // Execute redirection if needed
 		if (node->type != TOKEN)
 		{
-			execute_ast_node(node); // Execute the command if it's not a cmd
+			execute_ast_node(node, data); // Execute the command if it's not a cmd
 			exit(1);
 		}
-    ft_execve(*node->env, node->data, arr);
+    ft_execve(data->env, node->data, arr);
 	}
 	else
 	{
@@ -213,14 +212,14 @@ int	execute_cmd(t_ASTNode *node)
 		while (save->right && (save->right->type == '>' || save->right->type == '<' || save->right->type == 3 || save->right->type == 4))
 			save = save->right;
 		if (save->right && save->right->type == '|')
-			execute_ast_node(save->right); /* dev test*/
+			execute_ast_node(save->right, data); /* dev test*/
 		return (WEXITSTATUS(status)); // Return the exit status of the child
 	}
 	return (0);
 }
 
 
-int	execute_pipe(t_ASTNode *node)
+int	execute_pipe(t_ASTNode *node, t_data *data)
 {
 	int	pipefd[2];
 
@@ -241,7 +240,7 @@ int	execute_pipe(t_ASTNode *node)
 		// if (node->left->type != 4)
 		dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
 		close(pipefd[1]); // Close pipe write end
-		execute_ast_node(node->left);
+		execute_ast_node(node->left, data);
 
 		exit(0);
 	}
@@ -258,7 +257,7 @@ int	execute_pipe(t_ASTNode *node)
 			dup2(pipefd[0], STDIN_FILENO); // Redirect stdin to pipe read end
 			close(pipefd[0]); // Close pipe read end
 
-			execute_ast_node(node->right);
+			execute_ast_node(node->right, data);
 
 			exit(0);
 		} else {
@@ -274,25 +273,25 @@ int	execute_pipe(t_ASTNode *node)
 	return (0);
 }
 
-void	execute_job(t_ASTNode *node)
+void	execute_job(t_ASTNode *node, t_data *data)
 {
 	if (node->type == CHAR_PIPE)
-		execute_pipe(node);
+		execute_pipe(node, data);
 	else if (node->type == TOKEN)
-		execute_cmd(node);
+		execute_cmd(node, data);
 	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
-		execute_cmd(node);
-	update_env(node->env);
+		execute_cmd(node, data);
+	update_env(&data->env);
 }
 
-int	execute_ast_node(t_ASTNode *node)
+int	execute_ast_node(t_ASTNode *node, t_data *data)
 {
 	if (node == NULL) {
 		return 0;
 	}
 	// ADD NODE TYPE
 	// FG
-		execute_job(node);
+		execute_job(node, data);
 		// execute_ast_node(node->right);
 	// BG 
 	
