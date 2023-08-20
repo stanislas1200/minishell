@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 13:11:01 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 16:42:14 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	update_pwd(char ***envp);
 void	update_old_pwd(char ***envp, char *path);
 long	ft_long_atoi(const char *nptr);
 
-void	cd(char ***envp, char **paths)
+int	cd(char ***envp, char **paths)
 {
 	int	state;
 
@@ -40,7 +40,7 @@ void	cd(char ***envp, char **paths)
 	else
 		state = cd2(envp, paths);
 	free_matrix(paths);
-	//exit(state);
+	return (state);
 }
 
 int	cd2(char ***envp, char **paths)
