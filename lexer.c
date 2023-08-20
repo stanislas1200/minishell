@@ -193,7 +193,7 @@ t_lexer	*lexer_build(char *str, t_data *data)
 			if (!token->data)
 				return (malloc_error(lexer));
 		}
-		if (token->data[0] == '$')
+		if (token->data[0] == '$' && token->data[1])
 		{
 			var = token->data;
 			var++;

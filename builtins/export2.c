@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 00:07:18 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 13:15:43 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 14:08:51 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ int	valid_identifier(char *var)
 		if (var[i] == '+' && var[i + 1] != '=')
 			return (1);
 	}
+	if (i == 0)
+		return (1);
 	if (!var[i])
 		return (2);
 	return (0);
