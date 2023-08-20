@@ -273,8 +273,10 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 	return (0);
 }
 
-void	execute_job(t_ASTNode *node, t_data *data)
+int	execute_job(t_ASTNode *node, t_data *data)
 {
+	if (data->parse_end)
+		return (data->parse_end = 0);
 	if (node->type == CHAR_PIPE)
 		execute_pipe(node, data);
 	else if (node->type == TOKEN)
@@ -282,6 +284,7 @@ void	execute_job(t_ASTNode *node, t_data *data)
 	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
 		execute_cmd(node, data);
 	update_env(&data->env);
+	return (1);
 }
 
 int	execute_ast_node(t_ASTNode *node, t_data *data)
@@ -291,9 +294,8 @@ int	execute_ast_node(t_ASTNode *node, t_data *data)
 	}
 	// ADD NODE TYPE
 	// FG
-		execute_job(node, data);
+	return (execute_job(node, data));
 		// execute_ast_node(node->right);
 	// BG 
-	
-	return (0);
+
 }
