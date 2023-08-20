@@ -181,10 +181,7 @@ int	execute_cmd(t_ASTNode *node)
 		}
 		if (execute_builtin(node, arr) == 0)
 			exit(0);
-		exec_cmd(node->data, arr, *node->env);
-		cperror("execve", NULL, NULL, 1);
-		free(arr);
-		exit(1); // Exit the child process on execvp error
+		ft_execve(*node->env, node->data, arr);
 	}
 	else
 	{
@@ -262,7 +259,7 @@ void	execute_job(t_ASTNode *node)
 		execute_cmd(node);
 	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
 		execute_cmd(node);
-	
+	update_env(node->env);
 }
 
 int	execute_ast_node(t_ASTNode *node)

@@ -6,11 +6,11 @@
 #    By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/18 15:27:21 by dspilleb         ###   ########.fr        #
+#    Updated: 2023/08/20 15:45:04 by dspilleb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c lexer.c parser.c executer.c executer2.c \
+SRCS = main.c lexer.c parser.c executer.c execve.c \
 		env_utils.c\
 						builtins/builtin.c\
 						builtins/builtin_tools.c\

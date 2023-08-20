@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 15:58:32 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/20 15:45:55 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,23 +92,11 @@ void	shell_lvl(char ***envp)
 	}
 }
 
-void	update_env(char ***envp, char *last_cmd)
+void	update_env(char ***envp)
 {
 	int		i;
 	char	*tmp;
-	char	*env_last_cmd;
 
 	shell_lvl(envp);
 	update_pwd(envp);
-	env_last_cmd = find_command_path(ft_getenv(*envp, "PATH"), last_cmd);
-	if (env_last_cmd)
-	{
-		i = ft_getindexenv(*envp, "_");
-		if (i != -1)
-			delete_from_env(envp, i);
-		tmp = ft_strjoin("_=", env_last_cmd);
-		if (tmp)
-			export2(envp, tmp, 1, 0);
-		free(tmp);
-	}
 }
