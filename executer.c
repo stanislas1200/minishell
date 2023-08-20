@@ -16,20 +16,20 @@
 int	execute_builtin(t_ASTNode *node, char **arr, t_data *data)
 {
 	if (ft_strncmp(node->data, "pwd", ft_strlen("pwd") + 1) == 0)
-		return (pwd(), 0);
+		return (pwd());
 	if (ft_strncmp(node->data, "cd", ft_strlen("cd") + 1) == 0)
-		return (cd(&data->env, arr), 0);
+		return (cd(&data->env, arr));
 	if (ft_strncmp(node->data, "echo", ft_strlen("echo") + 1) == 0)
-		return (echo(arr), 0);
+		return (echo(arr));
 	if (ft_strncmp(node->data, "env", ft_strlen("env") + 1) == 0)
-		return (env(data->env), 0);
+		return (env(data->env));
 	if (ft_strncmp(node->data, "export", ft_strlen("export") + 1) == 0)
-		return (export(&data->env, arr), 0);
+		return (export(&data->env, arr));
 	if (ft_strncmp(node->data, "unset", ft_strlen("unset") + 1) == 0)
-		return (unset(&data->env, arr), 0);
+		return (unset(&data->env, arr));
 	if (ft_strncmp(node->data, "exit", ft_strlen("exit") + 1) == 0)
 		return (ft_exit(data->env, arr), 0);
-	return (1);
+	return (-1);
 }
 
 void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO : handle all in one
@@ -181,8 +181,9 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	}
 	arr[i] = NULL;
 
-	if (!execute_builtin(node, arr, data))
-		return 0;
+	data->last_exit = execute_builtin(node, arr, data);
+	if (data->last_exit != -1)
+		return (data->last_exit);
 	// Fork a new process
 	
 	pid_t pid = fork();
@@ -280,9 +281,9 @@ int	execute_job(t_ASTNode *node, t_data *data)
 	if (node->type == CHAR_PIPE)
 		execute_pipe(node, data);
 	else if (node->type == TOKEN)
-		execute_cmd(node, data);
+		data->last_exit = execute_cmd(node, data);
 	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
-		execute_cmd(node, data);
+		data->last_exit = execute_cmd(node, data);
 	update_env(&data->env);
 	return (1);
 }

@@ -180,12 +180,24 @@ t_lexer	*lexer_build(char *str, t_data *data)
 	token = lexer->tokens;
 	while (token)
 	{
+		char	*var;
+		char	*new;
+		if (token->data[0] == '$' && token->data[1] == '?')
+		{
+			var = ft_itoa(data->last_exit);
+			new = strdup(&token->data[2]);
+			free(token->data);
+			token->data = ft_strjoin(var, new);
+			free(var);
+			free(new);
+			if (!token->data)
+				return (malloc_error(lexer));
+		}
 		if (token->data[0] == '$')
 		{
-			char	*var;
 			var = token->data;
 			var++;
-			char *new = ft_getenv(data->env, var);
+			new = ft_getenv(data->env, var);
 			free(token->data);
 			if (new)
 				token->data = ft_strdup(new);
