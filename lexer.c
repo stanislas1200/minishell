@@ -55,6 +55,107 @@ void	*malloc_error(t_lexer *lexer)
 	return (NULL);
 }
 
+void strip_quotes(char* src, char* dest)
+{
+	int	i;
+	int	j;
+	int	quote;
+
+	i = -1;
+	j = 0;
+	quote = 0;
+	while (src[++i])
+	{
+		if ((src[i] == '\'' || src[i] == '\"') && quote == 0)
+			quote = src[i];
+		else if (src[i] == quote)
+			quote = 0;
+		else
+			dest[j++] = src[i];
+	}
+	
+	dest[j] = 0;
+}
+
+char	*expand_variables(char *input, t_data *data)
+{
+	char	*result;
+	char	*var_name;
+	char	*var_value;
+	int		i;
+	int		var_start;
+	char	*tmp;
+	char	*tmp2;
+	
+	result = malloc(1);
+	if (!result)
+		return (NULL);
+	result[0] = '\0';
+	
+	i = 0;
+	while (input[i])
+	{
+		if (input[i] == '$')
+		{
+			i++;
+			var_start = i;
+			while (ft_isalnum(input[i]))
+				i++;
+			if (input[var_start] == '?')
+			{
+				tmp = result;
+				tmp2 = ft_itoa(data->last_exit);
+				if (tmp2)
+					result = ft_strjoin(result, tmp2);
+				free(tmp2);
+				free(tmp);
+				if (!result || !tmp2)
+					return (NULL);
+				i++;
+			}
+			else if (i > var_start)
+			{	
+				var_name = malloc(i - var_start + 1);
+				if (!var_name)
+					return (free(result), NULL);
+				ft_strlcpy(var_name, input + var_start, i - var_start + 1);
+				var_name[i - var_start] = '\0';
+				var_value = ft_getenv(data->env, var_name);
+				if (var_value)
+				{
+					tmp = result;
+					result = ft_strjoin(result, var_value);
+					free(tmp);
+					if (!result)
+						return (NULL);
+				}
+				free(var_name);
+			}
+			else
+			{
+				tmp = result;
+				result = ft_strjoin(result, "$");
+				free(tmp);
+				if (!result)
+					return (NULL);
+			}
+		}
+		else
+		{
+			tmp = ft_calloc(ft_strlen(result) + 2, sizeof(char));
+			if (!tmp)
+				return (free(result), NULL);
+			ft_strlcat(tmp, result, ft_strlen(result) + 2);
+			ft_strlcat(tmp, input + i, ft_strlen(result) + 2);
+			free(result);
+			result = tmp;
+			i++;
+		}
+	}
+	return result;
+}
+
+
 
 /*
 ** Lexer Build Function
@@ -182,29 +283,21 @@ t_lexer	*lexer_build(char *str, t_data *data)
 	{
 		char	*var;
 		char	*new;
-		if (token->data[0] == '$' && token->data[1] == '?')
-		{
-			var = ft_itoa(data->last_exit);
-			new = strdup(&token->data[2]);
-			free(token->data);
-			token->data = ft_strjoin(var, new);
-			free(var);
-			free(new);
-			if (!token->data)
-				return (malloc_error(lexer));
-		}
-		if (token->data[0] == '$' && token->data[1])
-		{
-			var = token->data;
-			var++;
-			new = ft_getenv(data->env, var);
-			free(token->data);
-			if (new)
-				token->data = ft_strdup(new);
-			else
-				token->data = ft_strdup("");
 
-		}
+		// expand
+		new = expand_variables(token->data, data);
+		if (!new)
+			return (malloc_error(lexer));
+		free(token->data);
+		token->data = new;
+		// strip
+		new = malloc(sizeof(char) * ft_strlen(token->data));
+		if (!new)
+			return (malloc_error(lexer));
+		strip_quotes(token->data, new);
+		free(token->data);
+		token->data = new;
+
 		token = token->next;
 	}
 	return (lexer);
@@ -219,7 +312,7 @@ void	lexer_print(t_lexer *lexer)
 	printf(Y "lexer:\n" C);
 	while (token)
 	{
-		printf("type: %d, value: %s\n", token->type, token->data);
+		printf("type: %d, value: %s|\n", token->type, token->data);
 		token = token->next;
 	}
 	printf("\n");

@@ -34,11 +34,11 @@ void	signal_handler(int signum)
 	if (signum == SIGINT)
 	{
 		printf("\n");
-		printf("\33[2K\r");
-		// rl_replace_line("", 0);
-		// rl_on_new_line();
-		// rl_redisplay();
-		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		// printf("\33[2K\r");
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
@@ -107,11 +107,13 @@ int	main(int ac, char **av, char **envv)
 		lexer = lexer_build(buff, data);
 		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
+		{
 			ast_root = parse(lexer, data);
-		lexer_destroy(lexer); // Free lexer memory
-		// print_ast(ast_root);	/* DEBUG */
-		execute_ast_node(ast_root, data);
-		ast_destroy(ast_root); // Free AST memory
+			lexer_destroy(lexer); // Free lexer memory
+			// print_ast(ast_root);	/* DEBUG */
+			execute_ast_node(ast_root, data);
+			ast_destroy(ast_root); // Free AST memory
+		}
 		free(buff);
 	}
 	return (0);
