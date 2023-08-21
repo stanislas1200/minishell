@@ -146,7 +146,6 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	// Recursively parse the right side of the pipe
 	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 	{
-		printf(G "pipe\n");
 		// node->right = parse_top((*token)->next, data);
 		// *token = (*token)->next;
 		// return (job_pipe(token, data, node));

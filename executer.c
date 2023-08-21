@@ -42,6 +42,8 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 			fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
 		else
 			fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		if (fd == -1)
+			return (perror("open"), exit(1));
 		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
 		{
 			if (save->right->type != redirection)
@@ -68,7 +70,7 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 		fd = open(path, O_RDONLY);
 		if (fd == -1)
 		{
-			printf("Error: %s: %s\n", path, strerror(errno));
+			perror("Error \n");
 			exit(1) ;
 		}
 		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
@@ -187,10 +189,13 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	// Fork a new process
 	
 	pid_t pid = fork();
-	if (pid == -1) {
+	if (pid == -1)
+	{
 		perror("fork");
 		return (free(arr), -1);
-	} else if (pid == 0) {
+	}
+	else if (pid == 0)
+	{
 		// Child process: execute the command
 		
 		execute_redirection(save, redirection, path); // Execute redirection if needed
@@ -199,7 +204,7 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 			execute_ast_node(node, data); // Execute the command if it's not a cmd
 			exit(1);
 		}
-    ft_execve(data->env, node->data, arr);
+    	ft_execve(data->env, node->data, arr);
 	}
 	else
 	{
@@ -222,6 +227,7 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 
 int	execute_pipe(t_ASTNode *node, t_data *data)
 {
+	int status;
 	int	pipefd[2];
 
 	if (pipe(pipefd) == -1)
@@ -242,8 +248,7 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 		dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
 		close(pipefd[1]); // Close pipe write end
 		execute_ast_node(node->left, data);
-
-		exit(0);
+		exit(data->last_exit);
 	}
 	else
 	{
@@ -252,32 +257,35 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 		{
 			perror("fork");
 			return -1;
-		} else if (right_pid == 0) {
+		}
+		else if (right_pid == 0)
+		{
 			// Child process (right side of the pipe)
 			close(pipefd[1]); // Close write end of the pipe
 			dup2(pipefd[0], STDIN_FILENO); // Redirect stdin to pipe read end
 			close(pipefd[0]); // Close pipe read end
 
 			execute_ast_node(node->right, data);
-
-			exit(0);
-		} else {
+			exit(data->last_exit);
+		}
+		else
+		{
 			// Parent process: close both ends of the pipe
 			close(pipefd[0]);
 			close(pipefd[1]);
 
 			// Wait for both child processes to complete
 			waitpid(left_pid, NULL, 0);
-			waitpid(right_pid, NULL, 0);
+			waitpid(right_pid, &status, 0);	
 		}
 	}
-	return (0);
+	return (WEXITSTATUS(status));
 }
 
 int	execute_job(t_ASTNode *node, t_data *data)
 {
 	if (node->type == CHAR_PIPE)
-		execute_pipe(node, data);
+		data->last_exit = execute_pipe(node, data);
 	else if (node->type == TOKEN)
 		data->last_exit = execute_cmd(node, data);
 	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)

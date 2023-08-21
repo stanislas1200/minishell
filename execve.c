@@ -58,6 +58,7 @@ void	ft_execve(char **env, char *cmd, char **args)
 
 	cmd_path = find_command_path(ft_getenv(env, "PATH"), cmd);
 	execve(cmd_path, args, env);
-	cperror("execve", cmd, NULL, 1);
+	// cperror("execve", cmd, NULL, 1);
+	perror("execve");
 	exit(1);
 }
