@@ -86,6 +86,7 @@ char	*expand_variables(char *input, t_data *data)
 	int		var_start;
 	char	*tmp;
 	char	*tmp2;
+	int		quote = 0;
 	
 	result = malloc(1);
 	if (!result)
@@ -95,7 +96,11 @@ char	*expand_variables(char *input, t_data *data)
 	i = 0;
 	while (input[i])
 	{
-		if (input[i] == '$')
+		if ((input[i] == '\'' || input[i] == '\"') && quote == 0)
+			quote = input[i];
+		else if (input[i] == quote)
+			quote = 0;
+		if (input[i] == '$' && quote != '\'')
 		{
 			i++;
 			var_start = i;
