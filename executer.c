@@ -276,8 +276,6 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 
 int	execute_job(t_ASTNode *node, t_data *data)
 {
-	if (data->parse_end)
-		return (data->parse_end = 0);
 	if (node->type == CHAR_PIPE)
 		execute_pipe(node, data);
 	else if (node->type == TOKEN)

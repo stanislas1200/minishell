@@ -100,6 +100,11 @@ t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 		*token = (*token)->next;
 
 		// Recursively parse the right side of the pipe
+		if ((*token)->type != TOKEN)
+		{
+		data->parse_end = 1;
+			return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
+		}
 		node->right = parse_top(*token, data);
 
 		return (node);
@@ -127,10 +132,10 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
+		return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
 	}
 	// if ((*token)->data[0] == '\n')
-	// 	return (printf(M "-minishell: " R "syntax error near unexpected token `newline'" C),free_node(left));
+	// 	return (printf(M "-minishell: " R "syntax error near unexpected token ``newline'" C),free_node(left));
 	// Create a new node for the redirection operator
 	node = new_node(type, (*token)->data);
 	if (!node)
@@ -188,7 +193,7 @@ t_ASTNode	*redirection_append(t_token **token, t_data *data)
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
+		return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
 	}
 		node = new_node(3, (*token)->data);
 		if (!node)
@@ -198,10 +203,6 @@ t_ASTNode	*redirection_append(t_token **token, t_data *data)
 		// Recursively parse the right side of the pipe
 		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 		{
-			printf(G "pipe\n");
-			// node->right = parse_top((*token)->next, data);
-			// *token = (*token)->next;
-			// return (job_pipe(token, data, node));
 			*token = (*token)->next;
 			t_ASTNode	*new_root = new_node('|', (*token)->data);
 			node->right = new_root;
@@ -234,7 +235,7 @@ t_ASTNode	*redirection_heredoc(t_token **token, t_data *data)
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (printf(M "-minishell: " C "syntax error near unexpected token " Y "`%s`\n" C, (*token)->data),free_node(left));
+		return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
 	}
 		node = new_node(4, (*token)->data);
 		if (!node)
@@ -245,10 +246,6 @@ t_ASTNode	*redirection_heredoc(t_token **token, t_data *data)
 		// Recursively parse the right side of the pipe
 		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 		{
-			printf(G "pipe\n");
-			// node->right = parse_top((*token)->next, data);
-			// *token = (*token)->next;
-			// return (job_pipe(token, data, node));
 			*token = (*token)->next;
 			t_ASTNode	*new_root = new_node('|', (*token)->data);
 			node->right = new_root;
@@ -275,19 +272,19 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 		return (NULL);
 	save = token;
 	node = NULL;
-
-	if ((node = job_pipe(&token, data, NULL)) != NULL)	// <command> | <job>
+	
+	if ((node = job_pipe(&token, data, NULL)) != NULL && !data->parse_end)	// <command> | <job>
 		return (node);
 	token = save;
-	if ((node = redirection_append(&token, data)) != NULL) // <command> >> <filename>
+	if ((node = redirection_append(&token, data)) != NULL && !data->parse_end) // <command> >> <filename>
 		return (node);
 	token = save;
-	if ((node = redirection_heredoc(&token, data)) != NULL) // <command> << <filename>
+	if ((node = redirection_heredoc(&token, data)) != NULL && !data->parse_end) // <command> << <filename>
 		return (node);
 	token = save;
-	if ((node = job_command(token, data)) != NULL)	// <command>
+	if ((node = job_command(token, data)) != NULL && !data->parse_end)	// <command>
 		return (node);
-	return (NULL);
+	return(ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd(token->data, 2), ft_putstr_fd("'\n", 2),data->parse_end = 1, NULL);
 }
 
 t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
@@ -402,6 +399,14 @@ t_ASTNode	*parse(t_lexer *lexer, t_data *data)
 	token = lexer->tokens;
 
 	tree = parse_top(token, data);
+	
+	if (data->parse_end)
+	{
+		ast_destroy(tree);
+		tree = NULL;
+		data->parse_end = 0;
+		return (data->last_exit = 2, NULL);
+	}
 	reorder_tree(&tree);
 	check_eof(&tree);
 	return (tree);

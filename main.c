@@ -111,7 +111,8 @@ int	main(int ac, char **av, char **envv)
 			ast_root = parse(lexer, data);
 			lexer_destroy(lexer); // Free lexer memory
 			// print_ast(ast_root);	/* DEBUG */
-			execute_ast_node(ast_root, data);
+			if (ast_root)
+				execute_ast_node(ast_root, data);
 			ast_destroy(ast_root); // Free AST memory
 		}
 		free(buff);
