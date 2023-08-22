@@ -103,7 +103,7 @@ t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 		if ((*token)->type != TOKEN)
 		{
 		data->parse_end = 1;
-			return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
+			return (ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
 		}
 		node->right = parse_top(*token, data);
 
@@ -132,10 +132,10 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
+		return (ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
 	}
 	// if ((*token)->data[0] == '\n')
-	// 	return (printf(M "-minishell: " R "syntax error near unexpected token ``newline'" C),free_node(left));
+	// 	return (printf(M "-stanshell: " R "syntax error near unexpected token ``newline'" C),free_node(left));
 	// Create a new node for the redirection operator
 	node = new_node(type, (*token)->data);
 	if (!node)
@@ -192,7 +192,7 @@ t_ASTNode	*redirection_append(t_token **token, t_data *data)
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
+		return (ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
 	}
 		node = new_node(3, (*token)->data);
 		if (!node)
@@ -234,7 +234,7 @@ t_ASTNode	*redirection_heredoc(t_token **token, t_data *data)
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
+		return (ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
 	}
 		node = new_node(4, (*token)->data);
 		if (!node)
@@ -283,7 +283,9 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 	token = save;
 	if ((node = job_command(token, data)) != NULL && !data->parse_end)	// <command>
 		return (node);
-	return(ft_putstr_fd(M "-minishell: " C "syntax error near unexpected token `",2), ft_putstr_fd(token->data, 2), ft_putstr_fd("'\n", 2),data->parse_end = 1, NULL);
+	if (data->parse_end)
+		return (data->parse_end = 1, NULL);
+	return(ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd(token->data, 2), ft_putstr_fd("'\n", 2),data->parse_end = 1, NULL);
 }
 
 t_ASTNode *remove_all_input_nodes(t_ASTNode **root)

@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/22 19:36:18 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/22 19:39:59 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	main(int ac, char **av, char **envv)
 	char		**envp;
 	t_lexer		*lexer;
 	t_ASTNode	*ast_root;
-	t_data		*data;
+	t_data		data;
 
 
 	envp = dup_env(envv);
@@ -95,10 +95,9 @@ int	main(int ac, char **av, char **envv)
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, SIG_IGN);
 
-	data = malloc(sizeof(t_data));
-	data->env = envp;
-	data->last_exit = 0;
-	data->parse_end = 0;
+	data.env = envp;
+	data.last_exit = 0;
+	data.parse_end = 0;
 	print_header();
 	while (1)
 	{
@@ -112,15 +111,15 @@ int	main(int ac, char **av, char **envv)
 		}
 		free(prompt);
 		add_history(buff);
-		lexer = lexer_build(buff, data);
+		lexer = lexer_build(buff, &data);
 		// lexer_print(lexer); /* DEBUG */
 		if (lexer)
 		{
-			ast_root = parse(lexer, data);
+			ast_root = parse(lexer, &data);
 			lexer_destroy(lexer); // Free lexer memory
 			// print_ast(ast_root);	/* DEBUG */
 			if (ast_root)
-				execute_ast_node(ast_root, data);
+				execute_ast_node(ast_root, &data);
 			ast_destroy(ast_root); // Free AST memory
 		}
 		free(buff);
