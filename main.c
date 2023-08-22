@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/22 18:49:21 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/22 19:36:18 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ void	signal_handler(int signum)
 	{
 		printf("\n");
 		// printf("\33[2K\r");
-		// rl_replace_line("", 0);
-		// rl_on_new_line();
-		// rl_redisplay();
-		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
@@ -64,7 +64,7 @@ void	*get_prompt(void)
 	if (!getcwd(cwd, sizeof(cwd)) || !user)
 	{
 		free(str);
-		return (NULL);
+		return (ft_strdup(B "stanshell> " C));
 	}
 	strcat(str, "\x1b[1;32m");
 	strcat(str, getenv("USER"));
