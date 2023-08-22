@@ -364,18 +364,18 @@ void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections &&
 
 		// if (node && !type && node->type != TOKEN && node->type != CHAR_PIPE)
 		// 	type = node->type; // replace && node->type != TOKEN && node->type != CHAR_PIPE by type
-		if (node && (node->type == TOKEN || node->type == CHAR_PIPE || node->type == 4))
+		if (node && (node->type == TOKEN || node->type == CHAR_PIPE))
 			prev_save = node;
-		if (node && node->type != TOKEN && node->type != CHAR_PIPE && node->type != 4)
+		if (node && node->type != TOKEN && node->type != CHAR_PIPE)
 		{
 			save = node;
-			while (node && node->type != TOKEN && node->type != CHAR_PIPE && node->type != 4)
+			while (node && node->type != TOKEN && node->type != CHAR_PIPE)
 			{
 				prev = node;
 				if (!node->right)
 					return ;
 				node = node->right;
-				if (node && (node->type == CHAR_PIPE || node->type == 4))
+				if (node && (node->type == CHAR_PIPE))
 				{
 					prev->right = NULL;
 					node->left = save;

@@ -61,6 +61,7 @@ typedef struct t_data
 	int		parse_end;
 	char	**env;
 	int		last_exit;
+	int		pipefd;
 }	t_data;
 
 enum e_TOKEN_TYPE

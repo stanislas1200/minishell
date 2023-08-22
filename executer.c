@@ -32,7 +32,7 @@ int	execute_builtin(t_ASTNode *node, char **arr, t_data *data)
 	return (-1);
 }
 
-void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO : handle all in one
+void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *data) // TODO : handle all in one
 {
 	// Handle output redirection (>) and (>>) append
 	if (redirection == 3 || redirection == CHAR_OUTPUTR)
@@ -51,13 +51,13 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 				dup2(fd, STDOUT_FILENO);
 				close(fd);
 			}
-			execute_redirection(save->right, save->right->type, save->right->data);
+			execute_redirection(save->right, save->right->type, save->right->data, data);
 			return ;
 		}
 		else
 		{
 			if (save->right && save->right->type == 4)
-				execute_redirection(save->right, save->right->type, save->right->data);
+				execute_redirection(save->right, save->right->type, save->right->data, data);
 			dup2(fd, STDOUT_FILENO);
 			close(fd);
 		}
@@ -80,13 +80,13 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 				dup2(fd, STDIN_FILENO);
 				close(fd);
 			}
-			execute_redirection(save->right, save->right->type, save->right->data);
+			execute_redirection(save->right, save->right->type, save->right->data, data);
 			return ;
 		}
 		else
 		{
 			if (save->right && save->right->type == 4)
-				execute_redirection(save->right, save->right->type, save->right->data);
+				execute_redirection(save->right, save->right->type, save->right->data, data);
 			dup2(fd, STDIN_FILENO);
 			close(fd);
 		}
@@ -116,18 +116,23 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path) // TODO :
 			text = ft_strjoin(text, "\n");
 			free(buffer);
 		}
-		
 		if (save->right && save->right->type != CHAR_PIPE)
-			execute_redirection(save->right, save->right->type, save->right->data);
-		else{
-		// Write the text to the pipe
-		write(fd[1], text, strlen(text));
-		// Close the write end of the pipe
-		close(fd[1]);
+			execute_redirection(save->right, save->right->type, save->right->data, data);
+		else
+		{
+			if (data->pipefd)
+			{
+				dup2(data->pipefd, STDOUT_FILENO);
+				close(data->pipefd);
+			}
+			// Write the text to the pipe
+			write(fd[1], text, strlen(text));
+			// Close the write end of the pipe
+			close(fd[1]);
 
-		// Redirect STDIN_FILENO to the read end of the pipe
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
+			// Redirect STDIN_FILENO to the read end of the pipe
+			dup2(fd[0], STDIN_FILENO);
+			close(fd[0]);
 		}
 
 	}
@@ -197,7 +202,7 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	else if (pid == 0)
 	{
 		// Child process: execute the command
-		execute_redirection(save, redirection, path); // Execute redirection if needed
+		execute_redirection(save, redirection, path, data); // Execute redirection if needed
 		data->last_exit = execute_builtin(node, arr, data);
 		if (data->last_exit != -1)
 			exit(data->last_exit);
@@ -240,15 +245,22 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 
 	pid_t left_pid, right_pid;
 	left_pid = fork();
-	if (left_pid == -1) {
+	if (left_pid == -1)
+	{
 		perror("fork");
 		return -1;
-	} else if (left_pid == 0) {
+	}
+	else if (left_pid == 0)
+	{
 		// Child process (left side of the pipe)
 		close(pipefd[0]); // Close read end of the pipe
-		// if (node->left->type != 4)
+		if (node->left->type == 4)
+			data->pipefd = pipefd[1];
+		else
+		{
 		dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
 		close(pipefd[1]); // Close pipe write end
+		}
 		execute_ast_node(node->left, data);
 		exit(data->last_exit);
 	}
