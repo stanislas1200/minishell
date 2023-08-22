@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/22 17:23:28 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/22 18:08:02 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,20 @@
 void	print_header(void)
 {
 	printf("\n");
-	printf(G "********************************************\n");
-	printf("*                                          *\n");
-	printf("*    ██    " M "Welcome to My Custom Shell!" R "       *\n");
-	printf("*                                          *\n");
-	printf("********************************************\n" C);
+	printf(R "███████╗████████╗ █████╗ ███╗   ██╗███████╗██╗  ██╗███████╗██╗     ██╗     \n");
+	printf(G "██╔════╝╚══██╔══╝██╔══██╗████╗  ██║██╔════╝██║  ██║██╔════╝██║     ██║     \n");
+	printf(B "███████╗   ██║   ███████║██╔██╗ ██║███████╗███████║█████╗  ██║     ██║     \n");
+	printf(Y "╚════██║   ██║   ██╔══██║██║╚██╗██║╚════██║██╔══██║██╔══╝  ██║     ██║     \n");
+	printf(M "███████║   ██║   ██║  ██║██║ ╚████║███████║██║  ██║███████╗███████╗███████╗\n");
+	printf(M "╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝\n");
+	printf(R "								(and dspilleb)\n" C);
 	printf("\n");
 }
 
 void	print_exit_message(void)
 {
-	// printf(R "Error: Shell has encountered an   \n");
-	// printf("                   		unexpected shutdown!\n" C);
+	//printf(R "Error: Shell has encountered an   \\n");
+	// printf("                   		unexpected shutdown!\\n" C);
 }
 
 void	signal_handler(int signum)
