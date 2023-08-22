@@ -305,8 +305,14 @@ t_lexer	*lexer_build(char *str, t_data *data)
 
 		token = token->next;
 	}
+	// remove_empty(&lexer);
 	return (lexer);
 }
+
+// void	remove_empty(t_lexer **lexer)
+// {
+// 	t_token *token = lexer->
+// }
 
 /* DEBUG */
 void	lexer_print(t_lexer *lexer)

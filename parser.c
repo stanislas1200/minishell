@@ -267,7 +267,7 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 	t_token		*save;
 	t_ASTNode	*node;
 
-	if (!token)
+	if (!token || token->type == 0)
 		return (NULL);
 	save = token;
 	node = NULL;
@@ -398,7 +398,7 @@ t_ASTNode	*parse(t_lexer *lexer, t_data *data)
 	token = lexer->tokens;
 
 	tree = parse_top(token, data);
-	
+
 	if (data->parse_end)
 	{
 		ast_destroy(tree);

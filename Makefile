@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+         #
+#    By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/20 15:45:04 by dspilleb         ###   ########.fr        #
+#    Updated: 2023/08/22 18:05:47 by sgodin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,16 +34,19 @@ GREEN = \033[1;32m
 BLUE = \033[1;34m
 RESET = \033[0m
 
+READLINEINCL = -I /Users/${shell whoami}/.brew/opt/readline/include
+READLINELIB = -lreadline -L /Users/${shell whoami}/.brew/opt/readline/lib
+
 all: ${NAME}
 
 ${NAME}: ${OBJS}
 	@echo -ne "${BLUE}Building libft...${RESET}"
 	@make -sC ./libft
-	@${GCC} ${OBJS} -o ${NAME} -lreadline -L./libft -lft && echo -ne "\r${BLUE}Compiling ${NAME} ${GREEN}Done${RESET}\n" || echo -ne "\r${BLUE}Compiling ${NAME} ${RED}Error${RESET}\n"
+	@${GCC} ${OBJS} -o ${NAME} ${READLINELIB}  -L./libft -lft && echo -ne "\r${BLUE}Compiling ${NAME} ${GREEN}Done${RESET}\n" || echo -ne "\r${BLUE}Compiling ${NAME} ${RED}Error${RESET}\n"
 
 $(OBJS_DIR)%.o: %.c
 	@mkdir -p $(dir $@)
-	@gcc $(FLAGS) -c $< -o $@
+	@gcc $(FLAGS) ${READLINEINCL} -c $< -o $@
 
 clean:
 	@echo -ne "${RED}Cleaning...${RESET}"

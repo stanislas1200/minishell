@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 19:13:19 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/22 18:05:21 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,9 @@ void	ft_execve(char **env, char *cmd, char **args)
 	execve(cmd_path, args, env);
 	// cperror("execve", cmd, NULL, 1);
 	perror("execve");
+	if (cmd[0] == '.')
+		exit(126);
+	if (errno == EACCES || errno == ENOENT)
+		exit(127);
 	exit(1);
 }

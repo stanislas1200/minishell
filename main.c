@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 16:39:14 by sgodin            #+#    #+#             */
-/*   Updated: 2023/08/20 19:14:48 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/22 17:23:28 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	print_header(void)
 	printf("\n");
 	printf(G "********************************************\n");
 	printf("*                                          *\n");
-	printf("*        " M "Welcome to My Custom Shell!" R "       *\n");
+	printf("*    ██    " M "Welcome to My Custom Shell!" R "       *\n");
 	printf("*                                          *\n");
 	printf("********************************************\n" C);
 	printf("\n");
@@ -35,10 +35,10 @@ void	signal_handler(int signum)
 	{
 		printf("\n");
 		// printf("\33[2K\r");
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		// rl_forced_update_display(); // work for ctrl-C but not for ctr-L
+		// rl_replace_line("", 0);
+		// rl_on_new_line();
+		// rl_redisplay();
+		rl_forced_update_display(); // work for ctrl-C but not for ctr-L
 	}
 }
 
@@ -85,7 +85,7 @@ int	main(int ac, char **av, char **envv)
 	envp = dup_env(envv);
 	update_env(&envp);
 	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, sig);
+	signal(SIGQUIT, SIG_IGN);
 
 	data = malloc(sizeof(t_data));
 	data->env = envp;

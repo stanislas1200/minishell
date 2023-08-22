@@ -182,9 +182,9 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 		arg_node = arg_node->right;
 	}
 	arr[i] = NULL;
-
-	data->last_exit = execute_builtin(node, arr, data);
-	if (data->last_exit != -1)
+	if (!redirection)
+		data->last_exit = execute_builtin(node, arr, data);
+	if (data->last_exit != -1 && !redirection)
 		return (data->last_exit);
 	// Fork a new process
 	
@@ -197,8 +197,10 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	else if (pid == 0)
 	{
 		// Child process: execute the command
-		
 		execute_redirection(save, redirection, path); // Execute redirection if needed
+		data->last_exit = execute_builtin(node, arr, data);
+		if (data->last_exit != -1)
+			exit(data->last_exit);
 		if (node->type != TOKEN)
 		{
 			execute_ast_node(node, data); // Execute the command if it's not a cmd
