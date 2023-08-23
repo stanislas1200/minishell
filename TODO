@@ -1,0 +1,7 @@
+Export: potentialy have "" for var data (USER="SGODIN")
+
+Syntax error: cmd | < cmd2 (only error if no cmd2)
+
+heredoc can cmd <<EOF arg ? 
+
+fix this cat <<EOF <<EOF | echo 42
