@@ -282,43 +282,34 @@ t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
 
 void check_eof(t_ASTNode **root)
 {
+	t_ASTNode	*node;
+	t_ASTNode	*cmd;
+
+
 	if (!*root)
 		return;
-
-	t_ASTNode *node = *root;
-
+	node = *root;
 	if (node->type == 4)
 	{
-		t_ASTNode *cmd = remove_all_input_nodes(&(node->left));
+		cmd = remove_all_input_nodes(&(node->left));
 		if (!node->left)
 			node->left = cmd;
-		// else
-		// 	node->left->left = cmd;
-		return; // No need to continue checking other branches
+		return;
 	}
-
 	check_eof(&(node->right));
 }
 
-
-
-
-void reorder_tree(t_ASTNode **root) // TODO : Handle all type of redirections && don't send data to the pipe
+void reorder_tree(t_ASTNode **root)
 {
-	t_ASTNode *node = *root;
-	t_ASTNode *prev = NULL; // Keep track of the previous node
-	t_ASTNode *prev_save = NULL; // Keep track of the previous node that is not a redirection
-	t_ASTNode *save = NULL;
-	// int			type = 0;
-	
-	if (node == NULL)
-		return;
-	
+	t_ASTNode *node;
+	t_ASTNode *prev;
+	t_ASTNode *prev_save;
+	t_ASTNode *save;
+
+	node = *root;
+	prev_save = NULL;
 	while (node && node->right)
 	{
-
-		// if (node && !type && node->type != TOKEN && node->type != CHAR_PIPE)
-		// 	type = node->type; // replace && node->type != TOKEN && node->type != CHAR_PIPE by type
 		if (node && (node->type == TOKEN || node->type == CHAR_PIPE))
 			prev_save = node;
 		if (node && node->type != TOKEN && node->type != CHAR_PIPE)
@@ -353,9 +344,9 @@ t_ASTNode	*parse(t_lexer *lexer, t_data *data)
 	t_token		*token;
 
 	token = lexer->tokens;
-
 	tree = parse_top(token, data);
-
+	if (!tree)
+		return (data->last_exit = 2, NULL);
 	if (data->parse_end)
 	{
 		ast_destroy(tree);
@@ -367,53 +358,3 @@ t_ASTNode	*parse(t_lexer *lexer, t_data *data)
 	check_eof(&tree);
 	return (tree);
 }
-
-/* Debug */
-
-void	print_ast_node(t_ASTNode *node, int indent)
-{
-	if (node == NULL)
-		return ;
-
-	// Print the current node's data with indentation
-	for (int i = 0; i < indent; i++)
-		printf("    ");
-
-	printf("Type: %d, Data: %s\n", node->type, node->data);
-
-	// Recursively print left and right subtrees
-	print_ast_node(node->left, indent + 1);
-	print_ast_node(node->right, indent + 1);
-}
-
-void print_ast_tree_vertical(t_ASTNode *node, int level) {
-	if (node != NULL) {
-		print_ast_tree_vertical(node->right, level + 1);
-
-		for (int i = 0; i < level; i++) {
-			printf("    ");
-		}
-		printf(M "|-- " C);
-		if (node->type == CHAR_PIPE)
-			printf(Y "%s" C, node->data);
-		else if ( node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR | node->type == 3)
-			printf(G "%c " C, node->type == 3 ? 'A' : node->type);
-		else if (node->type == 4)
-			printf(R "H " C);
-		printf("%s\n", node->data);
-
-		print_ast_tree_vertical(node->left, level + 1);
-	}
-}
-
-void	print_ast(t_ASTNode *root)
-{
-	if (root == NULL)
-		return (printf("Empty tree\n"), (void)NULL);
-	printf(Y "Abstract Syntax Tree:\n" C);
-	print_ast_node(root, 0);
-	printf("\n");
-	print_ast_tree_vertical(root, 0);
-}
-
-/* CHECK  AFTER REDIRECTION */
