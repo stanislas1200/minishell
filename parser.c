@@ -25,7 +25,6 @@ t_ASTNode	*new_node(int t, char *d)
 		return (free(node), NULL);
 	node->left = NULL;
 	node->right = NULL;
-
 	return (node);
 }
 
@@ -58,75 +57,82 @@ void	ast_destroy(t_ASTNode *node)
 	node = NULL;
 }
 
+void	*print_error(char *str, t_data *data)
+{
+	ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `", 2);
+	if (str)
+	{
+		if (str[0] == '\n')
+			ft_putstr_fd("newline", 2);
+		else if (str[0] == '\0')
+			ft_putstr_fd("end of file", 2);
+		else
+			ft_putstr_fd(str, 2);
+	}
+	ft_putstr_fd("'\n", 2);
+	data->parse_end = 1;
+	return (NULL);
+}
+
 t_ASTNode	*command_simple(t_token **token, int type)
 {
 	t_ASTNode	*node;
-	// Check token
-	if (!*token || (*token)->type != TOKEN)
-		return (NULL); // TODO
 
-	// Init token
+	if (!*token || (*token)->type != TOKEN)
+		return (NULL);
 	node = new_node(type, (*token)->data);
 	if (!node)
-		return (NULL); // TODO
-
-	// Move to the next
+		return (NULL); // MALLOC ERROR
 	if (*token && (*token)->type == TOKEN)
 		*token = (*token)->next;
-	// Get Arg if Arg
 	node->right = command_simple(token, ARG);
-
 	return (node);
 }
 
 t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 {
-	// t_ASTNode	*left;
 	t_ASTNode	*node;
 
 	if (!left)
 		left = command_simple(token, TOKEN);
 	if (!left)
-		return (NULL); // TODO
-
+		return (NULL);
 	if ((*token) && (*token)->type == CHAR_PIPE)
 	{
 		node = new_node(CHAR_PIPE, (*token)->data);
 		if (!node)
 			return (free_node(left));
 		node->left = left;
-
-		// Move the token pointer to the next token
 		*token = (*token)->next;
-
-		// Recursively parse the right side of the pipe
 		if ((*token)->type != TOKEN)
 		{
-		data->parse_end = 1;
-			return (ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
+			data->parse_end = 1;
+			return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
 		}
 		node->right = parse_top(*token, data);
-
 		return (node);
 	}
-
 	return (free_node(left));
 }
 
 t_ASTNode	*redirection(t_token **token, t_data *data)
 {
 	int			type;
-	t_ASTNode	*left = NULL;
+	int			old;
+	t_ASTNode	*left;
 	t_ASTNode	*node;
+	t_token		*save;
+	t_ASTNode	*new_root;
+	t_token		*temp;
 
-	// Check left side of the redirection operator
+	left = NULL;
 	if ((*token) && (*token)->type != CHAR_PIPE && (*token)->type != TOKEN && (*token)->next)
 	{
-		t_token *save = *token;
+		save = *token;
 		while (save && save->type != CHAR_PIPE && save->type != 0)
 		{
-			int old = save->type; // BE SURE
-			t_token *temp = save;
+			old = save->type;
+			temp = save;
 			save = save->next;
 			if (save && save->type == TOKEN && old == TOKEN)
 			{
@@ -137,13 +143,9 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	}
 	else
 		left = command_simple(token, TOKEN);
-
-	// Check if the token is a redirection operator
 	if (!(*token) || (*token)->type == CHAR_PIPE || (*token)->type == TOKEN)
 		return (free_node(left));
-	// Save the token type
 	type = (*token)->type;
-	// Check double
 	if ((*token)->next && (*token)->next->type == type)
 	{
 		(*token) = (*token)->next;
@@ -152,44 +154,35 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 		else if (type == CHAR_OUTPUTR)
 			type = 3;
 	}
-	// Move the token pointer to the next token (the filename)
 	*token = (*token)->next;
-	// Check if the token is a filename
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd((*token)->data, 2), ft_putstr_fd("'\n", 2), data->last_exit = 2, free_node(left));
+		return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
 	}
-	// Init the node
 	node = new_node(type, (*token)->data);
 	if (!node)
 		return (free_node(left));
-
-	// Set the node's left
 	node->left = left;
-	
-	// Move the token pointer to the next token if arg
 	while ((*token)->next && (*token)->next->type == 0)
 		(*token) = (*token)->next;
-	// Recursively parse the right side of the pipe
 	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
 	{
 		*token = (*token)->next;
-		t_ASTNode	*new_root = new_node('|', (*token)->data);
+		new_root = new_node('|', (*token)->data);
 		node->right = new_root;
 		new_root->right = parse_top((*token)->next, data);
 	}
 	else
 	{
-		// Get all arg if multiple redirections
 		if ((*token)->next && (*token)->next->type != CHAR_PIPE && left)
 		{
 			while (left->right)
 				left = left->right;
-			t_token *save = *token;
+			save = *token;
 			while (save && save->type != CHAR_PIPE)
 			{
-				int old = save->type; // BE SURE
+				old = save->type;
 				save = save->next;
 				if (save && save->type == TOKEN && (old == TOKEN || !old))
 				{
@@ -206,23 +199,6 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	return (node);
 }
 
-t_ASTNode	*job_command(t_token *token, t_data *data)
-{
-	t_token		*save;
-	t_ASTNode	*node;
-
-	save = token;
-	node = NULL;
-
-	if ((node = redirection(&token, data)) != NULL)		// <simple command> <|> <filename>
-		return (node);
-	token = save;
-	if ((node = command_simple(&token, TOKEN)) != NULL)	// <simple command>
-		return (node);
-
-	return (NULL);
-}
-
 t_ASTNode	*parse_top(t_token *token, t_data *data)
 {
 	t_token		*save;
@@ -230,31 +206,38 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 
 	while (token && token->type == 0)
 		token = token->next;
-
 	if (!token || token->type == 0)
 		return (NULL);
-	save = token;
 	node = NULL;
-	
-	if ((node = job_pipe(&token, data, NULL)) != NULL && !data->parse_end)	// <command> | <job>
+	save = token;
+	node = job_pipe(&token, data, NULL);
+	if (node && !data->parse_end)
 		return (node);
 	token = save;
-	if ((node = job_command(token, data)) != NULL && !data->parse_end)	// <command>
+	node = redirection(&token, data);
+	if (node && !data->parse_end)
+		return (node);
+	token = save;
+	node = command_simple(&token, TOKEN);
+	if (node && !data->parse_end)
 		return (node);
 	if (data->parse_end)
 		return (data->parse_end = 1, NULL);
-	return(ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `",2), ft_putstr_fd(token->data, 2), ft_putstr_fd("'\n", 2),data->parse_end = 1, NULL);
+	return (print_error(token->data, data));
 }
 
-t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
+t_ASTNode	*remove_all_input_nodes(t_ASTNode **root)
 {
-	t_ASTNode *cmd = NULL;
+	t_ASTNode	*cmd;
+	t_ASTNode	*node;
+	t_ASTNode	*prev;
+	t_ASTNode	*temp;
+
 	if (!*root)
 		return (NULL);
-
-	t_ASTNode *node = *root;
-	t_ASTNode *prev = NULL;
-
+	node = *root;
+	prev = NULL;
+	cmd = NULL;
 	while (node)
 	{
 		if (node->type == CHAR_INPUTR)
@@ -265,8 +248,7 @@ t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
 				prev->right = node->right;
 			else
 				*root = node->right;
-
-			t_ASTNode *temp = node;
+			temp = node;
 			node = node->right;
 			temp->right = NULL;
 			free(temp->data);
@@ -283,31 +265,30 @@ t_ASTNode *remove_all_input_nodes(t_ASTNode **root)
 	return (cmd);
 }
 
-void check_eof(t_ASTNode **root)
+void	check_eof(t_ASTNode **root)
 {
 	t_ASTNode	*node;
 	t_ASTNode	*cmd;
 
-
 	if (!*root)
-		return;
+		return ;
 	node = *root;
 	if (node->type == 4)
 	{
 		cmd = remove_all_input_nodes(&(node->left));
 		if (!node->left)
 			node->left = cmd;
-		return;
+		return ;
 	}
 	check_eof(&(node->right));
 }
 
-void reorder_tree(t_ASTNode **root)
+void	reorder_tree(t_ASTNode **root)
 {
-	t_ASTNode *node;
-	t_ASTNode *prev;
-	t_ASTNode *prev_save;
-	t_ASTNode *save;
+	t_ASTNode	*node;
+	t_ASTNode	*prev;
+	t_ASTNode	*prev_save;
+	t_ASTNode	*save;
 
 	node = *root;
 	prev_save = NULL;
@@ -335,7 +316,6 @@ void reorder_tree(t_ASTNode **root)
 					return ;
 				}
 			}
-
 		}
 		node = node->right;
 	}
