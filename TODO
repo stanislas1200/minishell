@@ -4,4 +4,4 @@ Syntax error: cmd | < cmd2 (only error if no cmd2)
 
 heredoc can cmd <<EOF arg ? 
 
-fix this cat <<EOF <<EOF | echo 42
+fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
