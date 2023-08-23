@@ -199,6 +199,8 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 				}
 			}
 		}
+		if ((*token)->next && (*token)->next->type == 0)
+			(*token) = (*token)->next;
 		node->right = parse_top((*token)->next, data);
 	}
 	return (node);
