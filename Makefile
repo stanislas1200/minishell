@@ -3,14 +3,14 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+         #
+#    By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/13 14:39:47 by sgodin            #+#    #+#              #
-#    Updated: 2023/08/22 18:12:39 by sgodin           ###   ########.fr        #
+#    Updated: 2023/08/23 15:47:47 by dspilleb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c lexer.c parser.c executer.c execve.c \
+SRCS = main.c lexer.c parser.c executer.c execve.c utils.c\
 		env_utils.c\
 						builtins/builtin.c\
 						builtins/builtin_tools.c\
