@@ -5,3 +5,14 @@ Syntax error: cmd | < cmd2 (only error if no cmd2)
 heredoc can cmd <<EOF arg ? 
 
 fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
+
+Test 105: ❌ echo hi | >FILE echo bye >FILE-invalid_permission
+Only in ./bash_outfiles: outfile01
+mini outfiles:
+cat: './mini_outfiles/*': No such file or directory
+bash outfiles:
+mini exit code =
+bash exit code = 1
+
+
+136/151

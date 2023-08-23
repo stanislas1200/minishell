@@ -282,7 +282,7 @@ t_lexer	*lexer_build(char *str, t_data *data)
 		}
 	}
 	token->data[j] = 0;
-	// 6. Return the lexer
+	// 6. expand variables
 	token = lexer->tokens;
 	while (token)
 	{
@@ -293,6 +293,8 @@ t_lexer	*lexer_build(char *str, t_data *data)
 		new = expand_variables(token->data, data);
 		if (!new)
 			return (malloc_error(lexer));
+		if (new[0] == '\0')
+			token->type = CHAR_NULL;
 		free(token->data);
 		token->data = new;
 		// strip

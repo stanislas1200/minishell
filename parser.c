@@ -169,7 +169,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	node->left = left;
 	
 	// Move the token pointer to the next token if arg
-	if ((*token)->next && (*token)->next->type == 0)
+	while ((*token)->next && (*token)->next->type == 0)
 		(*token) = (*token)->next;
 	// Recursively parse the right side of the pipe
 	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
@@ -199,7 +199,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 				}
 			}
 		}
-		if ((*token)->next && (*token)->next->type == 0)
+		while ((*token)->next && (*token)->next->type == 0)
 			(*token) = (*token)->next;
 		node->right = parse_top((*token)->next, data);
 	}
@@ -227,6 +227,9 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 {
 	t_token		*save;
 	t_ASTNode	*node;
+
+	while (token && token->type == 0)
+		token = token->next;
 
 	if (!token || token->type == 0)
 		return (NULL);
