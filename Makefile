@@ -10,16 +10,22 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c lexer.c parser.c executer.c execve.c utils.c\
+SRCS = main.c\
+		lexer.c\
+		parser.c\
+		executer.c\
+		execve.c \
 		env_utils.c\
-						builtins/builtin.c\
-						builtins/builtin_tools.c\
-						builtins/cd.c\
-						builtins/echo.c\
-						builtins/exit.c\
-						builtins/export.c\
-						builtins/export2.c\
-						builtins/unset.c\
+    utils.c\
+		debug.c\
+			builtins/builtin.c\
+			builtins/builtin_tools.c\
+			builtins/cd.c\
+			builtins/echo.c\
+			builtins/exit.c\
+			builtins/export.c\
+			builtins/export2.c\
+			builtins/unset.c\
 
 OBJS_DIR = ./objects/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
