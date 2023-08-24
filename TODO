@@ -18,4 +18,39 @@ mini exit code =
 bash exit code = 1
 
 
+#invalid command, followed by empty variable, should clear the exit code
+doesntexist
+$EMPTY
+echo $?
+
+# Neither of these unsets should break the shell, and you should still be able to call `/bin/ls`
+unset USER
+unset PATH
+unset PWD
+/bin/ls
+
+
+cat <<HERE | ls
+oi
+HERE
+
+cat <<HERE
+$USER
+oi
+HERE
+
+cat <minishell.h <<EOF <missing | ls (mini have pipe error)
+
+cat <minishell.h <<EOF | cat (should take heredoc as input and send it to next cat)
+
+cat <minishell.h <<HERE <missing <<DOC | echo oi
+> HERE
+> DOC
+oi
+-bash: missing: No such file or directory
+
+<< echo oi
+> echo
+oi: command not found
+
 136/151
