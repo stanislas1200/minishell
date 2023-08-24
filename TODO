@@ -2,12 +2,11 @@ Export: potentialy have "" for var data (USER="SGODIN")
 
 Syntax error: cmd | < cmd2 (only error if no cmd2)
 
-heredoc can cmd <<EOF arg ? 
 
 fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
 
 heredoc EOF NULL cmd not working
-heredoc not working after redirection
+heredoc not working after pipe
 
 Test 105: ❌ echo hi | >FILE echo bye >FILE-invalid_permission
 Only in ./bash_outfiles: outfile01
@@ -52,5 +51,8 @@ oi
 << echo oi
 > echo
 oi: command not found
+
+<<EOF // segfault , should work
+<<EOF $MISSIGN echo 42 // segfault , should work
 
 136/151
