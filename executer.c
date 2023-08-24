@@ -46,20 +46,24 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 			return (perror("open"), exit(1));
 		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
 		{
-			if (save->right->type != redirection)
-			{
+			if (save->right->type != redirection) // handle different redirections
 				dup2(fd, STDOUT_FILENO);
-				close(fd);
-			}
+			close(fd);
 			execute_redirection(save->right, save->right->type, save->right->data, data);
 			return ;
 		}
 		else
 		{
 			if (save->right && save->right->type == 4)
+			{
+				data->pipefd = fd;
 				execute_redirection(save->right, save->right->type, save->right->data, data);
-			dup2(fd, STDOUT_FILENO);
-			close(fd);
+			}
+			else
+			{
+				dup2(fd, STDOUT_FILENO);
+				close(fd);
+			}
 		}
 	}
 	// Handle input redirection (<)  
@@ -73,20 +77,16 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 			perror("");
 			exit(1) ;
 		}
-		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
+		if (save->right && save->right->type != CHAR_PIPE)
 		{
-			if (save->right->type != redirection) // handle different redirections
-			{
+			if (save->right->type != redirection && save->right->type != 4) // handle different redirections
 				dup2(fd, STDIN_FILENO);
-				close(fd);
-			}
+			close(fd);
 			execute_redirection(save->right, save->right->type, save->right->data, data);
 			return ;
 		}
 		else
 		{
-			if (save->right && save->right->type == 4)
-				execute_redirection(save->right, save->right->type, save->right->data, data);
 			dup2(fd, STDIN_FILENO);
 			close(fd);
 		}
@@ -116,15 +116,36 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 			text = ft_strjoin(text, "\n");
 			free(buffer);
 		}
-		if (save->right && save->right->type != CHAR_PIPE)
-			execute_redirection(save->right, save->right->type, save->right->data, data);
-		else
-		{
+		
 			if (data->pipefd)
 			{
 				dup2(data->pipefd, STDOUT_FILENO);
 				close(data->pipefd);
 			}
+		if (save->right && save->right->type != CHAR_PIPE)
+		{
+			if (save->right->type != redirection && save->right->type != CHAR_INPUTR) // handle different redirections
+			{
+				int flag = 0;
+				t_ASTNode *temp = save->right;
+				while (temp->right && temp->right->type != CHAR_PIPE)
+				{
+					if (temp->right->type == 4)
+						flag = 1;
+					temp = temp->right;
+				}
+				if (!flag)
+				{
+					write(fd[1], text, strlen(text));
+					dup2(fd[0], STDIN_FILENO);
+				}
+			}
+			close(fd[1]);
+			close(fd[0]);
+			execute_redirection(save->right, save->right->type, save->right->data, data);
+		}
+		else
+		{
 			// Write the text to the pipe
 			write(fd[1], text, strlen(text));
 			// Close the write end of the pipe
@@ -134,7 +155,6 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 			dup2(fd[0], STDIN_FILENO);
 			close(fd[0]);
 		}
-
 	}
 
 }
