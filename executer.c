@@ -70,7 +70,7 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 		fd = open(path, O_RDONLY);
 		if (fd == -1)
 		{
-			perror("Error \n");
+			perror("");
 			exit(1) ;
 		}
 		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
@@ -289,8 +289,10 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 			close(pipefd[1]);
 
 			// Wait for both child processes to complete
+			signal(SIGINT, SIG_IGN);
 			waitpid(left_pid, NULL, 0);
 			waitpid(right_pid, &status, 0);	
+			signal(SIGINT, signal_handler);
 		}
 	}
 	return (WEXITSTATUS(status));

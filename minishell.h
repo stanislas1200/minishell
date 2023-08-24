@@ -80,6 +80,9 @@ enum e_TOKEN_TYPE
 	ARG = -2
 };
 
+//utils
+char		*free_join(char *s1, char *s2);
+
 //builtins
 int			cd(char ***envp, char **paths);
 int			pwd(void);
