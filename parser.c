@@ -78,6 +78,8 @@ t_ASTNode	*command_simple(t_token **token, int type)
 {
 	t_ASTNode	*node;
 
+	while (*token && (*token)->type == 0)
+		*token = (*token)->next;
 	if (!*token || (*token)->type != TOKEN)
 		return (NULL);
 	node = new_node(type, (*token)->data);
@@ -143,7 +145,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	}
 	else
 		left = command_simple(token, TOKEN);
-	if (!(*token) || (*token)->type == CHAR_PIPE || (*token)->type == TOKEN)
+	if (!(*token) || (*token)->type == CHAR_PIPE || (*token)->type == TOKEN || (*token)->type == 0) // 
 		return (free_node(left));
 	type = (*token)->type;
 	if ((*token)->next && (*token)->next->type == type)

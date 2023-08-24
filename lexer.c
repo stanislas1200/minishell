@@ -74,7 +74,7 @@ void strip_quotes(char* src, char* dest)
 			dest[j++] = src[i];
 	}
 	
-	dest[j] = 0;
+	dest[j] = '\0';
 }
 
 char	*expand_variables(char *input, t_data *data)
@@ -298,13 +298,15 @@ t_lexer	*lexer_build(char *str, t_data *data)
 		free(token->data);
 		token->data = new;
 		// strip
-		new = malloc(sizeof(char) * ft_strlen(token->data));
-		if (!new)
-			return (malloc_error(lexer));
-		strip_quotes(token->data, new);
-		free(token->data);
-		token->data = new;
-
+		if (token->type != CHAR_NULL)
+		{
+			new = malloc(sizeof(char) * ft_strlen(token->data) + 1);
+			if (!new)
+				return (malloc_error(lexer));
+			strip_quotes(token->data, new);
+			free(token->data);
+			token->data = new;
+		}
 		token = token->next;
 	}
 	return (lexer);

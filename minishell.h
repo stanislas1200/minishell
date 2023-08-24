@@ -58,10 +58,11 @@ typedef struct t_ASTNode // Abstract Syntax Tree Node
 
 typedef struct t_data
 {
-	int		parse_end;
-	char	**env;
-	int		last_exit;
-	int		pipefd;
+	int			parse_end;
+	char		**env;
+	int			last_exit;
+	int			pipefd;
+	t_ASTNode	*ast_root;
 }	t_data;
 
 enum e_TOKEN_TYPE

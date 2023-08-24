@@ -12,7 +12,10 @@ void	lexer_print(t_lexer *lexer)
 	printf(Y "lexer:\n" C);
 	while (token)
 	{
-		printf("type: %d, value: %s|\n", token->type, token->data);
+		if (token->type == CHAR_NULL)
+			printf("type: %d, value: %s|\n", token->type, "NULL");
+		else
+			printf("type: %d, value: %s|\n", token->type, token->data);
 		token = token->next;
 	}
 	printf("\n");

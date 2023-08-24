@@ -7,6 +7,7 @@ heredoc can cmd <<EOF arg ?
 fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
 
 heredoc EOF NULL cmd not working
+heredoc not working after redirection
 
 Test 105: ❌ echo hi | >FILE echo bye >FILE-invalid_permission
 Only in ./bash_outfiles: outfile01

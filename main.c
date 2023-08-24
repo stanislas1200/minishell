@@ -73,28 +73,27 @@ void	*get_prompt(void)
 
 void	main_loop(t_data data, char *buff, char *prompt)
 {
-	t_ASTNode	*ast_root;
 	t_lexer		*lexer;
 
 	while (1)
 	{
 		prompt = get_prompt();
 		buff = readline(prompt);
+		free(prompt);
 		if (!buff)
 		{
 			printf(R "exit\n" C);
 			break ;
 		}
-		free(prompt);
 		add_history(buff);
 		lexer = lexer_build(buff, &data);
 		if (lexer)
 		{
-			ast_root = parse(lexer, &data);
+			data.ast_root = parse(lexer, &data);
 			lexer_destroy(lexer);
-			if (ast_root)
-				execute_ast_node(ast_root, &data);
-			ast_destroy(ast_root);
+			if (data.ast_root)
+				execute_ast_node(data.ast_root, &data);
+			ast_destroy(data.ast_root);
 		}
 		free(buff);
 	}
