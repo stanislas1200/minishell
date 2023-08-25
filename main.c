@@ -86,6 +86,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 			break ;
 		}
 		add_history(buff);
+		data.parse_end = 0;
 		lexer = lexer_build(buff, &data);
 		if (lexer)
 		{
