@@ -315,6 +315,7 @@ void	reorder_tree(t_ASTNode **root)
 						prev_save->right = node;
 					else
 						*root = node;
+					reorder_tree(&(node->right));
 					return ;
 				}
 			}

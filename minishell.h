@@ -61,7 +61,7 @@ typedef struct t_data
 	int			parse_end;
 	char		**env;
 	int			last_exit;
-	int			pipefd;
+	int			pipefd[2];
 	t_ASTNode	*ast_root;
 }	t_data;
 

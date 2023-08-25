@@ -64,8 +64,11 @@ int	heredoc(char *path, t_data *data)
 int	check_heredoc(t_ASTNode *node)
 {
 	t_ASTNode *temp = node;
-	while (temp && temp->type != CHAR_PIPE)
+	while (temp)
 	{
+		if (temp->type == CHAR_PIPE)
+			if (check_heredoc(temp->left))
+				return (1);
 		if (temp->type == 4)
 			return (1);
 		temp = temp->right;

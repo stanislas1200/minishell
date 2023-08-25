@@ -113,7 +113,7 @@ int	main(int ac, char **av, char **envv)
 	data.env = envp;
 	data.last_exit = 0;
 	data.parse_end = 0;
-	print_header();
+	// print_header();
 	main_loop(data, buff, prompt);
 	return (0);
 }
