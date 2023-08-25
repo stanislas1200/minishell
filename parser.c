@@ -108,8 +108,14 @@ t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 		*token = (*token)->next;
 		if ((*token)->type != TOKEN)
 		{
-			data->parse_end = 1;
-			return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
+			if (!(*token)->next || (*token)->next->type != TOKEN)
+			{
+				if (!(*token)->next || !(*token)->next->next || (*token)->next->type != (*token)->type)
+				{
+					data->parse_end = 1;
+				return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
+				}
+			}
 		}
 		node->right = parse_top(*token, data);
 		return (node);
