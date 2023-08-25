@@ -86,10 +86,12 @@ void	main_loop(t_data data, char *buff, char *prompt)
 			break ;
 		}
 		add_history(buff);
+		data.parse_end = 0;
 		lexer = lexer_build(buff, &data);
 		if (lexer)
 		{
 			data.ast_root = parse(lexer, &data);
+			// print_ast(data.ast_root);
 			lexer_destroy(lexer);
 			if (data.ast_root)
 				execute_ast_node(data.ast_root, &data);

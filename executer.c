@@ -121,7 +121,7 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 		// 	fd = heredoc(path, data);
 		if (fd == -1)
 		{
-			perror("");
+			perror("open");
 			exit(1) ;
 		}
 		// if (data->pipefd) // 
@@ -169,19 +169,29 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 			text = ft_strjoin(text, "\n");
 			free(buffer);
 		}
+		if (!text)
+			text = ft_strdup("");
+
+		// EXPAND HERE DOC
+		char *new;
+		new = expand_variables(text, data);
+		if (new)
+		{	 // TODO : handle error
+		free(text);
+		text = new;}
 		
-			if (data->pipefd[1])
-			{
-				dup2(data->pipefd[1], STDOUT_FILENO);
-				close(data->pipefd[1]);
-				data->pipefd[1] = 0;
-			}
-			if (data->pipefd[0])
-			{
-				dup2(data->pipefd[0], STDIN_FILENO);
-				close(data->pipefd[0]);
-				data->pipefd[0] = 0;
-			}
+		if (data->pipefd[1] && !check_heredoc(save->right))
+		{
+			dup2(data->pipefd[1], STDOUT_FILENO);
+			close(data->pipefd[1]);
+			data->pipefd[1] = 0;
+		}
+		if (data->pipefd[0] && !check_heredoc(save->right))
+		{
+			dup2(data->pipefd[0], STDIN_FILENO);
+			close(data->pipefd[0]);
+			data->pipefd[0] = 0;
+		}
 		if (save->right && save->right->type != CHAR_PIPE)
 		{
 			if (save->right->type != redirection && save->right->type != CHAR_INPUTR) // handle different redirections

@@ -120,6 +120,7 @@ long		ft_long_atoi(const char *nptr);
 // Lexer
 t_lexer		*lexer_build(char *str, t_data *data);
 void		lexer_destroy(t_lexer *lexer);
+char		*expand_variables(char *input, t_data *data);
 
 // Parser
 t_ASTNode	*parse(t_lexer *lexer, t_data *data);
