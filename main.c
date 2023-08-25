@@ -91,7 +91,6 @@ void	main_loop(t_data data, char *buff, char *prompt)
 		if (lexer)
 		{
 			data.ast_root = parse(lexer, &data);
-			// print_ast(data.ast_root);
 			lexer_destroy(lexer);
 			if (data.ast_root)
 				execute_ast_node(data.ast_root, &data);
@@ -115,7 +114,7 @@ int	main(int ac, char **av, char **envv)
 	data.env = envp;
 	data.last_exit = 0;
 	data.parse_end = 0;
-	// print_header();
+	print_header();
 	main_loop(data, buff, prompt);
 	return (0);
 }

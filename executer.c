@@ -229,7 +229,7 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	t_ASTNode	*save;
 	int			num_args;
 	t_ASTNode	*arg_node ;
-	char		**arr;
+	char		**arr = NULL;
 
 	redirection = 0;
 	path = NULL;
@@ -242,39 +242,41 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 		node = node->left;
 	}
 
-	// Count the number of arguments
-	num_args = 0;
-	arg_node = node->right;
-	while (arg_node)
+	if (node)
 	{
-		num_args++;
-		arg_node = arg_node->right;
-	}
+		// Count the number of arguments
+		num_args = 0;
+		arg_node = node->right;
+		while (arg_node)
+		{
+			num_args++;
+			arg_node = arg_node->right;
+		}
 
-	// Create an array to hold the command and arguments
-	arr = (char **)malloc((num_args + 2) * sizeof(char *));
-	if (!arr)
-	{
-		perror("malloc");
-		return (-1);
-	}
+		// Create an array to hold the command and arguments
+		arr = (char **)malloc((num_args + 2) * sizeof(char *));
+		if (!arr)
+		{
+			perror("malloc");
+			return (-1);
+		}
 
-	// Fill in the array with the command and arguments
-	arr[0] = node->data;
-	int i = 1;
-	arg_node = node->right;
-	while (arg_node != NULL) {
-		arr[i] = arg_node->data;
-		i++;
-		arg_node = arg_node->right;
+		// Fill in the array with the command and arguments
+		arr[0] = node->data;
+		int i = 1;
+		arg_node = node->right;
+		while (arg_node != NULL) {
+			arr[i] = arg_node->data;
+			i++;
+			arg_node = arg_node->right;
+		}
+		arr[i] = NULL;
+		if (!redirection)
+			data->last_exit = execute_builtin(node, arr, data);
+		if (data->last_exit != -1 && !redirection)
+			return (data->last_exit);
 	}
-	arr[i] = NULL;
-	if (!redirection)
-		data->last_exit = execute_builtin(node, arr, data);
-	if (data->last_exit != -1 && !redirection)
-		return (data->last_exit);
 	// Fork a new process
-	
 	pid_t pid = fork();
 	if (pid == -1)
 	{
@@ -285,15 +287,19 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	{
 		// Child process: execute the command
 		execute_redirection(save, redirection, path, data); // Execute redirection if needed
-		data->last_exit = execute_builtin(node, arr, data);
-		if (data->last_exit != -1)
-			exit(data->last_exit);
-		if (node->type != TOKEN)
+		if (node)
 		{
-			execute_ast_node(node, data); // Execute the command if it's not a cmd
-			exit(1);
+			data->last_exit = execute_builtin(node, arr, data);
+			if (data->last_exit != -1)
+				exit(data->last_exit);
+			if (node->type != TOKEN)
+			{
+				execute_ast_node(node, data); // Execute the command if it's not a cmd
+				exit(1);
+			}
+			ft_execve(data->env, node->data, arr);
 		}
-    	ft_execve(data->env, node->data, arr);
+		exit(0);
 	}
 	else
 	{
@@ -302,7 +308,8 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
 		signal(SIGINT, signal_handler);
-		free(arr);
+		if (arr)
+			free(arr);
 		/* DEV TEST */ // move to execute_redirection
 		while (save->right && (save->right->type == '>' || save->right->type == '<' || save->right->type == 3 || save->right->type == 4))
 			save = save->right;

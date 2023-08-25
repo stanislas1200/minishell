@@ -137,11 +137,13 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	if ((*token) && (*token)->type != CHAR_PIPE && (*token)->type != TOKEN && (*token)->next)
 	{
 		save = *token;
-		while (save && save->type != CHAR_PIPE && save->type != 0)
+		while (save && save->type != CHAR_PIPE)
 		{
 			old = save->type;
 			temp = save;
 			save = save->next;
+			while(save && save->type == 0)
+				save = save->next;
 			if (save && save->type == TOKEN && old == TOKEN)
 			{
 				left = new_node(TOKEN, save->data);

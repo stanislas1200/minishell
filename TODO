@@ -1,13 +1,6 @@
-Export: potentialy have "" for var data (USER="SGODIN")
-
-Syntax error: cmd | < cmd2 (only error if no cmd2)
-
-remake expand in 1 function for all cases (av, heredoc)
-handle error in heredoc and executer
-
 # fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
 
-heredoc EOF NULL cmd not working
+# heredoc EOF NULL cmd not working
 # heredoc not working after pipe
 
 # Test 105: ❌ echo hi | >FILE echo bye >FILE-invalid_permission
@@ -18,19 +11,8 @@ heredoc EOF NULL cmd not working
 # mini exit code =
 # bash exit code = 1
 
-echo hi | <<EOF ( should heredoc )
-echo 42 | <FILE | wc ( should try <FILE )
-
-#invalid command, followed by empty variable, should clear the exit code
-doesntexist
-$EMPTY
-echo $?
-
-# Neither of these unsets should break the shell, and you should still be able to call `/bin/ls`
-unset USER
-unset PATH
-unset PWD
-/bin/ls
+# echo hi | <<EOF ( should heredoc )
+# echo 42 | <FILE | wc ( should try <FILE )
 
 
 # cat <<HERE | ls
@@ -46,20 +28,46 @@ unset PWD
 
 # cat <minishell.h <<EOF | cat (should take heredoc as input and send it to next cat)
 
+
+# << echo oi
+# > echo
+# oi: command not found
+
+# <<EOF // segfault , should work
+# <<EOF $MISSIGN echo 42 // segfault , should work
+
+Export: potentialy have "" for var data (USER="SGODIN")
+
+Syntax error: cmd | < cmd2 (only error if no cmd2)
+
+remake expand in 1 function for all cases (av, heredoc)
+handle error in heredoc and executer
+
+#invalid command, followed by empty variable, should clear the exit code
+doesntexist
+$EMPTY
+echo $?
+
+# Neither of these unsets should break the shell, and you should still be able to call `/bin/ls`
+unset USER
+unset PATH
+unset PWD
+/bin/ls
+
 cat <minishell.h <<HERE <missing <<DOC | echo oi
 > HERE
 > DOC
 oi
 -bash: missing: No such file or directory
 
-# << echo oi
-# > echo
-# oi: command not found
+Test  17: ❌ echo hi |  "|" 
+mini exit code = 1
+bash exit code = 127
+mini error = ( No such file or directory)
+bash error = ( command not found)
 
-<<EOF // segfault , should work
-<<EOF $MISSIGN echo 42 // segfault , should work
 
-136/151
+137/151
 
 
 
