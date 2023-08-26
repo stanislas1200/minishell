@@ -38,7 +38,9 @@
 
 Export: potentialy have "" for var data (USER="SGODIN")
 
-Syntax error: cmd | < cmd2 (only error if no cmd2)
+# Syntax error: cmd | < cmd2 (only error if no cmd2)
+
+cat | cat << EOF ( heredoc broken if cmd that want read before | )
 
 remake expand in 1 function for all cases (av, heredoc)
 handle error in heredoc and executer
@@ -54,11 +56,11 @@ unset PATH
 unset PWD
 /bin/ls
 
-cat <minishell.h <<HERE <missing <<DOC | echo oi
-> HERE
-> DOC
-oi
--bash: missing: No such file or directory
+# cat <minishell.h <<HERE <missing <<DOC | echo oi
+# > HERE
+# > DOC
+# oi
+# -bash: missing: No such file or directory
 
 Test  17: ❌ echo hi |  "|" 
 mini exit code = 1

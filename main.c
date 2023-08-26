@@ -114,6 +114,9 @@ int	main(int ac, char **av, char **envv)
 	data.env = envp;
 	data.last_exit = 0;
 	data.parse_end = 0;
+	data.r_break = 0;
+	data.pipefd[0] = 0;
+	data.pipefd[1] = 0;
 	print_header();
 	main_loop(data, buff, prompt);
 	return (0);

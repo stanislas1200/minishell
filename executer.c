@@ -78,6 +78,13 @@ int	check_heredoc(t_ASTNode *node)
 
 void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *data) // TODO : handle all in one
 {
+	if (data->r_break && redirection != 4)
+		{
+			if (save->right && check_heredoc(save->right))
+				return (execute_redirection(save->right, save->right->type, save->right->data, data));
+			else
+				return ;
+		}
 	// Handle output redirection (>) and (>>) append
 	if (redirection == 3 || redirection == CHAR_OUTPUTR)
 	{
@@ -121,7 +128,13 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 		// 	fd = heredoc(path, data);
 		if (fd == -1)
 		{
-			perror("open");
+			data->r_break = 1;
+			if (save->right && check_heredoc(save->right))
+				execute_redirection(save->right, save->right->type, save->right->data, data);
+			ft_putstr_fd(M "-stanshell" C ": " Y, 2);
+			ft_putstr_fd(path, 2);
+			ft_putstr_fd(C ": No such file or directory\n", 2);
+			// return ;
 			exit(1) ;
 		}
 		// if (data->pipefd) // 
@@ -132,10 +145,12 @@ void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *d
 		// }
 		if (save->right && save->right->type != CHAR_PIPE)
 		{
-			if (save->right->type != redirection && save->right->type != 4) // handle different redirections
+			if (save->right->type != redirection && !check_heredoc(save->right)) // handle different redirections
 				dup2(fd, STDIN_FILENO);
 			close(fd);
 			execute_redirection(save->right, save->right->type, save->right->data, data);
+			// if (data->r_break)
+			// 	perror("open");
 			return ;
 		}
 		else

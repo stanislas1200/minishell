@@ -59,9 +59,10 @@ typedef struct t_ASTNode // Abstract Syntax Tree Node
 typedef struct t_data
 {
 	int			parse_end;
-	char		**env;
 	int			last_exit;
+	int			r_break;
 	int			pipefd[2];
+	char		**env;
 	t_ASTNode	*ast_root;
 }	t_data;
 
