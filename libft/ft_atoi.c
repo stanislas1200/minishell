@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 09:44:43 by sgodin            #+#    #+#             */
-/*   Updated: 2022/11/16 13:49:41 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/28 16:30:48 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include <errno.h>
 
 int	ft_overfloaw(int neg)
 {
@@ -37,10 +39,10 @@ int	ft_atoi(const char *str)
 		i++;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
-		nb = str[i++] - '0' + nb * 10;
-		if (nb < temp)
-			return (ft_overfloaw(neg));
-		temp = nb;
+		temp = str[i++] - '0' + temp * 10;
+		if (temp * neg > 2147483647 || temp * neg < -2147483648)
+			return (errno = 22, ft_overfloaw(neg));
+		nb = temp;
 	}
 	return (nb * neg);
 }
