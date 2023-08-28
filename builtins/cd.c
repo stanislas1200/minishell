@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/22 19:09:53 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/28 15:27:37 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,7 @@ int	cd(char ***envp, char **paths)
 	int	state;
 
 	state = 0;
-	if (matrix_len(paths) > 2)
-	{
-		ft_putstr_fd(R "cd: too many arguments\n" C, 2);
-		state = 1;
-	}
-	else if (paths[1] && ft_strncmp(paths[1], "-", 2) == 0)
+	if (paths[1] && ft_strncmp(paths[1], "-", 2) == 0)
 	{
 		if (chdir(ft_getenv(*envp, "OLDPWD")) == -1)
 		{

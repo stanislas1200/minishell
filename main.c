@@ -82,7 +82,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 		free(prompt);
 		if (!buff)
 		{
-			printf(R "exit\n" C);
+			// printf(R "exit\n" C);
 			break ;
 		}
 		add_history(buff);
@@ -117,7 +117,7 @@ int	main(int ac, char **av, char **envv)
 	data.r_break = 0;
 	data.pipefd[0] = 0;
 	data.pipefd[1] = 0;
-	print_header();
+	// print_header();
 	main_loop(data, buff, prompt);
 	return (0);
 }

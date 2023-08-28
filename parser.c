@@ -142,7 +142,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 			old = save->type;
 			temp = save;
 			save = save->next;
-			while(save && save->type == 0)
+			while (save && save->type == 0)
 				save = save->next;
 			if (save && save->type == TOKEN && old == TOKEN)
 			{

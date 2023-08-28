@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/16 22:04:16 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/22 16:38:22 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/08/28 14:50:47 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	ft_exit(char **envp, char **args)
 
 	errno = 0;
 	exit_code = 0;
-	printf(R "exit\n");
+	// printf(R "exit\n");
 	if (matrix_len(args) > 2)
 	{
 		cperror("exit", NULL, "too many arguments", 0);
@@ -39,12 +39,12 @@ int	check_exit(char *str)
 	long	number;
 
 	if (is_numeric(str))
-		return (cperror("exit", str, "numeric argument required", 0), 2);
+		return (cperror("exit", str, "numeric argument required", 0), 255);
 	number = ft_long_atoi(str);
 	if (errno != 0)
 	{
 		errno = 0;
-		return (cperror("exit", str, "numeric argument required", 0), 2);
+		return (cperror("exit", str, "numeric argument required", 0), 255);
 	}
 	else
 	{
