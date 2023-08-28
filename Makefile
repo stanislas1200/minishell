@@ -12,6 +12,8 @@
 
 SRCS = main.c\
 		lexer.c\
+		lexer_utils.c\
+		expand.c\
 		parser.c\
 		executer.c\
 		execve.c \

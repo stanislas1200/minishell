@@ -42,6 +42,8 @@ Export: potentialy have "" for var data (USER="SGODIN")
 
 cat | cat << EOF ( heredoc broken if cmd that want read before | )
 
+echo hey <> FILE you ( should work and create FILE but not redirect )
+
 remake expand in 1 function for all cases (av, heredoc)
 handle error in heredoc and executer
 
@@ -68,8 +70,8 @@ bash exit code = 127
 mini error = ( No such file or directory)
 bash error = ( command not found)
 
-
-137/151
+146/151 macos bash 3.2
+133/151 linux bash 5.0.17(1)-release (x86_64-pc-linux-gnu)
 
 
 
