@@ -6,11 +6,13 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 18:10:00 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/28 16:36:59 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	is_numeric(char *str);
 
 char	*ft_getenv(char **env, char *str)
 {
@@ -71,33 +73,44 @@ char	**dup_env(char **envp)
 
 void	shell_lvl(char ***envp)
 {
-	static int	count;
 	char		*tmp;
 	int			num;
 	char		*original_value;
 
+	errno = 0;
 	original_value = ft_getenv(*envp, "SHLVL");
 	if (!original_value)
-		export2(envp, "SHLVL=0", 5, 0);
-	else if (count == 0)
+		export2(envp, "SHLVL=1", 5, 0);
+	else
 	{
-		num = ft_atoi(original_value);
-		num++;
+		if (is_numeric(original_value) == 0)
+		{
+			num = ft_atoi(original_value);
+			if (num == INT_MAX || num == INT_MIN || num++ < 0 || errno != 0)
+				num = 0;
+		}
+		else
+			num = 1;
 		tmp = ft_strjoin("SHLVL=", ft_itoa(num));
 		if (!tmp)
-			return (cperror("SHLVL", "malloc", NULL, 1));
+			return (errno = 0, cperror("SHLVL", "malloc", NULL, 1));
 		export2(envp, tmp, 5, 0);
 		free(tmp);
-		count = 1;
 	}
+	errno = 0;
 }
 
 void	update_env(char ***envp)
 {
-	int		i;
-	char	*tmp;
+	static int	count;
+	int			i;
+	char		*tmp;
 
-	shell_lvl(envp);
+	if (!count)
+	{
+		shell_lvl(envp);
+		count++;
+	}
 	update_pwd(envp);
 	i = ft_getindexenv(*envp, "_=");
 	if (i != -1)
