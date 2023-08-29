@@ -338,6 +338,17 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 
 int	execute_pipe(t_ASTNode *node, t_data *data)
 {
+	/*FIX CAT*/
+	
+	// Create a pipe for communication between left and right sides
+	int comm_pipe[2];
+	if (pipe(comm_pipe) == -1)
+	{
+		perror("pipe");
+		return -1;
+	}
+	/*			*/
+
 	int status;
 	int	pipefd[2];
 
@@ -367,6 +378,16 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 		dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe write end
 		close(pipefd[1]); // Close pipe write end
 		}
+		/*FIX CAT*/
+		if (check_heredoc(node->right)) // wait for signal from the right side // ANYTIME OR ONLY IF HEREDOC ?  look good
+        {
+            close(comm_pipe[1]); // Close write end of communication pipe
+            // Wait for signal from the right side
+            char signal_buf[1];
+            read(comm_pipe[0], signal_buf, sizeof(signal_buf)); // Read signal from pipe
+            close(comm_pipe[0]); // Close read end of communication pipe
+        }
+		/*		*/
 		execute_ast_node(node->left, data);
 		exit(data->last_exit);
 	}
@@ -394,6 +415,13 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 				close(pipefd[0]); // Close pipe read end
 			}
 			execute_ast_node(node->right, data);
+
+			/* FIX CAT */
+            close(comm_pipe[0]); // Close read end of communication pipe
+			write(comm_pipe[1], "1", 1); // Send signal to left side
+            close(comm_pipe[1]); // Close write end of communication pipe
+			/*		*/
+
 			exit(data->last_exit);
 		}
 		else
@@ -405,7 +433,7 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 			// Wait for both child processes to complete
 			signal(SIGINT, SIG_IGN);
 			waitpid(left_pid, NULL, 0);
-			waitpid(right_pid, &status, 0);	
+			waitpid(right_pid, &status, 0);
 			signal(SIGINT, signal_handler);
 		}
 	}

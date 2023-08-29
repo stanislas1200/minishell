@@ -40,7 +40,7 @@ Export: potentialy have "" for var data (USER="SGODIN")
 
 # Syntax error: cmd | < cmd2 (only error if no cmd2)
 
-cat | cat << EOF ( heredoc broken if cmd that want read before | )
+# cat | cat << EOF ( heredoc broken if cmd that want read before | )
 
 echo hey <> FILE you ( should work and create FILE but not redirect )
 
