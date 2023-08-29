@@ -2,12 +2,11 @@
 
 int	token_init(t_token *token, int size)
 {
-	token->data = malloc(size + 1);
-	if (!token->data)
-		return (1);
-	token->data[0] = 0;
 	token->type = CHAR_NULL;
 	token->next = NULL;
+	token->data = ft_calloc(size + 1, sizeof(char));
+	if (!token->data)
+		return (1);
 	return (0);
 }
 

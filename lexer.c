@@ -49,6 +49,8 @@ t_token	*lexer_general_next(t_token *token, t_data *data, char c, int size)
 	{
 		if (data->j > 0)
 			token = token_new_next(token, data, size);
+		if (!token)
+			return (NULL);
 		token->data[0] = c;
 		token->data[1] = 0;
 		token->type = c;
@@ -90,7 +92,7 @@ int	lexer_lex(t_token *token, char *str, int size, t_data *data)
 	data->state = GENERAL;
 	data->i = -1;
 	data->j = 0;
-	while (str[++data->i] && token)
+	while (str[++data->i])
 	{
 		if (data->state == GENERAL)
 			token = lexer_general(token, str[data->i], size, data);
@@ -100,6 +102,8 @@ int	lexer_lex(t_token *token, char *str, int size, t_data *data)
 			if (str[data->i] == data->state)
 				data->state = GENERAL;
 		}
+		if (!token)
+			return (1);
 	}
 	token->data[data->j] = 0;
 	return (0);

@@ -68,7 +68,7 @@ int	result_add(t_data *data, char **result, char *input, char *tmp)
 {
 	tmp = ft_calloc(ft_strlen(*result) + 2, sizeof(char));
 	if (!tmp)
-		return (free(*result), 1);
+		return (1);
 	ft_strlcat(tmp, *result, ft_strlen(*result) + 2);
 	ft_strlcat(tmp, input + data->i, ft_strlen(*result) + 2);
 	free(*result);
@@ -101,7 +101,7 @@ char	*expand_variables(char *input, t_data *data)
 				return (free(result), NULL);
 		}
 		else if (result_add(data, &result, input, tmp))
-			return (NULL);
+			return (free(result), NULL);
 	}
 	return (result);
 }

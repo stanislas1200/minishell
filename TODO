@@ -1,4 +1,5 @@
 # fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
+no exactly like bash echo hey | cat | <<EOF 
 
 # heredoc EOF NULL cmd not working
 # heredoc not working after pipe
@@ -101,3 +102,6 @@ SIGSTOP (19): Stop. Sent to a process to pause its execution.
 SIGTSTP (20): Terminal stop. Sent to a process when the user presses CTRL+Z in the terminal.
 SIGTTIN (21): Background read from a terminal.
 SIGTTOU (22): Background write to a terminal.
+
+
+// Lexer Bulletproof

@@ -113,7 +113,7 @@ t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 				if (!(*token)->next || !(*token)->next->next || (*token)->next->type != (*token)->type)
 				{
 					data->parse_end = 1;
-				return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
+					return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
 				}
 			}
 		}
@@ -153,7 +153,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	}
 	else
 		left = command_simple(token, TOKEN);
-	if (!(*token) || (*token)->type == CHAR_PIPE || (*token)->type == TOKEN || (*token)->type == 0) // 
+	if (!(*token) || (*token)->type == CHAR_PIPE || (*token)->type == TOKEN || (*token)->type == 0)
 		return (free_node(left));
 	type = (*token)->type;
 	if ((*token)->next && (*token)->next->type == type)
