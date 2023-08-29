@@ -379,7 +379,7 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 		close(pipefd[1]); // Close pipe write end
 		}
 		/*FIX CAT*/
-		if (check_heredoc(node->right)) // wait for signal from the right side // ANYTIME OR ONLY IF HEREDOC ?  look good
+		if (check_heredoc(node->right) && !check_heredoc(node->left)) // wait for signal from the right side // ANYTIME OR ONLY IF HEREDOC ?  look good
         {
             close(comm_pipe[1]); // Close write end of communication pipe
             // Wait for signal from the right side
