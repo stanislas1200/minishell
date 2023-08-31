@@ -15,6 +15,9 @@ no exactly like bash echo hey | cat | <<EOF
 # echo hi | <<EOF ( should heredoc )
 # echo 42 | <FILE | wc ( should try <FILE )
 
+# Test  52: ❌  
+# mini exit code = 2
+# bash exit code = 0
 
 # cat <<HERE | ls
 # oi
@@ -71,7 +74,7 @@ bash exit code = 127
 mini error = ( No such file or directory)
 bash error = ( command not found)
 
-146/151 macos bash 3.2
+149/152 macos bash 3.2
 133/151 linux bash 5.0.17(1)-release (x86_64-pc-linux-gnu)
 
 

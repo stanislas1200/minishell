@@ -71,6 +71,7 @@ void	*print_error(char *str, t_data *data)
 	}
 	ft_putstr_fd("'\n", 2);
 	data->parse_end = 1;
+	data->last_exit = 2;
 	return (NULL);
 }
 
@@ -113,7 +114,7 @@ t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 				if (!(*token)->next || !(*token)->next->next || (*token)->next->type != (*token)->type)
 				{
 					data->parse_end = 1;
-					return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
+					return (print_error((*token)->data, data), free_node(left));
 				}
 			}
 		}
@@ -168,7 +169,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
 	{
 		data->parse_end = 1;
-		return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
+		return (print_error((*token)->data, data), free_node(left));
 	}
 	node = new_node(type, (*token)->data);
 	if (!node)
@@ -340,7 +341,7 @@ t_ASTNode	*parse(t_lexer *lexer, t_data *data)
 	token = lexer->tokens;
 	tree = parse_top(token, data);
 	if (!tree)
-		return (data->last_exit = 2, NULL);
+		return (NULL);
 	if (data->parse_end)
 	{
 		ast_destroy(tree);
