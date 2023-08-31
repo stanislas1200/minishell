@@ -14,13 +14,11 @@
 
 #define GENERAL 0
 
-int	lexer_edit(t_lexer *lexer, t_data *data)
+int	lexer_edit(t_token *token, t_data *data)
 {
-	t_token	*token;
 	char	*var;
 	char	*new;
 
-	token = lexer->tokens;
 	while (token)
 	{
 		new = expand_variables(token->data, data);
@@ -129,7 +127,8 @@ t_lexer	*lexer_build(char *str, t_data *data)
 	lexer->tokens = malloc(sizeof(t_token));
 	if (!lexer->tokens || token_init(lexer->tokens, size))
 		return (lexer_malloc_error(lexer));
-	if (lexer_lex(lexer->tokens, str, size, data) || lexer_edit(lexer, data))
+	if (lexer_lex(lexer->tokens, str, size, data) \
+	|| lexer_edit(lexer->tokens, data))
 		return (lexer_malloc_error(lexer));
 	return (lexer);
 }

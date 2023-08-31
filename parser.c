@@ -132,16 +132,14 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	t_ASTNode	*node;
 	t_token		*save;
 	t_ASTNode	*new_root;
-	t_token		*temp;
 
 	left = NULL;
 	if ((*token) && (*token)->type != CHAR_PIPE && (*token)->type != TOKEN && (*token)->next)
 	{
 		save = *token;
-		while (save && save->type != CHAR_PIPE)
+		while (save && save->data && save->type != CHAR_PIPE)
 		{
 			old = save->type;
-			temp = save;
 			save = save->next;
 			while (save && save->type == 0)
 				save = save->next;
@@ -149,6 +147,7 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 			{
 				left = new_node(TOKEN, save->data);
 				save->type = 0;
+				break;
 			}
 		}
 	}
@@ -177,15 +176,9 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	node->left = left;
 	while ((*token)->next && (*token)->next->type == 0)
 		(*token) = (*token)->next;
-	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
-	{
-		*token = (*token)->next;
-		new_root = new_node('|', (*token)->data);
-		node->right = new_root;
-		new_root->right = parse_top((*token)->next, data);
-	}
-	else
-	{
+	
+	// else
+	// {
 		if ((*token)->next && (*token)->next->type != CHAR_PIPE && left)
 		{
 			while (left->right)
@@ -205,8 +198,16 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 		}
 		while ((*token)->next && (*token)->next->type == 0)
 			(*token) = (*token)->next;
-		node->right = parse_top((*token)->next, data);
-	}
+		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+		{
+			*token = (*token)->next;
+			new_root = new_node('|', (*token)->data);
+			node->right = new_root;
+			new_root->right = parse_top((*token)->next, data);
+		}
+		else
+			node->right = parse_top((*token)->next, data);
+	// }
 	return (node);
 }
 

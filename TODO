@@ -40,6 +40,13 @@ no exactly like bash echo hey | cat | <<EOF
 # <<EOF // segfault , should work
 # <<EOF $MISSIGN echo 42 // segfault , should work
 
+# echo > R 42
+# echo > R 42 > G 41
+# > R echo 42 > G 41 > B 40
+
+# > R echo 42 | <
+#echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
+
 Export: potentialy have "" for var data (USER="SGODIN")
 
 # Syntax error: cmd | < cmd2 (only error if no cmd2)
