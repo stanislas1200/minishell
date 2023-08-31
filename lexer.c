@@ -41,6 +41,7 @@ int	lexer_edit(t_lexer *lexer, t_data *data)
 		}
 		token = token->next;
 	}
+	return (0);
 }
 
 t_token	*lexer_general_next(t_token *token, t_data *data, char c, int size)
