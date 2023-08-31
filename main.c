@@ -85,19 +85,18 @@ void	main_loop(t_data data, char *buff, char *prompt)
 		if (feof(stdin))
 			break ;
 		lexer = lexer_build(line, &data);
-		lexer_print(lexer);
 		if (lexer)
 		{
 			data.ast_root = parse(lexer, &data);
 			print_ast(data.ast_root);
 			lexer_destroy(lexer);
-			if (data.ast_root)
-				execute_ast_node(data.ast_root, &data);
+			// if (data.ast_root)
+				// execute_ast_node(data.ast_root, &data);
 			ast_destroy(data.ast_root);
 		}
 		// free(buff);
 	}
-
+	free_matrix(data.env);
 
 	// while (1)
 	// {

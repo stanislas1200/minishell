@@ -113,5 +113,6 @@ SIGTSTP (20): Terminal stop. Sent to a process when the user presses CTRL+Z in t
 SIGTTIN (21): Background read from a terminal.
 SIGTTOU (22): Background write to a terminal.
 
-
+# echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo | < R echo ARG > G ARG ARG
 // Lexer Bulletproof
+// parse_top Bulletproof
