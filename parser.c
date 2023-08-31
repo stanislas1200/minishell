@@ -237,18 +237,10 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 	return (print_error(token->data, data));
 }
 
-t_ASTNode	*remove_all_input_nodes(t_ASTNode **root)
+t_ASTNode	*r(t_ASTNode **root,t_ASTNode *node, t_ASTNode *cmd, t_ASTNode *prev)
 {
-	t_ASTNode	*cmd;
-	t_ASTNode	*node;
-	t_ASTNode	*prev;
 	t_ASTNode	*temp;
 
-	if (!*root)
-		return (NULL);
-	node = *root;
-	prev = NULL;
-	cmd = NULL;
 	while (node)
 	{
 		if (node->type == CHAR_INPUTR)
@@ -262,10 +254,7 @@ t_ASTNode	*remove_all_input_nodes(t_ASTNode **root)
 			temp = node;
 			node = node->right;
 			temp->right = NULL;
-			free(temp->data);
-			temp->data = NULL;
-			free(temp);
-			temp = NULL;
+			free_node(temp);
 		}
 		else
 		{
@@ -286,7 +275,10 @@ void	check_eof(t_ASTNode **root)
 	node = *root;
 	if (node->type == 4)
 	{
-		cmd = remove_all_input_nodes(&(node->left));
+		if (node->left)
+			cmd = r(&(node->left), node->left, NULL, NULL);
+		else
+			cmd = NULL;
 		if (!node->left)
 			node->left = cmd;
 		return ;
@@ -294,12 +286,37 @@ void	check_eof(t_ASTNode **root)
 	check_eof(&(node->right));
 }
 
+int	reorder_check_pipe(t_ASTNode **root, t_ASTNode *node, t_ASTNode *prev_save)
+{
+	t_ASTNode	*save;
+	t_ASTNode	*prev;
+
+	save = node;
+	while (node && node->type != TOKEN && node->type != CHAR_PIPE)
+	{
+		prev = node;
+		if (!node->right)
+			return (1);
+		node = node->right;
+		if (node && (node->type == CHAR_PIPE))
+		{
+			prev->right = NULL;
+			node->left = save;
+			if (prev_save)
+				prev_save->right = node;
+			else
+				*root = node;
+			reorder_tree(&(node->right));
+			return (1);
+		}
+	}
+	return (0);
+}
+
 void	reorder_tree(t_ASTNode **root)
 {
 	t_ASTNode	*node;
-	t_ASTNode	*prev;
 	t_ASTNode	*prev_save;
-	t_ASTNode	*save;
 
 	node = *root;
 	prev_save = NULL;
@@ -309,25 +326,8 @@ void	reorder_tree(t_ASTNode **root)
 			prev_save = node;
 		if (node && node->type != TOKEN && node->type != CHAR_PIPE)
 		{
-			save = node;
-			while (node && node->type != TOKEN && node->type != CHAR_PIPE)
-			{
-				prev = node;
-				if (!node->right)
-					return ;
-				node = node->right;
-				if (node && (node->type == CHAR_PIPE))
-				{
-					prev->right = NULL;
-					node->left = save;
-					if (prev_save)
-						prev_save->right = node;
-					else
-						*root = node;
-					reorder_tree(&(node->right));
-					return ;
-				}
-			}
+			if (reorder_check_pipe(root, node, prev_save))
+				return ;
 		}
 		node = node->right;
 	}

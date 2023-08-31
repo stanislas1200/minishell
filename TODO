@@ -51,7 +51,7 @@ echo hey <> FILE you ( should work and create FILE but not redirect )
 remake expand in 1 function for all cases (av, heredoc)
 handle error in heredoc and executer
 
-#invalid command, followed by empty variable, should clear the exit code
+#invalid command, followed by empty variable, should clear the exit code // set last-exit = 0; on expand
 doesntexist
 $EMPTY
 echo $?

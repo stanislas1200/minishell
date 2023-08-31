@@ -134,6 +134,7 @@ t_token		*token_new_next(t_token *token, t_data *data, int size);
 t_ASTNode	*parse(t_lexer *lexer, t_data *data);
 t_ASTNode	*parse_top(t_token *token, t_data *data);
 void		ast_destroy(t_ASTNode *node);
+void		reorder_tree(t_ASTNode **root);
 
 // Executer
 int			execute_ast_node(t_ASTNode *node, t_data *data);
