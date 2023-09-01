@@ -18,6 +18,7 @@ SRCS = main.c\
 		parser_utils.c\
 		parser_check.c\
 		executer.c\
+		redirection.c\
 		execve.c \
 		env_utils.c\
     utils.c\

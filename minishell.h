@@ -34,6 +34,7 @@
 
 # include <limits.h>
 # include <errno.h>
+#include <fcntl.h>
 
 // Structure
 typedef struct t_token
@@ -144,6 +145,8 @@ t_ASTNode	*command_simple(t_token **token, int type, t_data *data);
 
 // Executer
 int			execute_ast_node(t_ASTNode *node, t_data *data);
+void		execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *data);
+int			check_heredoc(t_ASTNode *node);
 
 /* DEBUG */
 void		lexer_print(t_lexer *lexer);
