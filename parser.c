@@ -85,7 +85,7 @@ t_ASTNode	*command_simple(t_token **token, int type, t_data *data)
 		return (NULL);
 	node = new_node(type, (*token)->data);
 	if (!node)
-		return (data->parse_end = 1, lexer_malloc_error(NULL)); // MALLOC ERROR
+		return (data->parse_end = 1, lexer_malloc_error(NULL));
 	if (*token && (*token)->type == TOKEN)
 		*token = (*token)->next;
 	node->right = command_simple(token, ARG, data);
@@ -112,31 +112,49 @@ t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 			if (!(*token)->next || (*token)->next->type != TOKEN)
 			{
 				if (!(*token)->next || !(*token)->next->next || (*token)->next->type != (*token)->type)
-				{
-					data->parse_end = 1;
-					return (print_error((*token)->data, data), free_node(left));
-				}
+					return (data->parse_end = 1, print_error((*token)->data, data), ast_destroy(node), free_node(left));
 			}
 		}
-		node->right = parse_top(*token, data);
-		return (node);
+		return (node->right = parse_top(*token, data), node);
 	}
 	return (free_node(left));
 }
 
-t_ASTNode	*redirection(t_token **token, t_data *data)
+int	check_arg(t_token **token, t_ASTNode *left)
 {
-	int			type;
 	int			old;
-	t_ASTNode	*left;
-	t_ASTNode	*node;
 	t_token		*save;
-	t_ASTNode	*new_root;
 
-	left = NULL;
+	if ((*token)->next && (*token)->next->type != CHAR_PIPE && left)
+	{
+		while (left->right)
+			left = left->right;
+		save = *token;
+		while (save && save->type != CHAR_PIPE)
+		{
+			old = save->type;
+			save = save->next;
+			if (save && save->type == TOKEN && (old == TOKEN || !old))
+			{
+				left->right = new_node(TOKEN, save->data);
+				if (!left->right)
+					return (1);
+				save->type = 0;
+				left = left->right;
+			}
+		}
+	}
+	return (0);
+}
+
+int	check_cmd(t_token **token, t_ASTNode **left, t_data *data)
+{
+	int		old;
+	t_token	*save;
+
+	save = *token;
 	if ((*token) && (*token)->type != CHAR_PIPE && (*token)->type != TOKEN && (*token)->next)
 	{
-		save = *token;
 		while (save && save->data && save->type != CHAR_PIPE)
 		{
 			old = save->type;
@@ -145,16 +163,56 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 				save = save->next;
 			if (save && save->type == TOKEN && old == TOKEN)
 			{
-				left = new_node(TOKEN, save->data);
-				if (!left)
-					return (data->parse_end = 1, lexer_malloc_error(NULL));
+				*left = new_node(TOKEN, save->data);
+				if (!(*left))
+					return (1);
 				save->type = 0;
-				break;
+				return (0);
 			}
 		}
 	}
 	else
-		left = command_simple(token, TOKEN, data);
+		*left = command_simple(token, TOKEN, data);
+	return (0);
+}
+
+t_ASTNode	*redirection_node(t_token **token, t_data *data, t_ASTNode *left, int type)
+{
+	t_ASTNode	*node;
+	t_ASTNode	*new_root;
+
+	node = new_node(type, (*token)->data);
+	if (!node)
+		return (free_node(left), data->parse_end = 1, lexer_malloc_error(NULL));
+	node->left = left;
+	while ((*token)->next && (*token)->next->type == 0)
+		(*token) = (*token)->next;
+	if (check_arg(token, left))
+		return (data->parse_end = 1, ast_destroy(node), lexer_malloc_error(NULL));
+	while ((*token)->next && (*token)->next->type == 0)
+		(*token) = (*token)->next;
+	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+	{
+		*token = (*token)->next;
+		new_root = new_node('|', (*token)->data);
+		if (!new_root)
+			return (data->parse_end = 1, ast_destroy(node), lexer_malloc_error(NULL));
+		node->right = new_root;
+		new_root->right = parse_top((*token)->next, data);
+	}
+	else
+		node->right = parse_top((*token)->next, data);
+	return (node);
+}
+
+t_ASTNode	*redirection(t_token **token, t_data *data)
+{
+	int			type;
+	t_ASTNode	*left;
+
+	left = NULL;
+	if (check_cmd(token, &left, data))
+		return (data->parse_end = 1, lexer_malloc_error(NULL));
 	if (!(*token) || (*token)->type == CHAR_PIPE || (*token)->type == TOKEN || (*token)->type == 0)
 		return (free_node(left));
 	type = (*token)->type;
@@ -168,53 +226,8 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	}
 	*token = (*token)->next;
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
-	{
-		data->parse_end = 1;
 		return (print_error((*token)->data, data), free_node(left));
-	}
-	node = new_node(type, (*token)->data);
-	if (!node)
-		return (free_node(left), data->parse_end = 1, lexer_malloc_error(NULL));
-	node->left = left;
-	while ((*token)->next && (*token)->next->type == 0)
-		(*token) = (*token)->next;
-	
-	// else
-	// {
-		if ((*token)->next && (*token)->next->type != CHAR_PIPE && left)
-		{
-			while (left->right)
-				left = left->right;
-			save = *token;
-			while (save && save->type != CHAR_PIPE)
-			{
-				old = save->type;
-				save = save->next;
-				if (save && save->type == TOKEN && (old == TOKEN || !old))
-				{
-					left->right = new_node(TOKEN, save->data);
-					if (!left->right)
-						return (data->parse_end = 1, ast_destroy(node), lexer_malloc_error(NULL));
-					save->type = 0;
-					left = left->right;
-				}
-			}
-		}
-		while ((*token)->next && (*token)->next->type == 0)
-			(*token) = (*token)->next;
-		if ((*token)->next && (*token)->next->type == CHAR_PIPE)
-		{
-			*token = (*token)->next;
-			new_root = new_node('|', (*token)->data);
-			if (!new_root)
-				return (data->parse_end = 1, ast_destroy(node), lexer_malloc_error(NULL));
-			node->right = new_root;
-			new_root->right = parse_top((*token)->next, data);
-		}
-		else
-			node->right = parse_top((*token)->next, data);
-	// }
-	return (node);
+	return (redirection_node(token, data, left, type));
 }
 
 t_ASTNode	*parse_top(t_token *token, t_data *data)
@@ -246,7 +259,7 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 	return (print_error(token->data, data));
 }
 
-t_ASTNode	*r(t_ASTNode **root,t_ASTNode *node, t_ASTNode *cmd, t_ASTNode *prev)
+t_ASTNode	*r(t_ASTNode **root, t_ASTNode *node, t_ASTNode *cmd, t_ASTNode *prev)
 {
 	t_ASTNode	*temp;
 
