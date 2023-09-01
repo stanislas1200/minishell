@@ -95,7 +95,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 		}
 		// free(buff);
 	}
-	free_matrix(data.env);
+	// free_matrix(data.env);
 
 	// while (1)
 	// {
@@ -129,11 +129,11 @@ int	main(int ac, char **av, char **envv)
 	char		*buff;
 	char		*prompt;
 
-	envp = dup_env(envv);
-	update_env(&envp);
+	// envp = dup_env(envv);
+	// update_env(&envp);
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, SIG_IGN);
-	data.env = envp;
+	// data.env = envp;
 	data.last_exit = 0;
 	data.parse_end = 0;
 	data.r_break = 0;

@@ -52,16 +52,19 @@ char	*find_command_path(char *all_paths, char *command)
 	return (ft_strdup(command));
 }
 
-void	ft_execve(char **env, char *cmd, char **args)
+void	ft_execve(t_data *data, char *cmd, char **args)
 {
 	char	*cmd_path;
 
-	cmd_path = find_command_path(ft_getenv(env, "PATH"), cmd);
-	execve(cmd_path, args, env);
+	// cmd_path = find_command_path(ft_getenv(env, "PATH"), cmd);
+	execvp(cmd, args);
+	// execve(cmd_path, args, env);
 	// cperror("execve", cmd, NULL, 1);
 	perror("execve");
-	if (cmd[0] == '.')
-		exit(126);
+	ast_destroy(data->ast_root);
+	// if (cmd[0] == '.')
+	// 	exit(126); // need free arg
+	free(args);
 	if (errno == EACCES || errno == ENOENT)
 		exit(127);
 	exit(1);
