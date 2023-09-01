@@ -133,8 +133,14 @@ t_token		*token_new_next(t_token *token, t_data *data, int size);
 // Parser
 t_ASTNode	*parse(t_lexer *lexer, t_data *data);
 t_ASTNode	*parse_top(t_token *token, t_data *data);
-void		ast_destroy(t_ASTNode *node);
+void		*ast_destroy(t_ASTNode *node);
 void		reorder_tree(t_ASTNode **root);
+void		*print_error(char *str, t_data *data, t_ASTNode *node);
+void		*parser_error(t_data *data);
+int			check_cmd(t_token **token, t_ASTNode **left, t_data *data);
+int			check_arg(t_token **token, t_ASTNode *left);
+t_ASTNode	*new_node(int t, char *d);
+t_ASTNode	*command_simple(t_token **token, int type, t_data *data);
 
 // Executer
 int			execute_ast_node(t_ASTNode *node, t_data *data);

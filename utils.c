@@ -25,3 +25,10 @@ char	*free_join(char *s1, char *s2)
 	}
 	return (ft_strdup(s2));
 }
+
+void	*parser_error(t_data *data)
+{
+	perror(R "Error: " C "malloc" C);
+	data->parse_end = 1;
+	return (NULL);
+}
