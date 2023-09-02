@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execve.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/22 19:16:30 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/02 11:58:30 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,10 @@ char	*find_command_path(char *all_paths, char *command)
 	char	*full_path;
 
 	i = -1;
-	if (!all_paths || !command || !ft_strlen(command))
+	if (!command || !ft_strlen(command))
 		return (NULL);
+	if (!all_paths)
+		return (ft_strdup(command));
 	arr = ft_split(all_paths, ':');
 	if (!arr)
 		return (cperror("Malloc", NULL, NULL, 1), NULL);
