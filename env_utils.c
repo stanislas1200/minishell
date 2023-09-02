@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/02 11:49:39 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/02 12:04:03 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,24 +79,22 @@ void	shell_lvl(char ***envp)
 
 	errno = 0;
 	num = 1;
-	if (!ft_getenv(*envp, "SHLVL"))
-		export2(envp, "SHLVL=1", 5, 0);
-	else
+	tmp2 = ft_getenv(*envp, "SHLVL");
+	if (!tmp2)
+		return (export2(envp, "SHLVL=1", 5, 0));
+	if (is_numeric(tmp2) == 0)
 	{
-		if (is_numeric(tmp2) == 0)
-		{
-			num = ft_atoi(tmp2);
-			if (num == INT_MAX || num == INT_MIN || num++ < 0 || errno != 0)
-				num = 0;
-		}
-		tmp2 = ft_itoa(num);
-		tmp = ft_strjoin("SHLVL=", tmp2);
-		free(tmp2);
-		if (!tmp)
-			return (errno = 0, cperror("SHLVL", "malloc", NULL, 1));
-		export2(envp, tmp, 5, 0);
-		free(tmp);
+		num = ft_atoi(tmp2);
+		if (num == INT_MAX || num == INT_MIN || num++ < 0 || errno != 0)
+			num = 0;
 	}
+	tmp2 = ft_itoa(num);
+	tmp = ft_strjoin("SHLVL=", tmp2);
+	free(tmp2);
+	if (!tmp)
+		return (errno = 0, cperror("SHLVL", "malloc", NULL, 1));
+	export2(envp, tmp, 5, 0);
+	free(tmp);
 	errno = 0;
 }
 
