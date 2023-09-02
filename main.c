@@ -120,6 +120,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 	// 	}
 	// 	free(buff);
 	// }
+	// rl_clear_history();
 }
 
 int	main(int ac, char **av, char **envv)
