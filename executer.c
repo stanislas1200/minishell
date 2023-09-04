@@ -101,6 +101,17 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 		node = node->left;
 	}
 
+	if (data->ast_root == node)
+	{
+		execute_redirection(save, redirection, path, data);
+		arr = make_cmd_arr(node);
+		data->last_exit = execute_builtin(node, arr, data);
+		free(arr);
+		arr = NULL;
+		if (data->last_exit != -1)
+			return (data->last_exit);
+	}
+
 	// Fork a new process
 	pid_t pid = fork();
 	if (pid == -1)
