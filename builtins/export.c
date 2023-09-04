@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 17:24:57 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/28 15:39:40 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	export2(char ***envp, char *var, int i, int append);
 void	add_to_env(char ***envp, char *str);
 int		valid_identifier(char *var);
 void	check_identifier(char **envp, char *var, int *i, int *append);
+void	print_export_no_arg(char *str);
 
 int	export(char ***envp, char **args)
 {
@@ -124,7 +125,7 @@ void	print_sort_env(char **envp)
 	}
 	i = -1;
 	while (envp && envp[++i])
-		printf("declare -x %s\n", envp[i]);
+		print_export_no_arg(envp[i]);
 }
 
 char	*plus_remover(char *str)

@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 00:07:18 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 14:08:51 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/08/28 15:40:24 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,24 @@ void	export_no_arg(char **envp)
 		print_sort_env(tmp);
 		free_matrix(tmp);
 	}
+}
+
+void	print_export_no_arg(char *str)
+{
+	int	i;
+	int	flag;
+
+	i = -1;
+	flag = 0;
+	printf("declare -x ");
+	while (str[++i])
+	{
+		printf("%c", str[i]);
+		if (flag == 0 && str[i] == '=')
+		{
+			flag = 1;
+			printf("\"");
+		}
+	}
+	printf("\"\n");
 }
