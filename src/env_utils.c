@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/02 12:04:03 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 17:25:29 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	is_numeric(char *str);
 
@@ -100,15 +100,10 @@ void	shell_lvl(char ***envp)
 
 void	update_env(char ***envp)
 {
-	static int	count;
 	int			i;
 	char		*tmp;
 
-	if (!count)
-	{
-		shell_lvl(envp);
-		count++;
-	}
+	shell_lvl(envp);
 	update_pwd(envp);
 	i = ft_getindexenv(*envp, "_=");
 	if (i != -1)

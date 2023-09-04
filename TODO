@@ -1,6 +1,8 @@
 # fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
 no exactly like bash echo hey | cat | <<EOF 
 
+function erro stop executer;
+
 # heredoc EOF NULL cmd not working
 # heredoc not working after pipe
 
@@ -47,7 +49,7 @@ no exactly like bash echo hey | cat | <<EOF
 # > R echo 42 | <
 #echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
 
-Export: potentialy have "" for var data (USER="SGODIN")
+# Export: potentialy have "" for var data (USER="SGODIN")
 
 # Syntax error: cmd | < cmd2 (only error if no cmd2)
 
@@ -63,13 +65,12 @@ doesntexist
 $EMPTY
 echo $?
 
-# Neither of these unsets should break the shell, and you should still be able to call `/bin/ls`
-unset USER
-unset PATH
-unset PWD
-/bin/ls
+# # Neither of these unsets should break the shell, and you should still be able to call `/bin/ls`
+# unset USER
+# unset PATH
+# unset PWD
+# /bin/ls
 
---> DONE
 
 # cat <minishell.h <<HERE <missing <<DOC | echo oi
 # > HERE

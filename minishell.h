@@ -34,7 +34,7 @@
 
 # include <limits.h>
 # include <errno.h>
-#include <fcntl.h>
+# include <fcntl.h>
 
 // Structure
 typedef struct t_token
@@ -66,6 +66,7 @@ typedef struct t_data
 	int			last_exit;
 	int			r_break;
 	int			pipefd[2];
+	char		*path;
 	char		**env;
 	t_ASTNode	*ast_root;
 }	t_data;
@@ -121,6 +122,7 @@ void		cperror(char *func, char *arg, char *error, int p_err);
 void		free_matrix(char **str);
 int			matrix_len(char **str);
 long		ft_long_atoi(const char *nptr);
+int			execute_builtin(t_ASTNode *node, char **arr, t_data *data);
 
 // Lexer
 int			token_init(t_token *token, int size);
@@ -145,8 +147,11 @@ t_ASTNode	*command_simple(t_token **token, int type, t_data *data);
 
 // Executer
 int			execute_ast_node(t_ASTNode *node, t_data *data);
-void		execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *data);
+void		ex_redirection(t_ASTNode *save, int red, char *path, t_data *data);
+char		*heredoc_loop(char *path, int fd[2]);
 int			check_heredoc(t_ASTNode *node);
+char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
+int			execute_pipe(t_ASTNode *node, t_data *data);
 
 /* DEBUG */
 void		lexer_print(t_lexer *lexer);

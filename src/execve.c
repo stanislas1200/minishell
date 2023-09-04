@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   execve.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/02 11:58:30 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 17:00:14 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 char	*create_command_path(char *path, char *command)
 {
@@ -58,14 +58,15 @@ void	ft_execve(t_data *data, char *cmd, char **args)
 {
 	char	*cmd_path;
 
-	// cmd_path = find_command_path(ft_getenv(env, "PATH"), cmd);
-	execvp(cmd, args);
-	// execve(cmd_path, args, env);
-	// cperror("execve", cmd, NULL, 1);
-	perror("execve");
+	cmd_path = find_command_path(ft_getenv(data->env, "PATH"), cmd);
+	execve(cmd_path, args, data->env);
+	cperror("execve", cmd, NULL, 1);
 	ast_destroy(data->ast_root);
-	// if (cmd[0] == '.')
-	// 	exit(126); // need free arg
+	if (cmd[0] == '.')
+	{
+		free(args);
+		exit(126);
+	}
 	free(args);
 	if (errno == EACCES || errno == ENOENT)
 		exit(127);

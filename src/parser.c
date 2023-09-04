@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 {

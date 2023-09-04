@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_tools.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:36:58 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/18 11:07:16 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 17:10:33 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,21 @@ void	cperror(char *func, char *arg, char *error, int p_err)
 	if (func)
 	{
 		ft_putstr_fd(func, 2);
-		ft_putstr_fd(": ", 2);
+		ft_putstr_fd(C ": " Y, 2);
 	}
 	if (arg)
 	{
 		ft_putstr_fd(arg, 2);
-		if (error || p_err)
-			ft_putstr_fd(": ", 2);
+		if (error)
+			ft_putstr_fd(C ": ", 2);
 	}
 	if (error)
 	{
 		ft_putstr_fd(error, 2);
-		ft_putstr_fd("\n", 2);
+		ft_putstr_fd(C "\n", 2);
 	}
 	else if (p_err == 1)
-		perror("");
+		perror(C "");
 }
 
 void	free_matrix(char **str)

@@ -10,19 +10,20 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c\
-		lexer.c\
-		lexer_utils.c\
-		expand.c\
-		parser.c\
-		parser_utils.c\
-		parser_check.c\
-		executer.c\
-		redirection.c\
-		execve.c \
-		env_utils.c\
-    utils.c\
-		debug.c\
+SRCS = src/main.c\
+		src/lexer.c\
+		src/lexer_utils.c\
+		src/expand.c\
+		src/parser.c\
+		src/parser_utils.c\
+		src/parser_check.c\
+		src/executer.c\
+		src/executer_utils.c\
+		src/pipe.c\
+		src/redirection.c\
+		src/execve.c \
+		src/env_utils.c\
+    	src/utils.c\
 			builtins/builtin.c\
 			builtins/builtin_tools.c\
 			builtins/cd.c\

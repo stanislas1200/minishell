@@ -1,4 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirection.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/04 16:49:14 by sgodin            #+#    #+#             */
+/*   Updated: 2023/09/04 16:49:14 by sgodin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
 
 char	*heredoc_next(char *text, t_data *data, t_ASTNode *save)
 {
@@ -27,33 +39,6 @@ char	*heredoc_next(char *text, t_data *data, t_ASTNode *save)
 	return (text);
 }
 
-char	*heredoc_loop(char *path, int fd[2])
-{
-	char	*buffer;
-	char	*text;
-	char	*temp;
-
-	text = NULL;
-	pipe(fd);
-	while (1)
-	{
-		buffer = readline(G "> " C);
-		if (strcmp(buffer, path) == 0)
-			break ;
-		if (!text)
-			text = ft_strdup(buffer);
-		else
-		{
-			temp = ft_strjoin(text, buffer);
-			free(text);
-			text = temp;
-		}
-		text = ft_strjoin(text, "\n");
-		free(buffer);
-	}
-	return (text);
-}
-
 void	heredoc(char *path, t_data *data, int redirection, t_ASTNode *s)
 {
 	int		fd[2];
@@ -72,7 +57,7 @@ void	heredoc(char *path, t_data *data, int redirection, t_ASTNode *s)
 		}
 		close(fd[1]);
 		close(fd[0]);
-		execute_redirection(s->right, s->right->type, s->right->data, data);
+		ex_redirection(s->right, s->right->type, s->right->data, data);
 		return ;
 	}
 	write(fd[1], text, strlen(text));
@@ -96,13 +81,13 @@ void	output(char *path, t_data *data, int redirection, t_ASTNode *s)
 		if (s->right->type != redirection)
 			dup2(fd, STDOUT_FILENO);
 		close(fd);
-		execute_redirection(s->right, s->right->type, s->right->data, data);
+		ex_redirection(s->right, s->right->type, s->right->data, data);
 		return ;
 	}
 	if (s->right && s->right->type == 4)
 	{
 		data->pipefd[1] = fd;
-		execute_redirection(s->right, s->right->type, s->right->data, data);
+		ex_redirection(s->right, s->right->type, s->right->data, data);
 		return ;
 	}
 	dup2(fd, STDOUT_FILENO);
@@ -118,7 +103,7 @@ void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
 	{
 		data->r_break = 1;
 		if (s->right && check_heredoc(s->right))
-			execute_redirection(s->right, s->right->type, s->right->data, data);
+			ex_redirection(s->right, s->right->type, s->right->data, data);
 		ft_putstr_fd(M "-stanshell" C ": " Y, 2);
 		ft_putstr_fd(path, 2);
 		ft_putstr_fd(C ": No such file or directory\n", 2);
@@ -130,27 +115,27 @@ void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
 		if (s->right->type != redirection && !check_heredoc(s->right))
 			dup2(fd, STDIN_FILENO);
 		close(fd);
-		execute_redirection(s->right, s->right->type, s->right->data, data);
+		ex_redirection(s->right, s->right->type, s->right->data, data);
 		return ;
 	}
 	dup2(fd, STDIN_FILENO);
 	close(fd);
 }
 
-void	execute_redirection(t_ASTNode *save, int red, char *path, t_data *data)
+void	ex_redirection(t_ASTNode *save, int redir, char *path, t_data *data)
 {
-	if (data->r_break && red != 4)
+	if (data->r_break && redir != 4)
 	{
 		if (save->right && check_heredoc(save->right))
-			return (execute_redirection(save->right, save->right->type, \
+			return (ex_redirection(save->right, save->right->type, \
 			save->right->data, data));
 		else
 			return ;
 	}
-	if (red == 3 || red == CHAR_OUTPUTR)
-		output(path, data, red, save);
-	else if (red == CHAR_INPUTR)
-		input(path, data, red, save);
-	else if (red == 4)
-		heredoc(path, data, red, save);
+	if (redir == 3 || redir == CHAR_OUTPUTR)
+		output(path, data, redir, save);
+	else if (redir == CHAR_INPUTR)
+		input(path, data, redir, save);
+	else if (redir == 4)
+		heredoc(path, data, redir, save);
 }

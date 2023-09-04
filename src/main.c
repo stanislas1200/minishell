@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	print_header(void)
 {
@@ -77,6 +77,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 
 	while (1)
 	{
+		data.parse_end = 0;
 		prompt = get_prompt();
 		buff = readline(prompt);
 		free(prompt);
@@ -87,19 +88,16 @@ void	main_loop(t_data data, char *buff, char *prompt)
 			break ;
 		}
 		add_history(buff);
-		data.parse_end = 0;
 		lexer = lexer_build(buff, &data);
 		if (lexer)
 		{
 			data.ast_root = parse(lexer, &data);
 			lexer_destroy(lexer);
-			if (data.ast_root)
-				execute_ast_node(data.ast_root, &data);
+			execute_ast_node(data.ast_root, &data);
 			ast_destroy(data.ast_root);
 		}
 		free(buff);
 	}
-	rl_clear_history();
 }
 
 int	main(int ac, char **av, char **envv)
@@ -121,5 +119,6 @@ int	main(int ac, char **av, char **envv)
 	data.pipefd[1] = 0;
 	print_header();
 	main_loop(data, buff, prompt);
+	rl_clear_history();
 	return (0);
 }
