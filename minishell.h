@@ -34,6 +34,7 @@
 
 # include <limits.h>
 # include <errno.h>
+#include <fcntl.h>
 
 // Structure
 typedef struct t_token
@@ -58,6 +59,9 @@ typedef struct t_ASTNode // Abstract Syntax Tree Node
 
 typedef struct t_data
 {
+	int			i;
+	int			j;
+	int			state;
 	int			parse_end;
 	int			last_exit;
 	int			r_break;
@@ -97,7 +101,7 @@ void		ft_exit(char **envp, char **args, t_data *data);
 void		export2(char ***envp, char *var, int i, int append);
 void		update_pwd(char ***envp);
 
-void		ft_execve(char **env, char *cmd, char **args);
+void		ft_execve(t_data *data, char *cmd, char **args);
 char		*find_command_path(char *all_paths, char *command);
 char		*create_command_path(char *path, char *command);
 void		delete_from_env(char ***envp, int del);
@@ -119,17 +123,30 @@ int			matrix_len(char **str);
 long		ft_long_atoi(const char *nptr);
 
 // Lexer
-t_lexer		*lexer_build(char *str, t_data *data);
+int			token_init(t_token *token, int size);
 void		lexer_destroy(t_lexer *lexer);
+void		strip_quotes(char *src, char *dest);
+void		*lexer_malloc_error(t_lexer *lexer);
 char		*expand_variables(char *input, t_data *data);
+t_lexer		*lexer_build(char *str, t_data *data);
+t_token		*token_new_next(t_token *token, t_data *data, int size);
 
 // Parser
 t_ASTNode	*parse(t_lexer *lexer, t_data *data);
 t_ASTNode	*parse_top(t_token *token, t_data *data);
-void		ast_destroy(t_ASTNode *node);
+void		*ast_destroy(t_ASTNode *node);
+void		reorder_tree(t_ASTNode **root);
+void		*print_error(char *str, t_data *data, t_ASTNode *node);
+void		*parser_error(t_data *data);
+int			check_cmd(t_token **token, t_ASTNode **left, t_data *data);
+int			check_arg(t_token **token, t_ASTNode *left);
+t_ASTNode	*new_node(int t, char *d);
+t_ASTNode	*command_simple(t_token **token, int type, t_data *data);
 
 // Executer
 int			execute_ast_node(t_ASTNode *node, t_data *data);
+void		execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *data);
+int			check_heredoc(t_ASTNode *node);
 
 /* DEBUG */
 void		lexer_print(t_lexer *lexer);

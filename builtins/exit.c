@@ -22,7 +22,7 @@ void	ft_exit(char **envp, char **args, t_data *data)
 
 	errno = 0;
 	exit_code = 0;
-	printf(R "exit\n");
+	// printf(R "exit\n");
 	if (matrix_len(args) > 2)
 	{
 		cperror("exit", NULL, "too many arguments", 0);

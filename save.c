@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <fcntl.h>
 
 int	execute_builtin(t_ASTNode *node, char **arr, t_data *data)
 {
@@ -27,8 +28,37 @@ int	execute_builtin(t_ASTNode *node, char **arr, t_data *data)
 	if (ft_strncmp(node->data, "unset", ft_strlen("unset") + 1) == 0)
 		return (unset(&data->env, arr));
 	if (ft_strncmp(node->data, "exit", ft_strlen("exit") + 1) == 0)
-		return (ft_exit(data->env, arr, data), 0);
+		return (ft_exit(data->env, arr), 0);
 	return (-1);
+}
+
+int	heredoc(char *path, t_data *data)
+{
+	int fd[2];
+	char *buffer = NULL;
+	char *text = NULL;
+	char *temp = NULL;
+	pipe(fd);
+	while (1)
+	{
+		buffer = readline(G "> " C);
+		if (strcmp(buffer, path) == 0)
+			break;
+		if (text == NULL)
+		{
+			text = ft_strdup(buffer);
+		} else {
+			char *temp = ft_strjoin(text, buffer);
+			free(text);
+			text = temp;
+		}
+
+		text = ft_strjoin(text, "\n");
+		free(buffer);
+	}
+	write(fd[1], text, strlen(text));
+	close(fd[1]);
+	return (fd[0]);
 }
 
 int	check_heredoc(t_ASTNode *node)
@@ -46,40 +76,165 @@ int	check_heredoc(t_ASTNode *node)
 	return (0);
 }
 
-char	**make_cmd_arr(t_ASTNode *node)
+void	execute_redirection(t_ASTNode *save, int redirection, char *path, t_data *data) // TODO : handle all in one
 {
-	int			num_args;
-	t_ASTNode	*arg_node ;
-	char		**arr = NULL;
-	
-	// Count the number of arguments
-	num_args = 0;
-	arg_node = node->right;
-	while (arg_node)
+	if (data->r_break && redirection != 4)
+		{
+			if (save->right && check_heredoc(save->right))
+				return (execute_redirection(save->right, save->right->type, save->right->data, data));
+			else
+				return ;
+		}
+	// Handle output redirection (>) and (>>) append
+	if (redirection == 3 || redirection == CHAR_OUTPUTR)
 	{
-		num_args++;
-		arg_node = arg_node->right;
+		int fd = 0;
+		if (redirection == 3)
+			fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
+		else
+			fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		if (fd == -1)
+			return (perror("open"), exit(1));
+		if (save->right && save->right->type != CHAR_PIPE && save->right->type != 4)
+		{
+			if (save->right->type != redirection) // handle different redirections
+				dup2(fd, STDOUT_FILENO);
+			close(fd);
+			execute_redirection(save->right, save->right->type, save->right->data, data);
+			return ;
+		}
+		else
+		{
+			if (save->right && save->right->type == 4)
+			{
+				data->pipefd[1] = fd;
+				execute_redirection(save->right, save->right->type, save->right->data, data);
+			}
+			else
+			{
+				dup2(fd, STDOUT_FILENO);
+				close(fd);
+			}
+		}
+	}
+	// Handle input redirection (<)  
+	if (redirection == CHAR_INPUTR) // TODO : handle with here doc ex: ls < file > R << EOF
+	{
+		int	fd;
+
+		if (redirection == CHAR_INPUTR)
+			fd = open(path, O_RDONLY);
+		// else
+		// 	fd = heredoc(path, data);
+		if (fd == -1)
+		{
+			data->r_break = 1;
+			if (save->right && check_heredoc(save->right))
+				execute_redirection(save->right, save->right->type, save->right->data, data);
+			ft_putstr_fd(M "-stanshell" C ": " Y, 2);
+			ft_putstr_fd(path, 2);
+			ft_putstr_fd(C ": No such file or directory\n", 2);
+			// return ;
+			ast_destroy(data->ast_root);
+			exit(1);
+		}
+		// if (data->pipefd) // 
+		// {
+		// 	dup2(data->pipefd, STDOUT_FILENO);
+		// 	close(data->pipefd);
+		// 	data->pipefd = 0;
+		// }
+		if (save->right && save->right->type != CHAR_PIPE)
+		{
+			if (save->right->type != redirection && !check_heredoc(save->right)) // handle different redirections
+				dup2(fd, STDIN_FILENO);
+			close(fd);
+			execute_redirection(save->right, save->right->type, save->right->data, data);
+			// if (data->r_break)
+			// 	perror("open");
+			return ;
+		}
+		else
+		{
+			dup2(fd, STDIN_FILENO);
+			close(fd);
+		}
 	}
 
-	// Create an array to hold the command and arguments
-	arr = (char **)malloc((num_args + 2) * sizeof(char *));
-	if (!arr)
+	if (redirection == 4)
 	{
-		perror("malloc");
-		return (NULL);
+		int fd[2];
+		char *buffer = NULL;
+		char *text = NULL;
+		char *temp = NULL;
+		pipe(fd);
+		while (1)
+		{
+			buffer = readline(G "> " C);
+			if (strcmp(buffer, path) == 0)
+				break;
+			if (text == NULL)
+			{
+				text = ft_strdup(buffer);
+			} else {
+				char *temp = ft_strjoin(text, buffer);
+				free(text);
+				text = temp;
+			}
+
+			text = ft_strjoin(text, "\n");
+			free(buffer);
+		}
+		if (!text)
+			text = ft_strdup("");
+
+		// EXPAND HERE DOC
+		char *new;
+		new = expand_variables(text, data);
+		if (new)
+		{	 // TODO : handle error
+		free(text);
+		text = new;}
+		
+		if (data->pipefd[1] && !check_heredoc(save->right))
+		{
+			dup2(data->pipefd[1], STDOUT_FILENO);
+			close(data->pipefd[1]);
+			data->pipefd[1] = 0;
+		}
+		if (data->pipefd[0] && !check_heredoc(save->right))
+		{
+			dup2(data->pipefd[0], STDIN_FILENO);
+			close(data->pipefd[0]);
+			data->pipefd[0] = 0;
+		}
+		if (save->right && save->right->type != CHAR_PIPE)
+		{
+			if (save->right->type != redirection && save->right->type != CHAR_INPUTR) // handle different redirections
+			{
+				if (!check_heredoc(save->right))
+				{
+					write(fd[1], text, strlen(text));
+					dup2(fd[0], STDIN_FILENO);
+				}
+			}
+			close(fd[1]);
+			close(fd[0]);
+			execute_redirection(save->right, save->right->type, save->right->data, data);
+		}
+		else
+		{
+			// Write the text to the pipe
+			write(fd[1], text, strlen(text));
+			// Close the write end of the pipe
+			close(fd[1]);
+
+			// Redirect STDIN_FILENO to the read end of the pipe
+			dup2(fd[0], STDIN_FILENO);
+			close(fd[0]);
+		}
 	}
 
-	// Fill in the array with the command and arguments
-	arr[0] = node->data;
-	int i = 1;
-	arg_node = node->right;
-	while (arg_node != NULL) {
-		arr[i] = arg_node->data;
-		i++;
-		arg_node = arg_node->right;
-	}
-	arr[i] = NULL;
-	return (arr);
 }
 
 int	execute_cmd(t_ASTNode *node, t_data *data)
@@ -88,6 +243,8 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	int			redirection;
 	char		*path;
 	t_ASTNode	*save;
+	int			num_args;
+	t_ASTNode	*arg_node ;
 	char		**arr = NULL;
 
 	redirection = 0;
@@ -101,17 +258,40 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 		node = node->left;
 	}
 
-	if (data->ast_root == node)
+	if (node)
 	{
-		execute_redirection(save, redirection, path, data);
-		arr = make_cmd_arr(node);
-		data->last_exit = execute_builtin(node, arr, data);
-		free(arr);
-		arr = NULL;
-		if (data->last_exit != -1)
-			return (data->last_exit);
-	}
+		// Count the number of arguments
+		num_args = 0;
+		arg_node = node->right;
+		while (arg_node)
+		{
+			num_args++;
+			arg_node = arg_node->right;
+		}
 
+		// Create an array to hold the command and arguments
+		arr = (char **)malloc((num_args + 2) * sizeof(char *));
+		if (!arr)
+		{
+			perror("malloc");
+			return (-1);
+		}
+
+		// Fill in the array with the command and arguments
+		arr[0] = node->data;
+		int i = 1;
+		arg_node = node->right;
+		while (arg_node != NULL) {
+			arr[i] = arg_node->data;
+			i++;
+			arg_node = arg_node->right;
+		}
+		arr[i] = NULL;
+		if (!redirection)
+			data->last_exit = execute_builtin(node, arr, data);
+		if (data->last_exit != -1 && !redirection)
+			return (free(arr), data->last_exit);
+	}
 	// Fork a new process
 	pid_t pid = fork();
 	if (pid == -1)
@@ -121,31 +301,22 @@ int	execute_cmd(t_ASTNode *node, t_data *data)
 	}
 	else if (pid == 0)
 	{
-		
 		// Child process: execute the command
 		execute_redirection(save, redirection, path, data); // Execute redirection if needed
 		if (node)
 		{
-			arr = make_cmd_arr(node);
 			data->last_exit = execute_builtin(node, arr, data);
 			if (data->last_exit != -1)
-			{
-				ast_destroy(data->ast_root);
-				free(arr);
 				exit(data->last_exit);
-			}
 			if (node->type != TOKEN)
 			{
-				perror("command not found ?????"); // DEV
-				data->last_exit = execute_ast_node(node, data); // Execute the command if it's not a cmd
-				ast_destroy(data->ast_root);
-				free(arr);
-				exit(data->last_exit);
+				execute_ast_node(node, data); // Execute the command if it's not a cmd
+				exit(1);
 			}
 			ft_execve(data, node->data, arr);
 		}
 		ast_destroy(data->ast_root);
-		exit(data->last_exit);
+		exit(0);
 	}
 	else
 	{
@@ -275,14 +446,27 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 	return (WEXITSTATUS(status));
 }
 
-int	execute_ast_node(t_ASTNode *node, t_data *data)
+int	execute_job(t_ASTNode *node, t_data *data)
 {
-	if (!node)
-		return (data->last_exit);
 	if (node->type == CHAR_PIPE)
 		data->last_exit = execute_pipe(node, data);
-	else
+	else if (node->type == TOKEN)
+		data->last_exit = execute_cmd(node, data);
+	else if (node->type == CHAR_INPUTR || node->type == CHAR_OUTPUTR || node->type == 3 || node->type == 4)
 		data->last_exit = execute_cmd(node, data);
 	// update_env(&data->env);
-	return (data->last_exit);
+	return (1);
+}
+
+int	execute_ast_node(t_ASTNode *node, t_data *data)
+{
+	if (node == NULL) {
+		return 0;
+	}
+	// ADD NODE TYPE
+	// FG
+	return (execute_job(node, data));
+		// execute_ast_node(node->right);
+	// BG 
+
 }

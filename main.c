@@ -75,19 +75,16 @@ void	main_loop(t_data data, char *buff, char *prompt)
 {
 	t_lexer		*lexer;
 
+	
+	char line[MAXLINE];
 	while (1)
 	{
-		prompt = get_prompt();
-		buff = readline(prompt);
-		free(prompt);
-		if (!buff)
-		{
-			printf(R "exit\n" C);
-			break ;
-		}
-		add_history(buff);
 		data.parse_end = 0;
-		lexer = lexer_build(buff, &data);
+		if (fgets(line, MAXLINE, stdin) == NULL)
+			break ;
+		if (feof(stdin))
+			break ;
+		lexer = lexer_build(line, &data);
 		if (lexer)
 		{
 			data.ast_root = parse(lexer, &data);
@@ -96,8 +93,34 @@ void	main_loop(t_data data, char *buff, char *prompt)
 				execute_ast_node(data.ast_root, &data);
 			ast_destroy(data.ast_root);
 		}
-		free(buff);
+		// free(buff);
 	}
+	// free_matrix(data.env);
+
+	// while (1)
+	// {
+	// 	prompt = get_prompt();
+	// 	buff = readline(prompt);
+	// 	free(prompt);
+	// 	if (!buff)
+	// 	{
+	// 		// printf(R "exit\n" C);
+	// 		break ;
+	// 	}
+	// 	add_history(buff);
+	// 	data.parse_end = 0;
+	// 	lexer = lexer_build(buff, &data);
+	// 	if (lexer)
+	// 	{
+	// 		data.ast_root = parse(lexer, &data);
+	// 		lexer_destroy(lexer);
+	// 		if (data.ast_root)
+	// 			execute_ast_node(data.ast_root, &data);
+	// 		ast_destroy(data.ast_root);
+	// 	}
+	// 	free(buff);
+	// }
+	// rl_clear_history();
 }
 
 int	main(int ac, char **av, char **envv)
@@ -107,17 +130,17 @@ int	main(int ac, char **av, char **envv)
 	char		*buff;
 	char		*prompt;
 
-	envp = dup_env(envv);
-	update_env(&envp);
+	// envp = dup_env(envv);
+	// update_env(&envp);
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, SIG_IGN);
-	data.env = envp;
+	// data.env = envp;
 	data.last_exit = 0;
 	data.parse_end = 0;
 	data.r_break = 0;
 	data.pipefd[0] = 0;
 	data.pipefd[1] = 0;
-	print_header();
+	// print_header();
 	main_loop(data, buff, prompt);
 	return (0);
 }
