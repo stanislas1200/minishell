@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/28 16:36:59 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/02 12:04:03 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ int	ft_getindexenv(char **env, char *str)
 	i = -1;
 	while (env[++i])
 		if (ft_strncmp(env[i], tmp, len) == 0)
-			return (i);
-	return (-1);
+			return (free(tmp), i);
+	return (free(tmp), -1);
 }
 
 char	**dup_env(char **envp)
@@ -75,28 +75,26 @@ void	shell_lvl(char ***envp)
 {
 	char		*tmp;
 	int			num;
-	char		*original_value;
+	char		*tmp2;
 
 	errno = 0;
-	original_value = ft_getenv(*envp, "SHLVL");
-	if (!original_value)
-		export2(envp, "SHLVL=1", 5, 0);
-	else
+	num = 1;
+	tmp2 = ft_getenv(*envp, "SHLVL");
+	if (!tmp2)
+		return (export2(envp, "SHLVL=1", 5, 0));
+	if (is_numeric(tmp2) == 0)
 	{
-		if (is_numeric(original_value) == 0)
-		{
-			num = ft_atoi(original_value);
-			if (num == INT_MAX || num == INT_MIN || num++ < 0 || errno != 0)
-				num = 0;
-		}
-		else
-			num = 1;
-		tmp = ft_strjoin("SHLVL=", ft_itoa(num));
-		if (!tmp)
-			return (errno = 0, cperror("SHLVL", "malloc", NULL, 1));
-		export2(envp, tmp, 5, 0);
-		free(tmp);
+		num = ft_atoi(tmp2);
+		if (num == INT_MAX || num == INT_MIN || num++ < 0 || errno != 0)
+			num = 0;
 	}
+	tmp2 = ft_itoa(num);
+	tmp = ft_strjoin("SHLVL=", tmp2);
+	free(tmp2);
+	if (!tmp)
+		return (errno = 0, cperror("SHLVL", "malloc", NULL, 1));
+	export2(envp, tmp, 5, 0);
+	free(tmp);
 	errno = 0;
 }
 
