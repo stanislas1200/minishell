@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/16 22:04:16 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/02 11:41:16 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 16:41:45 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	ft_exit(char **envp, char **args, t_data *data)
 
 	errno = 0;
 	exit_code = 0;
-	// printf(R "exit\n");
+	printf(R "exit\n" C);
 	if (matrix_len(args) > 2)
 	{
 		cperror("exit", NULL, "too many arguments", 0);
@@ -32,6 +32,7 @@ void	ft_exit(char **envp, char **args, t_data *data)
 		exit_code = check_exit(args[1]);
 	ast_destroy(data->ast_root);
 	free_matrix(data->env);
+	free(args);
 	exit(exit_code);
 }
 
