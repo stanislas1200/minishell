@@ -1,4 +1,5 @@
 # fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
+no exactly like bash echo hey | cat | <<EOF 
 
 # heredoc EOF NULL cmd not working
 # heredoc not working after pipe
@@ -14,6 +15,9 @@
 # echo hi | <<EOF ( should heredoc )
 # echo 42 | <FILE | wc ( should try <FILE )
 
+# Test  52: ❌  
+# mini exit code = 2
+# bash exit code = 0
 
 # cat <<HERE | ls
 # oi
@@ -36,16 +40,25 @@
 # <<EOF // segfault , should work
 # <<EOF $MISSIGN echo 42 // segfault , should work
 
+# echo > R 42
+# echo > R 42 > G 41
+# > R echo 42 > G 41 > B 40
+
+# > R echo 42 | <
+#echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
+
 Export: potentialy have "" for var data (USER="SGODIN")
 
 # Syntax error: cmd | < cmd2 (only error if no cmd2)
 
-cat | cat << EOF ( heredoc broken if cmd that want read before | )
+# cat | cat << EOF ( heredoc broken if cmd that want read before | )
+
+echo hey <> FILE you ( should work and create FILE but not redirect )
 
 remake expand in 1 function for all cases (av, heredoc)
 handle error in heredoc and executer
 
-#invalid command, followed by empty variable, should clear the exit code
+#invalid command, followed by empty variable, should clear the exit code // set last-exit = 0; on expand
 doesntexist
 $EMPTY
 echo $?
@@ -68,8 +81,8 @@ bash exit code = 127
 mini error = ( No such file or directory)
 bash error = ( command not found)
 
-
-137/151
+149/152 macos bash 3.2
+133/151 linux bash 5.0.17(1)-release (x86_64-pc-linux-gnu)
 
 
 
@@ -99,3 +112,7 @@ SIGSTOP (19): Stop. Sent to a process to pause its execution.
 SIGTSTP (20): Terminal stop. Sent to a process when the user presses CTRL+Z in the terminal.
 SIGTTIN (21): Background read from a terminal.
 SIGTTOU (22): Background write to a terminal.
+
+# echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo | < R echo ARG > G ARG ARG
+// Lexer Bulletproof
+// parser probably Bulletproof 

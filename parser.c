@@ -12,149 +12,75 @@
 
 #include "minishell.h"
 
-t_ASTNode	*new_node(int t, char *d)
-{
-	t_ASTNode	*node;
-
-	node = malloc(sizeof(t_ASTNode));
-	if (!node)
-		return (NULL);
-	node->type = t;
-	node->data = ft_strdup(d);
-	if (!node->data)
-		return (free(node), NULL);
-	node->left = NULL;
-	node->right = NULL;
-	return (node);
-}
-
-void	*free_node(t_ASTNode *node)
-{
-	if (!node)
-		return (NULL);
-	if (node->left)
-		free_node(node->left);
-	if (node->right)
-		free_node(node->right);
-	if (node->data)
-		free(node->data);
-	node->data = NULL;
-	free(node);
-	node = NULL;
-	return (NULL);
-}
-
-void	ast_destroy(t_ASTNode *node)
-{
-	if (!node)
-		return ;
-	ast_destroy(node->left);
-	ast_destroy(node->right);
-	if (node->data)
-		free(node->data);
-	node->data = NULL;
-	free(node);
-	node = NULL;
-}
-
-void	*print_error(char *str, t_data *data)
-{
-	ft_putstr_fd(M "-stanshell: " C "syntax error near unexpected token `", 2);
-	if (str)
-	{
-		if (str[0] == '\n')
-			ft_putstr_fd("newline", 2);
-		else if (str[0] == '\0')
-			ft_putstr_fd("end of file", 2);
-		else
-			ft_putstr_fd(str, 2);
-	}
-	ft_putstr_fd("'\n", 2);
-	data->parse_end = 1;
-	return (NULL);
-}
-
-t_ASTNode	*command_simple(t_token **token, int type)
-{
-	t_ASTNode	*node;
-
-	while (*token && (*token)->type == 0)
-		*token = (*token)->next;
-	if (!*token || (*token)->type != TOKEN)
-		return (NULL);
-	node = new_node(type, (*token)->data);
-	if (!node)
-		return (NULL); // MALLOC ERROR
-	if (*token && (*token)->type == TOKEN)
-		*token = (*token)->next;
-	node->right = command_simple(token, ARG);
-	return (node);
-}
-
 t_ASTNode	*job_pipe(t_token **token, t_data *data, t_ASTNode *left)
 {
 	t_ASTNode	*node;
 
 	if (!left)
-		left = command_simple(token, TOKEN);
+		left = command_simple(token, TOKEN, data);
 	if (!left)
 		return (NULL);
 	if ((*token) && (*token)->type == CHAR_PIPE)
 	{
 		node = new_node(CHAR_PIPE, (*token)->data);
 		if (!node)
-			return (free_node(left));
+			return (ast_destroy(left), parser_error(data));
 		node->left = left;
 		*token = (*token)->next;
 		if ((*token)->type != TOKEN)
 		{
 			if (!(*token)->next || (*token)->next->type != TOKEN)
 			{
-				if (!(*token)->next || !(*token)->next->next || (*token)->next->type != (*token)->type)
-				{
-					data->parse_end = 1;
-				return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
-				}
+				if (!(*token)->next || !(*token)->next->next \
+				|| (*token)->next->type != (*token)->type)
+					return (print_error((*token)->data, data, node));
 			}
 		}
-		node->right = parse_top(*token, data);
-		return (node);
+		return (node->right = parse_top(*token, data), node);
 	}
-	return (free_node(left));
+	return (ast_destroy(left));
+}
+
+t_ASTNode	*r_n(t_token **token, t_data *data, t_ASTNode *left, int type)
+{
+	t_ASTNode	*node;
+	t_ASTNode	*new_root;
+
+	node = new_node(type, (*token)->data);
+	if (!node)
+		return (ast_destroy(left), parser_error(data));
+	node->left = left;
+	while ((*token)->next && (*token)->next->type == 0)
+		(*token) = (*token)->next;
+	if (check_arg(token, left))
+		return (ast_destroy(node), parser_error(data));
+	while ((*token)->next && (*token)->next->type == 0)
+		(*token) = (*token)->next;
+	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
+	{
+		*token = (*token)->next;
+		new_root = new_node('|', (*token)->data);
+		if (!new_root)
+			return (ast_destroy(node), parser_error(data));
+		node->right = new_root;
+		new_root->right = parse_top((*token)->next, data);
+	}
+	else
+		node->right = parse_top((*token)->next, data);
+	return (node);
 }
 
 t_ASTNode	*redirection(t_token **token, t_data *data)
 {
 	int			type;
-	int			old;
 	t_ASTNode	*left;
-	t_ASTNode	*node;
-	t_token		*save;
-	t_ASTNode	*new_root;
-	t_token		*temp;
 
 	left = NULL;
-	if ((*token) && (*token)->type != CHAR_PIPE && (*token)->type != TOKEN && (*token)->next)
-	{
-		save = *token;
-		while (save && save->type != CHAR_PIPE)
-		{
-			old = save->type;
-			temp = save;
-			save = save->next;
-			while(save && save->type == 0)
-				save = save->next;
-			if (save && save->type == TOKEN && old == TOKEN)
-			{
-				left = new_node(TOKEN, save->data);
-				save->type = 0;
-			}
-		}
-	}
-	else
-		left = command_simple(token, TOKEN);
-	if (!(*token) || (*token)->type == CHAR_PIPE || (*token)->type == TOKEN || (*token)->type == 0) // 
-		return (free_node(left));
+	if (check_cmd(token, &left, data))
+		return (parser_error(data));
+	if (!(*token) || (*token)->type == CHAR_PIPE \
+	|| (*token)->type == TOKEN || (*token)->type == 0)
+		return (ast_destroy(left));
 	type = (*token)->type;
 	if ((*token)->next && (*token)->next->type == type)
 	{
@@ -166,47 +92,8 @@ t_ASTNode	*redirection(t_token **token, t_data *data)
 	}
 	*token = (*token)->next;
 	if (!(*token) || (*token)->type != TOKEN || (*token)->data[0] == '\n')
-	{
-		data->parse_end = 1;
-		return (print_error((*token)->data, data), data->last_exit = 2, free_node(left));
-	}
-	node = new_node(type, (*token)->data);
-	if (!node)
-		return (free_node(left));
-	node->left = left;
-	while ((*token)->next && (*token)->next->type == 0)
-		(*token) = (*token)->next;
-	if ((*token)->next && (*token)->next->type == CHAR_PIPE)
-	{
-		*token = (*token)->next;
-		new_root = new_node('|', (*token)->data);
-		node->right = new_root;
-		new_root->right = parse_top((*token)->next, data);
-	}
-	else
-	{
-		if ((*token)->next && (*token)->next->type != CHAR_PIPE && left)
-		{
-			while (left->right)
-				left = left->right;
-			save = *token;
-			while (save && save->type != CHAR_PIPE)
-			{
-				old = save->type;
-				save = save->next;
-				if (save && save->type == TOKEN && (old == TOKEN || !old))
-				{
-					left->right = new_node(TOKEN, save->data);
-					save->type = 0;
-					left = left->right;
-				}
-			}
-		}
-		while ((*token)->next && (*token)->next->type == 0)
-			(*token) = (*token)->next;
-		node->right = parse_top((*token)->next, data);
-	}
-	return (node);
+		return (print_error((*token)->data, data, left));
+	return (r_n(token, data, left, type));
 }
 
 t_ASTNode	*parse_top(t_token *token, t_data *data)
@@ -224,112 +111,18 @@ t_ASTNode	*parse_top(t_token *token, t_data *data)
 	if (node && !data->parse_end)
 		return (node);
 	token = save;
-	node = redirection(&token, data);
+	if (!data->parse_end)
+		node = redirection(&token, data);
 	if (node && !data->parse_end)
 		return (node);
 	token = save;
-	node = command_simple(&token, TOKEN);
+	if (!data->parse_end)
+		node = command_simple(&token, TOKEN, data);
 	if (node && !data->parse_end)
 		return (node);
 	if (data->parse_end)
-		return (data->parse_end = 1, NULL);
-	return (print_error(token->data, data));
-}
-
-t_ASTNode	*remove_all_input_nodes(t_ASTNode **root)
-{
-	t_ASTNode	*cmd;
-	t_ASTNode	*node;
-	t_ASTNode	*prev;
-	t_ASTNode	*temp;
-
-	if (!*root)
-		return (NULL);
-	node = *root;
-	prev = NULL;
-	cmd = NULL;
-	while (node)
-	{
-		if (node->type == CHAR_INPUTR)
-		{
-			if (node->left)
-				cmd = node->left;
-			if (prev)
-				prev->right = node->right;
-			else
-				*root = node->right;
-			temp = node;
-			node = node->right;
-			temp->right = NULL;
-			free(temp->data);
-			temp->data = NULL;
-			free(temp);
-			temp = NULL;
-		}
-		else
-		{
-			prev = node;
-			node = node->right;
-		}
-	}
-	return (cmd);
-}
-
-void	check_eof(t_ASTNode **root)
-{
-	t_ASTNode	*node;
-	t_ASTNode	*cmd;
-
-	if (!*root)
-		return ;
-	node = *root;
-	if (node->type == 4)
-	{
-		cmd = remove_all_input_nodes(&(node->left));
-		if (!node->left)
-			node->left = cmd;
-		return ;
-	}
-	check_eof(&(node->right));
-}
-
-void	reorder_tree(t_ASTNode **root)
-{
-	t_ASTNode	*node;
-	t_ASTNode	*prev;
-	t_ASTNode	*prev_save;
-	t_ASTNode	*save;
-
-	node = *root;
-	prev_save = NULL;
-	while (node && node->right)
-	{
-		if (node && (node->type == TOKEN || node->type == CHAR_PIPE))
-			prev_save = node;
-		if (node && node->type != TOKEN && node->type != CHAR_PIPE)
-		{
-			save = node;
-			while (node && node->type != TOKEN && node->type != CHAR_PIPE)
-			{
-				prev = node;
-				if (!node->right)
-					return ;
-				node = node->right;
-				if (node && (node->type == CHAR_PIPE))
-				{
-					prev->right = NULL;
-					node->left = save;
-					if (prev_save)
-						prev_save->right = node;
-					else
-						*root = node;
-					reorder_tree(&(node->right));
-					return ;
-				}
-			}
-		}
-		node = node->right;
-	}
+		return (data->parse_end = 1, ast_destroy(node), NULL);
+	return (print_error(token->data, data, NULL));
 }
 
 t_ASTNode	*parse(t_lexer *lexer, t_data *data)
@@ -340,7 +133,7 @@ t_ASTNode	*parse(t_lexer *lexer, t_data *data)
 	token = lexer->tokens;
 	tree = parse_top(token, data);
 	if (!tree)
-		return (data->last_exit = 2, NULL);
+		return (NULL);
 	if (data->parse_end)
 	{
 		ast_destroy(tree);
@@ -349,6 +142,5 @@ t_ASTNode	*parse(t_lexer *lexer, t_data *data)
 		return (data->last_exit = 2, NULL);
 	}
 	reorder_tree(&tree);
-	check_eof(&tree);
 	return (tree);
 }
