@@ -23,13 +23,18 @@ int	left_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 	}
 	else
 	{
-		dup2(pipefd[1], STDOUT_FILENO);
+		// if (node->right->type != 4)
+			dup2(pipefd[1], STDOUT_FILENO);
+		// else
+		// 	dup2(pipefd[1], STDERR_FILENO);
 		close(pipefd[1]);
 	}
 	close(comm_pipe[1]);
-	if (check_heredoc(node->right) && !check_heredoc(node->left))
+	if (check_heredoc(node->right) && !check_heredoc(node->left) && node == data->ast_root && node->right->type == 4) // need to know if somethin in pipe or close it
 	{
+		perror("here\n");
 		read(comm_pipe[0], signal_buf, sizeof(signal_buf));
+		perror("ok\n");
 	}
 	close(comm_pipe[0]);
 	execute_ast_node(node->left, data);
@@ -40,19 +45,22 @@ int	left_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 int	right_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 {
 	close(pipefd[1]);
-	if (check_heredoc(node->right))
-	{
+	// if (check_heredoc(node->right) && node->right->type == 4)
+	// {
 		data->pipefd[0] = pipefd[0];
-	}
-	else
-	{
+	// }
+	// else
+	// {
 		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
-	}
+		close(pipefd[0]);	
+	// }
+	char debug[100];
+	// read(0, debug, sizeof(debug));
+	// write(2, debug, sizeof(debug));
 	execute_ast_node(node->right, data);
 	close(comm_pipe[0]);
-	if (check_heredoc(node->right) && !check_heredoc(node->left))
-		write(comm_pipe[1], "1", 1);
+	// if (check_heredoc(node->right) && !check_heredoc(node->left))
+	// 	write(comm_pipe[1], "1", 1);
 	close(comm_pipe[1]);
 	ast_destroy(data->ast_root);
 	exit(data->last_exit);

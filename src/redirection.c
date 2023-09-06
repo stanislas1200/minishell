@@ -30,7 +30,7 @@ char	*heredoc_next(char *text, t_data *data, t_ASTNode *save)
 		close(data->pipefd[1]);
 		data->pipefd[1] = 0;
 	}
-	if (data->pipefd[0] && !check_heredoc(save->right))
+	if (data->pipefd[0] && !check_heredoc(save->right)) // No need ?
 	{
 		dup2(data->pipefd[0], STDIN_FILENO);
 		close(data->pipefd[0]);
@@ -44,6 +44,7 @@ void	heredoc(char *path, t_data *data, int redirection, t_ASTNode *s)
 	int		fd[2];
 	char	*text;
 
+	dup2(data->fdin, STDIN_FILENO); // restore stdin
 	text = heredoc_next(heredoc_loop(path, fd), data, s);
 	if (s->right && s->right->type != CHAR_PIPE)
 	{

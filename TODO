@@ -1,5 +1,12 @@
 # fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
 no exactly like bash echo hey | cat | <<EOF 
+ls | cat | << EOF
+cat | cat << EOF // ok but only for 1 read cmd not more 
+cat | cat | << EOF
+
+heredoc before all, split in 2 like pipe
+echo hey | cat >> G | ls >> R | echo hey >> B | wc << EOF | cat >> B | echo ok | cat >> G | echo you >> R
+top | grep root >> R | echo hey >> B | wc << EOF | man top >> G
 
 ls > R | wc > R
 wc > R | ls > R
@@ -57,13 +64,12 @@ function erro stop executer;
 # > R echo 42 > G 41 > B 40
 
 # > R echo 42 | <
-#echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
+# echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
 
 # Export: potentialy have "" for var data (USER="SGODIN")
 
 # Syntax error: cmd | < cmd2 (only error if no cmd2)
 
-# cat | cat << EOF ( heredoc broken if cmd that want read before | )
 
 echo hey <> FILE you ( should work and create FILE but not redirect )
 

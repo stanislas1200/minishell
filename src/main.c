@@ -93,6 +93,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 		{
 			data.ast_root = parse(lexer, &data);
 			lexer_destroy(lexer);
+			data.fdin = dup(STDIN_FILENO);
 			execute_ast_node(data.ast_root, &data);
 			ast_destroy(data.ast_root);
 		}

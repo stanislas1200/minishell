@@ -94,6 +94,8 @@ int	execute_cmd(t_ASTNode *node, t_ASTNode *save, t_data *data)
 		return (perror("fork"), 1);
 	else if (pid == 0)
 	{
+		// if (node->type == TOKEN)
+		// 	write(2, node->data, ft_strlen(node->data));
 		ex_redirection(save, redirection, path, data);
 		return (cmd_child(node, data));
 	}

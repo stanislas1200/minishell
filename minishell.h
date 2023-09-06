@@ -66,6 +66,7 @@ typedef struct t_data
 	int			last_exit;
 	int			r_break;
 	int			pipefd[2];
+	int			fdin;
 	char		*path;
 	char		**env;
 	t_ASTNode	*ast_root;
