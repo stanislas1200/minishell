@@ -1,6 +1,16 @@
 # fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
 no exactly like bash echo hey | cat | <<EOF 
 
+ls > R | wc > R
+wc > R | ls > R
+echo hey | cat > R | <<EOF
+
+pipe.c 30: node->right->type == 4 // all want read else 
+        55: no need just close fd
+
+utils.c 36: no need fd;
+
+
 function erro stop executer;
 
 # heredoc EOF NULL cmd not working
@@ -116,6 +126,6 @@ SIGTSTP (20): Terminal stop. Sent to a process when the user presses CTRL+Z in t
 SIGTTIN (21): Background read from a terminal.
 SIGTTOU (22): Background write to a terminal.
 
-# echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo | < R echo ARG > G ARG ARG
+# ls | wc > R | cat << EOF | echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo | < R echo ARG > G ARG ARG
 // Lexer Bulletproof
 // parser probably Bulletproof 
