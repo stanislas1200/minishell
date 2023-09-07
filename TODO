@@ -3,6 +3,7 @@ no exactly like bash echo hey | cat | <<EOF
 ls | cat | << EOF
 cat | cat << EOF // ok but only for 1 read cmd not more 
 cat | cat | << EOF
+cat | cat > R | << EOF
 
 heredoc before all, split in 2 like pipe
 echo hey | cat >> G | ls >> R | echo hey >> B | wc << EOF | cat >> B | echo ok | cat >> G | echo you >> R
