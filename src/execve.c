@@ -61,12 +61,16 @@ void	ft_execve(t_data *data, char *cmd, char **args)
 	cmd_path = find_command_path(ft_getenv(data->env, "PATH"), cmd);
 	execve(cmd_path, args, data->env);
 	cperror("execve", cmd, NULL, 1);
-	ast_destroy(data->ast_root);
+	free_matrix(data->env);
+	if (cmd_path)
+		free(cmd_path);
 	if (cmd[0] == '.')
 	{
+		ast_destroy(data->ast_root);
 		free(args);
 		exit(126);
 	}
+	ast_destroy(data->ast_root);
 	free(args);
 	if (errno == EACCES || errno == ENOENT)
 		exit(127);

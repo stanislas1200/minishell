@@ -24,6 +24,7 @@ int	cmd_child(t_ASTNode *node, t_data *data)
 		data->last_exit = execute_builtin(node, arr, data);
 		if (data->last_exit != -1)
 		{
+			free_matrix(data->env);
 			ast_destroy(data->ast_root);
 			free(arr);
 			exit(data->last_exit);
@@ -31,12 +32,14 @@ int	cmd_child(t_ASTNode *node, t_data *data)
 		if (node->type != TOKEN)
 		{
 			data->last_exit = execute_ast_node(node, data);
+			free_matrix(data->env);
 			ast_destroy(data->ast_root);
 			free(arr);
 			exit(data->last_exit);
 		}
 		ft_execve(data, node->data, arr);
 	}
+	free_matrix(data->env);
 	ast_destroy(data->ast_root);
 	exit(data->last_exit);
 }

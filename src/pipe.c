@@ -47,6 +47,7 @@ int	left_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 	}
 	close(comm_pipe[0]);
 	execute_ast_node(node->left, data);
+	free_matrix(data->env);
 	ast_destroy(data->ast_root);
 	exit(data->last_exit);
 }
@@ -73,6 +74,7 @@ int	right_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 	write(2, node->right->data, ft_strlen(node->right->data));
 	write(2, "\n", 1);
 	close(comm_pipe[1]);
+	free_matrix(data->env);
 	ast_destroy(data->ast_root);
 	exit(data->last_exit);
 }
