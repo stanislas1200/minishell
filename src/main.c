@@ -117,6 +117,8 @@ int	main(int ac, char **av, char **envv)
 	data.r_break = 0;
 	data.pipefd[0] = 0;
 	data.pipefd[1] = 0;
+	data.in_pipe = 0;
+	data.fdin = dup(STDIN_FILENO);
 	print_header();
 	main_loop(data, buff, prompt);
 	rl_clear_history();

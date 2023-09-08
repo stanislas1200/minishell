@@ -16,6 +16,7 @@ int	left_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 {
 	char	signal_buf[1];
 
+	data->in_pipe = 1;
 	close(pipefd[0]);
 	if (check_heredoc(node->left))
 	{
@@ -27,33 +28,29 @@ int	left_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 		close(pipefd[1]);
 	}
 	close(comm_pipe[1]);
-	if (check_heredoc(node->right) && !check_heredoc(node->left))
+	if (check_heredoc(node->right) && !check_heredoc(node->left) \
+	&& node == data->ast_root && node->right->type == 4)
 	{
 		read(comm_pipe[0], signal_buf, sizeof(signal_buf));
 	}
 	close(comm_pipe[0]);
 	execute_ast_node(node->left, data);
+	free_matrix(data->env);
 	ast_destroy(data->ast_root);
 	exit(data->last_exit);
 }
 
 int	right_child(t_ASTNode *node, int pipefd[2], int comm_pipe[2], t_data *data)
 {
+	data->in_pipe = 1;
 	close(pipefd[1]);
-	if (check_heredoc(node->right))
-	{
-		data->pipefd[0] = pipefd[0];
-	}
-	else
-	{
-		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
-	}
+	data->pipefd[0] = pipefd[0];
+	dup2(pipefd[0], STDIN_FILENO);
+	close(pipefd[0]);
 	execute_ast_node(node->right, data);
 	close(comm_pipe[0]);
-	if (check_heredoc(node->right) && !check_heredoc(node->left))
-		write(comm_pipe[1], "1", 1);
 	close(comm_pipe[1]);
+	free_matrix(data->env);
 	ast_destroy(data->ast_root);
 	exit(data->last_exit);
 }

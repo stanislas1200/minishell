@@ -36,6 +36,7 @@ char	*heredoc_next(char *text, t_data *data, t_ASTNode *save)
 		close(data->pipefd[0]);
 		data->pipefd[0] = 0;
 	}
+	signal(SIGINT, signal_handler);
 	return (text);
 }
 
@@ -44,6 +45,8 @@ void	heredoc(char *path, t_data *data, int redirection, t_ASTNode *s)
 	int		fd[2];
 	char	*text;
 
+	dup2(data->fdin, STDIN_FILENO);
+	signal(SIGINT, SIG_DFL);
 	text = heredoc_next(heredoc_loop(path, fd), data, s);
 	if (s->right && s->right->type != CHAR_PIPE)
 	{
@@ -107,6 +110,7 @@ void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
 		ft_putstr_fd(M "-stanshell" C ": " Y, 2);
 		ft_putstr_fd(path, 2);
 		ft_putstr_fd(C ": No such file or directory\n", 2);
+		free_matrix(data->env);
 		ast_destroy(data->ast_root);
 		exit(1);
 	}

@@ -59,3 +59,33 @@ char	*heredoc_loop(char *path, int fd[2])
 	}
 	return (text);
 }
+
+void	clean(t_data *data)
+{
+	free_matrix(data->env);
+	ast_destroy(data->ast_root);
+}
+
+int	get_next_token(t_token **token)
+{
+	char	*new;
+
+	if ((*token)->type == CHAR_INPUTR && (*token)->next \
+		&& (*token)->next->type == CHAR_INPUTR)
+	{
+		*token = (*token)->next->next;
+		if (token && (*token)->type != CHAR_NULL)
+		{
+			new = malloc(sizeof(char) * ft_strlen((*token)->data) + 1);
+			if (!new)
+				return (1);
+			strip_quotes((*token)->data, new);
+			free((*token)->data);
+			(*token)->data = new;
+			(*token) = (*token)->next;
+			return (0);
+		}
+	}
+	(*token) = (*token)->next;
+	return (0);
+}

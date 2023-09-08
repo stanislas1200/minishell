@@ -1,0 +1,128 @@
+#!/bin/bash
+
+RESET="\033[0m"
+BLACK="\033[30m"
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+BLUE="\033[34m"
+MAGENTA="\033[35m"
+CYAN="\033[36m"
+WHITE="\033[37m"
+
+BOLDBLACK="\033[1m\033[30m"
+BOLDRED="\033[1m\033[31m"
+BOLDGREEN="\033[1m\033[32m"
+BOLDYELLOW="\033[1m\033[33m"
+BOLDBLUE="\033[1m\033[34m"
+BOLDMAGENTA="\033[1m\033[35m"
+BOLDCYAN="\033[1m\033[36m"
+BOLDWHITE="\033[1m\033[37m"
+
+MINISHELL_PATH="../minishell"
+
+# Run a specific test if the file name was specified
+if [[ $1 ]]; then
+	test_lists=(
+		$1
+	)
+else
+	test_lists=(
+		"builtins"
+		"pipes"
+		"redirects"
+		"extras"
+	)
+fi
+
+if [[ $1 == "wildcards"  || $1 == "bonus" ]]; then
+	MINISHELL_PATH="../minishell_bonus"
+fi
+
+BOLD="\e[1m"
+YELLOW="\033[0;33m"
+GREY="\033[38;5;244m"
+PURPLE="\033[0;35m"
+BLUE="\033[0;36m"
+RED="\e[0;31m"
+END="\033[0m"
+
+chmod 000 ./test_files/invalid_permission
+mkdir ./outfiles
+mkdir ./mini_outfiles
+mkdir ./bash_outfiles
+
+printf $RED
+echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥";
+echo "                                                                                             ";
+echo " ██    ██ █ ██    █ █ █████ █   █ █████ █     █       ██████ █████ █████ ██████ █████ █████  ";
+echo " ███  ███ █ ███   █ █ █     █   █ █     █     █         ██   █     █       ██   █     █   ██ ";
+echo " █ ████ █ █ █ ██  █ █ █████ █████ ████  █     █         ██   ████  █████   ██   ████  █████  ";
+echo " █  ██  █ █ █  ██ █ █     █ █   █ █     █     █         ██   █         █   ██   █     █   ██ ";
+echo " █      █ █ █   ███ █ █████ █   █ █████ █████ █████     ██   █████ █████   ██   █████ █   ██ ";
+echo "                                                                                             ";
+echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥";
+echo "                                                                                              ";
+
+PROMPT=$(echo -e "\nexit\n" | $MINISHELL_PATH | head -n 1 | sed "s/\x1B\[[0-9;]\{1,\}[A-Za-z]//g" )
+# Helper commands:
+REMOVE_COLORS="sed s/\x1B\[[0-9;]\{1,\}[A-Za-z]//g"
+REMOVE_EXIT="grep -v ^exit$"
+
+for testfile in ${test_lists[*]}; do
+
+	printf $RED
+	echo ———————————— $testfile
+
+	while read teste; do
+		((i++))
+
+		TEST1=$(echo "$teste" | ../minishell 2> /dev/null)
+		ES_1=$(echo -e "$MINISHELL_PATH\n$teste\necho \$?\nexit\n" | bash 2> /dev/null | $REMOVE_COLORS | grep -vF "$PROMPT" | $REMOVE_EXIT | tail -n 1)
+		TEST1=$(echo "$TEST1" | tail -n +2)
+		TEST2=$(echo "$teste" "; exit" | bash 2>&-)
+		ES_2=$?
+		printf "$YELLOW Test %3s: " $i
+		if [ "$TEST1" == "$TEST2" ] && [ "$ES_1" == "$ES_2" ]; then
+			printf " $BOLDGREEN%s$RESET" "Oh oui bien joué 👀👄👀 "
+			((ok++))
+		else
+			printf " $BOLDRED%s$RESET" "✗ "
+		fi
+		printf "$BOLDMAGENTA \""$teste"\" $RESET"
+		if [ "$TEST1" != "$TEST2" ]; then
+			echo
+			echo
+			printf $BOLDRED"Your output : \n%.20s\n$BOLDRED$TEST1\n%.20s$RESET\n" "-----------------------------------------" "-----------------------------------------"
+			printf $BOLDGREEN"Expected output : \n%.20s\n$BOLDGREEN$TEST2\n%.20s$RESET\n" "-----------------------------------------" "-----------------------------------------"
+		fi
+		if [ "$ES_1" != "$ES_2" ]; then
+			echo
+			echo
+			printf $BOLDRED"Your exit status : $BOLDRED$ES_1$RESET\n"
+			printf $BOLDGREEN"Expected exit status : $BOLDGREEN$ES_2$RESET\n"
+		fi
+		echo
+		sleep 0.1
+	done < $testfile
+done
+
+chmod 666 ./test_files/invalid_permission
+rm -rf ./outfiles
+rm -rf ./mini_outfiles
+rm -rf ./bash_outfiles
+
+printf $PURPLE
+printf $BOLD
+echo   $ok/$i
+printf $END
+
+if [[ "$ok" == "$i" ]]; then
+	echo "🎊 🎊 🎊"
+	echo "😎 😎 😎"
+	echo "🎉 🎉 🎉"
+	exit 0
+else
+	echo "😭 😭 😭"
+	exit 1
+fi

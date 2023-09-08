@@ -1,9 +1,31 @@
 # fix this cat <<EOF <<EOF | echo 42 : heredoc pipe wait for EOF
 no exactly like bash echo hey | cat | <<EOF 
+ls | cat | << EOF
+cat | cat << EOF // ok but only for 1 read cmd not more 
+cat | cat | << EOF
+cat | cat > R | << EOF
+
+heredoc before all, split in 2 like pipe
+echo hey | cat >> G | ls >> R | echo hey >> B | wc << EOF | cat >> B | echo ok | cat >> G | echo you >> R
+top | grep root >> R | echo hey >> B | wc << EOF | man top >> G
+
+
+
+# exit | exit
+echo a > out1| <<out2 >| cat
+echo a > out1| <<out2> | cat
+ls>| cat
+echo a >| grep a
+<< "stop" cat
+# cat << $USER
+cmd | // ask second cmd
+
 
 ls > R | wc > R
 wc > R | ls > R
 echo hey | cat > R | <<EOF
+
+echo hey <> FILE you ( should work and create FILE but not redirect )
 
 pipe.c 30: node->right->type == 4 // all want read else 
         55: no need just close fd
@@ -57,15 +79,13 @@ function erro stop executer;
 # > R echo 42 > G 41 > B 40
 
 # > R echo 42 | <
-#echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
+# echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
 
 # Export: potentialy have "" for var data (USER="SGODIN")
 
 # Syntax error: cmd | < cmd2 (only error if no cmd2)
 
-# cat | cat << EOF ( heredoc broken if cmd that want read before | )
 
-echo hey <> FILE you ( should work and create FILE but not redirect )
 
 remake expand in 1 function for all cases (av, heredoc)
 handle error in heredoc and executer
@@ -94,7 +114,7 @@ bash exit code = 127
 mini error = ( No such file or directory)
 bash error = ( command not found)
 
-149/152 macos bash 3.2
+144/146 macos bash 3.2
 133/151 linux bash 5.0.17(1)-release (x86_64-pc-linux-gnu)
 
 

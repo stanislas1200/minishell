@@ -24,20 +24,20 @@ int	cmd_child(t_ASTNode *node, t_data *data)
 		data->last_exit = execute_builtin(node, arr, data);
 		if (data->last_exit != -1)
 		{
-			ast_destroy(data->ast_root);
+			clean(data);
 			free(arr);
 			exit(data->last_exit);
 		}
 		if (node->type != TOKEN)
 		{
 			data->last_exit = execute_ast_node(node, data);
-			ast_destroy(data->ast_root);
+			clean(data);
 			free(arr);
 			exit(data->last_exit);
 		}
 		ft_execve(data, node->data, arr);
 	}
-	ast_destroy(data->ast_root);
+	clean(data);
 	exit(data->last_exit);
 }
 
