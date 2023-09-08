@@ -134,6 +134,7 @@ void		*lexer_malloc_error(t_lexer *lexer);
 char		*expand_variables(char *input, t_data *data);
 t_lexer		*lexer_build(char *str, t_data *data);
 t_token		*token_new_next(t_token *token, t_data *data, int size);
+int			get_next_token(t_token **token);
 
 // Parser
 t_ASTNode	*parse(t_lexer *lexer, t_data *data);
