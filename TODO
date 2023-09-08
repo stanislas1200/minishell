@@ -9,9 +9,23 @@ heredoc before all, split in 2 like pipe
 echo hey | cat >> G | ls >> R | echo hey >> B | wc << EOF | cat >> B | echo ok | cat >> G | echo you >> R
 top | grep root >> R | echo hey >> B | wc << EOF | man top >> G
 
+
+
+# exit | exit
+echo a > out1| <<out2 >| cat
+echo a > out1| <<out2> | cat
+ls>| cat
+echo a >| grep a
+<< "stop" cat
+# cat << $USER
+cmd | // ask second cmd
+
+
 ls > R | wc > R
 wc > R | ls > R
 echo hey | cat > R | <<EOF
+
+echo hey <> FILE you ( should work and create FILE but not redirect )
 
 pipe.c 30: node->right->type == 4 // all want read else 
         55: no need just close fd
@@ -72,7 +86,6 @@ function erro stop executer;
 # Syntax error: cmd | < cmd2 (only error if no cmd2)
 
 
-echo hey <> FILE you ( should work and create FILE but not redirect )
 
 remake expand in 1 function for all cases (av, heredoc)
 handle error in heredoc and executer
@@ -101,7 +114,7 @@ bash exit code = 127
 mini error = ( No such file or directory)
 bash error = ( command not found)
 
-149/152 macos bash 3.2
+144/146 macos bash 3.2
 133/151 linux bash 5.0.17(1)-release (x86_64-pc-linux-gnu)
 
 

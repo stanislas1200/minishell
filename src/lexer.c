@@ -16,7 +16,6 @@
 
 int	lexer_edit(t_token *token, t_data *data)
 {
-	char	*var;
 	char	*new;
 
 	while (token)
@@ -37,7 +36,8 @@ int	lexer_edit(t_token *token, t_data *data)
 			free(token->data);
 			token->data = new;
 		}
-		token = token->next;
+		if (get_next_token(&token))
+			return (1);
 	}
 	return (0);
 }

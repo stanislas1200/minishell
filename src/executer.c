@@ -24,23 +24,20 @@ int	cmd_child(t_ASTNode *node, t_data *data)
 		data->last_exit = execute_builtin(node, arr, data);
 		if (data->last_exit != -1)
 		{
-			free_matrix(data->env);
-			ast_destroy(data->ast_root);
+			clean(data);
 			free(arr);
 			exit(data->last_exit);
 		}
 		if (node->type != TOKEN)
 		{
 			data->last_exit = execute_ast_node(node, data);
-			free_matrix(data->env);
-			ast_destroy(data->ast_root);
+			clean(data);
 			free(arr);
 			exit(data->last_exit);
 		}
 		ft_execve(data, node->data, arr);
 	}
-	free_matrix(data->env);
-	ast_destroy(data->ast_root);
+	clean(data);
 	exit(data->last_exit);
 }
 
@@ -97,8 +94,6 @@ int	execute_cmd(t_ASTNode *node, t_ASTNode *save, t_data *data)
 		return (perror("fork"), 1);
 	else if (pid == 0)
 	{
-		// if (node->type == TOKEN)
-		// 	write(2, node->data, ft_strlen(node->data));
 		ex_redirection(save, redirection, path, data);
 		return (cmd_child(node, data));
 	}

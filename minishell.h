@@ -67,6 +67,7 @@ typedef struct t_data
 	int			r_break;
 	int			pipefd[2];
 	int			fdin;
+	int			in_pipe;
 	char		*path;
 	char		**env;
 	t_ASTNode	*ast_root;
@@ -153,9 +154,6 @@ char		*heredoc_loop(char *path, int fd[2]);
 int			check_heredoc(t_ASTNode *node);
 char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
 int			execute_pipe(t_ASTNode *node, t_data *data);
-
-/* DEBUG */
-void		lexer_print(t_lexer *lexer);
-void		print_ast(t_ASTNode *root);
+void		clean(t_data *data);
 
 #endif

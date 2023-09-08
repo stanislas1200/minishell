@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/16 22:04:16 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 20:00:59 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/08 18:59:34 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	ft_exit(char **envp, char **args, t_data *data)
 
 	errno = 0;
 	exit_code = 0;
-	printf(R "exit\n" C);
+	if (!data->in_pipe)
+		printf(R "exit\n" C);
 	if (matrix_len(args) > 2)
 	{
 		cperror("exit", NULL, "too many arguments", 0);
