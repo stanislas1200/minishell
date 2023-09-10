@@ -2,9 +2,9 @@
 
 <!-- ls.c > doit regarder d'abord dans PATH -->
 
-ctrl+c <<EOF > exit code 1
+<!-- ctrl+c <<EOF > exit code 1 -->
 
-ctr+\ cat > quit
+<!-- ctr+\ cat > quit -->
 
-cat ctrl+c > code 130
+<!-- cat ctrl+c > code 130 -->
 

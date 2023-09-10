@@ -70,15 +70,13 @@ int	cmd_parent(t_ASTNode *save, t_data *data, pid_t pid)
 		execute_ast_node(save->right, data);
 	if (WIFSIGNALED(status))
 	{
-		data->last_exit = WTERMSIG(status);
-		if (data->last_exit == 3)
-		{
-			data->last_exit = 131;
-			printf("Quit: 3\n");
-		}
-		if (data->last_exit == 2)
-			data->last_exit = 130;
-		return (data->last_exit);
+		data->i = WTERMSIG(status);
+		if (data->i == 3)
+			return (printf(R "Quit" C ":" M "3\n" C), 131);
+		if (data->i == 2 && save->type == 4)
+			return (1);
+		if (data->i == 2)
+			return (130);
 	}
 	return (WEXITSTATUS(status));
 }
