@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/10 17:09:52 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/10 18:06:53 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*find_command_path(char *all_paths, char *command)
 	i = -1;
 	if (!command || !ft_strlen(command))
 		return (NULL);
-	if (!all_paths || access(command, X_OK) == 0)
+	if (!all_paths || !ft_strncmp(command, "./", 2) && !access(command, X_OK))
 		return (ft_strdup(command));
 	arr = ft_split(all_paths, ':');
 	if (!arr)
@@ -60,7 +60,6 @@ void	ft_execve(t_data *data, char *cmd, char **args)
 
 	cmd_path = find_command_path(ft_getenv(data->env, "PATH"), cmd);
 	execve(cmd_path, args, data->env);
-	cperror("execve", cmd, NULL, 1);
 	free_matrix(data->env);
 	if (cmd_path)
 		free(cmd_path);
