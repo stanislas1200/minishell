@@ -62,7 +62,7 @@ void	*get_prompt(void)
 		return (ft_strdup(G "• " M "stanshell" C "$ "));
 	str = NULL;
 	str = free_join(str, "\x1b[1;32m");
-	str = free_join(str, getenv("USER"));
+	str = free_join(str, user);
 	str = free_join(str, "\x1b[0m:\x1b[1;36m");
 	str = free_join(str, cwd);
 	str = free_join(str, "\x1b[0m$ \0");

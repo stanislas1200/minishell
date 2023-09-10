@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 17:25:29 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/10 13:41:43 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ char	*ft_getenv(char **env, char *str)
 
 	i = -1;
 	while (env[++i])
-		if (strncmp(env[i], str, ft_strlen(str)) == 0)
+		if (ft_strncmp(env[i], str, ft_strlen(str)) == 0)
 			return (&env[i][ft_strlen(str) + 1]);
 	return (NULL);
 }
