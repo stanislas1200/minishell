@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/10 18:06:53 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/10 18:41:29 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void	ft_execve(t_data *data, char *cmd, char **args)
 	char	*cmd_path;
 
 	cmd_path = find_command_path(ft_getenv(data->env, "PATH"), cmd);
+	signal(SIGQUIT, SIG_DFL);
 	execve(cmd_path, args, data->env);
 	free_matrix(data->env);
 	if (cmd_path)
