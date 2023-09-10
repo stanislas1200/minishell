@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 17:00:14 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/10 17:09:52 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*find_command_path(char *all_paths, char *command)
 	i = -1;
 	if (!command || !ft_strlen(command))
 		return (NULL);
-	if (!all_paths)
+	if (!all_paths || access(command, X_OK) == 0)
 		return (ft_strdup(command));
 	arr = ft_split(all_paths, ':');
 	if (!arr)
