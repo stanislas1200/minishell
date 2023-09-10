@@ -39,6 +39,7 @@ int	lexer_edit(t_token *token, t_data *data)
 		if (get_next_token(&token))
 			return (1);
 	}
+	data->last_exit = 0;
 	return (0);
 }
 

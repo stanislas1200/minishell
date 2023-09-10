@@ -147,6 +147,7 @@ int			check_cmd(t_token **token, t_ASTNode **left, t_data *data);
 int			check_arg(t_token **token, t_ASTNode *left);
 t_ASTNode	*new_node(int t, char *d);
 t_ASTNode	*command_simple(t_token **token, int type, t_data *data);
+void		process_parsing(t_data *data, t_lexer *lexer);
 
 // Executer
 int			execute_ast_node(t_ASTNode *node, t_data *data);

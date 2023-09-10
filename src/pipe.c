@@ -98,3 +98,14 @@ int	execute_pipe(t_ASTNode *node, t_data *data)
 	}
 	return (pipe_parent(pipefd, comm_pipe, left_pid, right_pid));
 }
+
+void	process_parsing(t_data *data, t_lexer *lexer)
+{
+	data->ast_root = parse(lexer, data);
+	lexer_destroy(lexer);
+	if (data->ast_root)
+	{
+		execute_ast_node(data->ast_root, data);
+		ast_destroy(data->ast_root);
+	}
+}

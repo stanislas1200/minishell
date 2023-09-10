@@ -90,10 +90,10 @@ function erro stop executer;
 remake expand in 1 function for all cases (av, heredoc)
 handle error in heredoc and executer
 
-#invalid command, followed by empty variable, should clear the exit code // set last-exit = 0; on expand
-doesntexist
-$EMPTY
-echo $?
+# #invalid command, followed by empty variable, should clear the exit code // set last-exit = 0; on expand
+# doesntexist
+# $EMPTY
+# echo $?
 
 # # Neither of these unsets should break the shell, and you should still be able to call `/bin/ls`
 # unset USER

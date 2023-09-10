@@ -59,7 +59,7 @@ void	*get_prompt(void)
 
 	user = getenv("USER");
 	if (!getcwd(cwd, sizeof(cwd)) || !user)
-		return (ft_strdup(B "stanshell> " C));
+		return (ft_strdup(G "• " M "stanshell" C "$ "));
 	str = NULL;
 	str = free_join(str, "\x1b[1;32m");
 	str = free_join(str, getenv("USER"));
@@ -67,7 +67,7 @@ void	*get_prompt(void)
 	str = free_join(str, cwd);
 	str = free_join(str, "\x1b[0m$ \0");
 	if (!str)
-		return (ft_strdup(B "stanshell> " C));
+		return (ft_strdup(G "• " M "stanshell" C "$ "));
 	return (str);
 }
 
@@ -87,14 +87,12 @@ void	main_loop(t_data data, char *buff, char *prompt)
 			printf(R "exit\n" C);
 			break ;
 		}
-		add_history(buff);
-		lexer = lexer_build(buff, &data);
-		if (lexer)
+		if (buff[0] != '\0')
 		{
-			data.ast_root = parse(lexer, &data);
-			lexer_destroy(lexer);
-			execute_ast_node(data.ast_root, &data);
-			ast_destroy(data.ast_root);
+			add_history(buff);
+			lexer = lexer_build(buff, &data);
+			if (lexer)
+				process_parsing(&data, lexer);
 		}
 		free(buff);
 	}
