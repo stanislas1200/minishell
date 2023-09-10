@@ -158,4 +158,7 @@ char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
 int			execute_pipe(t_ASTNode *node, t_data *data);
 void		clean(t_data *data);
 
+char		*get_home(t_data *data);
+char		*expand_home(t_data *data, char *input, int i);
+
 #endif

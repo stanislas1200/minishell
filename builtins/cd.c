@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/28 15:27:37 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/10 19:41:34 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	cd2(char ***envp, char **paths)
 	int	state;
 
 	state = 0;
-	if (!paths[1] || ft_strncmp(paths[1], "~", 2) == 0)
+	if (!paths[1])
 	{
 		if (chdir(ft_getenv(*envp, "HOME")) == -1)
 		{
