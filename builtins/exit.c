@@ -22,8 +22,8 @@ void	ft_exit(char **envp, char **args, t_data *data)
 
 	errno = 0;
 	exit_code = 0;
-	if (!data->in_pipe)
-		printf(R "exit\n" C);
+	// if (!data->in_pipe)
+	// 	printf(R "exit\n" C);
 	if (matrix_len(args) > 2)
 	{
 		cperror("exit", NULL, "too many arguments", 0);
