@@ -89,6 +89,13 @@ enum e_TOKEN_TYPE
 	ARG = -2
 };
 
+enum e_EXPORT_TYPE
+{
+	NORMAL = 0,
+	APPEND = 1,
+	HOME = 2
+};
+
 //utils
 char		*free_join(char *s1, char *s2);
 
@@ -158,7 +165,8 @@ char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
 int			execute_pipe(t_ASTNode *node, t_data *data);
 void		clean(t_data *data);
 
-char		*get_home(t_data *data);
+char		*get_home(char **env);
 char		*expand_home(t_data *data, char *input, int i);
+int			expand_variables2(char *input, t_data *data, char *result, int quote);
 
 #endif

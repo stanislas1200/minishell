@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_tools.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:36:58 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 17:10:33 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/12 17:50:50 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	add_to_env(char ***envp, char *str);
 
 void	cperror(char *func, char *arg, char *error, int p_err)
 {

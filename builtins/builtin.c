@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/08 16:23:51 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/12 19:16:49 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,22 @@ int	pwd(void)
 int	env(char **envp)
 {
 	int	i;
+	int	j;
+	int	flag;
 
+	flag = 0;
 	i = 0;
 	while (envp && envp[i])
-		printf("%s\n", envp[i++]);
+	{
+		flag = 0;
+		j = -1;
+		while (envp[i][++j])
+			if (envp[i][j] == '=')
+				flag = 1;
+		if (flag)
+			printf("%s\n", envp[i]);
+		i++;
+	}
 	printf("_=/usr/bin/env\n");
 	return (0);
 }

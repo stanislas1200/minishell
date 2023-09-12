@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/28 15:39:40 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/12 20:36:54 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,57 +17,71 @@ char	*plus_remover(char *str);
 void	export2(char ***envp, char *var, int i, int append);
 void	add_to_env(char ***envp, char *str);
 int		valid_identifier(char *var);
-void	check_identifier(char **envp, char *var, int *i, int *append);
+char	*check_identifier(char **envp, char *var, int *i, int *append);
 void	print_export_no_arg(char *str);
+void	export3(char ***en, char *v, int i, int ret);
 
 int	export(char ***envp, char **args)
 {
 	int		i;
 	int		j;
-	int		append;
-	int		exit_code;
+	int		option;
+	char	*tmp;
 
 	j = 0;
-	exit_code = 0;
 	while (args[++j])
 	{
 		i = -1;
-		append = 0;
-		check_identifier(*envp, args[j], &i, &append);
-		if (i > -1)
-			export2(envp, args[j], i, append);
+		option = NORMAL;
+		tmp = check_identifier(*envp, args[j], &i, &option);
+		printf("option %d\n", option);
+		if (i != -1 && tmp)
+			export2(envp, tmp, i, option);
 		else if (i == -1)
-			exit_code = 1;
+			return (1);
 	}
 	if (j == 1)
 		export_no_arg(*envp);
-	return (exit_code);
+	return (0);
 }
 
-void	export2(char ***envp, char *var, int i, int append)
+void	export2(char ***en, char *v, int i, int opt)
 {
 	char	*tmp;
 	int		ret;
 
-	ret = ft_getindexenv(*envp, var);
-	if (ret != -1 && append == 0 || ret != -1 && append == 1)
+	if (!v)
+		return ;
+	ret = ft_getindexenv(*en, v);
+	printf("ret %d\n", ret);
+	if (ret != -1 && opt == NORMAL || ret != -1 && opt == APPEND)
 	{
-		if (ret != -1 && append == 0)
-			tmp = ft_strdup(var);
+		if (ret != -1 && opt == NORMAL)
+			tmp = ft_strdup(v);
 		else
-			tmp = ft_strjoin((*envp)[ret], &var[++i]);
-		free((*envp)[ret]);
-		(*envp)[ret] = tmp;
+		{
+			if (!(*en)[ret][i - 1])
+			{
+				printf(B "blue\n" C);
+				tmp = ft_strjoin((*en)[ret], "=");
+				tmp = free_join(tmp, &v[++i]);
+			}
+			else
+				tmp = ft_strjoin((*en)[ret], &v[++i]);
+		}
+		free((*en)[ret]);
+		(*en)[ret] = tmp;
 	}
-	else if (ret == -1 && append == 1)
+	else if (ret == -1 && opt == APPEND)
 	{
-		tmp = plus_remover(var);
+		tmp = plus_remover(v);
 		if (tmp)
-			add_to_env(envp, tmp);
+			add_to_env(en, tmp);
 		free(tmp);
 	}
-	else
-		add_to_env(envp, var);
+	else if (ret == -1)
+		add_to_env(en, v);
+	free(v);
 }
 
 void	add_to_env(char ***envp, char *str)

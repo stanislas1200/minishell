@@ -1,22 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils2.c                                           :+:      :+:    :+:   */
+/*   expand2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 17:40:13 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/10 20:03:07 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/12 15:41:26 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char	*get_home(t_data *data)
+int		expand(t_data *data, char **result, char *input, int var_start);
+int		result_add(t_data *data, char **result, char *input, char *tmp);
+
+char	*get_home(char **env)
 {
 	char	*ret;
 
-	ret = ft_getenv(data->env, "HOME");
+	ret = ft_getenv(env, "HOME");
 	if (!ret)
 		return (getenv("HOME"));
 	return (ret);
@@ -30,6 +33,7 @@ int	ft_isspace(char n)
 
 char	*expand_home(t_data *data, char *input, int i)
 {
+	char	*tmp;
 	char	n;
 	char	p;
 
@@ -38,16 +42,19 @@ char	*expand_home(t_data *data, char *input, int i)
 		p = input[i - 1];
 	n = input[i + 1];
 	if ((ft_isspace(n) || n == '/' || !n) && (ft_isspace(p) || !p))
-		return (free_join(ft_strdup(get_home(data)), &input[i + 1]));
-	else
-		return (NULL);
+	{
+		tmp = get_home(data->env);
+		if (tmp)
+			tmp = ft_strdup(tmp);
+		if (tmp)
+			return (free_join(tmp, &input[i + 1]));
+	}
+	return (NULL);
 }
 
-//to be continued
-if (input[data->i] == '~' && !quote)
-{
-	tmp = expand_home(data, input, data->i);
-	if (tmp)
-		return (tmp);
-	result_add(data, &result, input, "~");
-}
+// char	*expand_variables2(char *input, t_data *data, char *result, int quote)
+// {
+// 	char	*tmp;
+
+// 	return (NULL);
+// }

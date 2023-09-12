@@ -120,5 +120,6 @@ int	execute_ast_node(t_ASTNode *node, t_data *data)
 		data->last_exit = execute_pipe(node, data);
 	else
 		data->last_exit = execute_cmd(node, node, data);
+	update_env(&data->env);
 	return (data->last_exit);
 }

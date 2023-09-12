@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/10 19:41:34 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/12 17:52:30 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ void	update_old_pwd(char ***envp)
 	if (!tmp)
 		return ;
 	export2(envp, tmp, 6, 0);
-	free(tmp);
 	update_pwd(envp);
 }
 
@@ -88,6 +87,5 @@ void	update_pwd(char ***envp)
 		if (!tmp)
 			return ;
 		export2(envp, tmp, 3, 0);
-		free(tmp);
 	}
 }

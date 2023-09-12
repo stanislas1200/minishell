@@ -24,7 +24,7 @@ SRCS = src/main.c\
 		src/execve.c \
 		src/env_utils.c\
     	src/utils.c\
-		src/utils2.c\
+		src/expand2.c\
 			builtins/builtin.c\
 			builtins/builtin_tools.c\
 			builtins/cd.c\

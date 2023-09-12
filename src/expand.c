@@ -53,7 +53,9 @@ int	expand(t_data *data, char **result, char *input, int var_start)
 	char	*var_name;
 	char	*var_value;
 
-	while (ft_isalnum(input[data->i]))
+	if (ft_isdigit(input[var_start]))
+		return (data->i++, 0);
+	while (ft_isalnum(input[data->i]) || input[data->i] == '_')
 		data->i++;
 	if (input[var_start] == '?')
 		get_exit_code(result, data);
@@ -71,9 +73,7 @@ int	expand(t_data *data, char **result, char *input, int var_start)
 	}
 	else
 		*result = free_join(*result, "$");
-	if (!*result)
-		return (1);
-	return (0);
+	return ((*result == NULL));
 }
 
 int	result_add(t_data *data, char **result, char *input, char *tmp)
@@ -111,6 +111,13 @@ char	*expand_variables(char *input, t_data *data)
 			data->i++;
 			if (expand(data, &result, input, data->i))
 				return (free(result), NULL);
+		}
+		else if (input[data->i] == '~' && !quote)
+		{
+			tmp = expand_home(data, input, data->i);
+			if (tmp)
+				return (free(result), tmp);
+			result_add(data, &result, input, "~");
 		}
 		else if (result_add(data, &result, input, tmp))
 			return (free(result), NULL);
