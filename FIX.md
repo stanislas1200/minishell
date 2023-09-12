@@ -12,7 +12,8 @@ cd "doesntexist" 2>/dev/null
 <!-- echo ~ -->
 <!-- echo '\" ' " \"\"" <!-- need interpret \ ?
 echo \\\" \\\" \\\" \\\"\\\"\\\" \\\'\\\'\\\'
-echo \$PWD -->
+echo \$PWD
+echo \-n hello -->
 <!-- echo $12 <!-- if 1 is number only take 1 -->
 <!-- /ls
 ./ls -->
@@ -28,3 +29,9 @@ Users -->
 
 <!-- cat ctrl+c > code 130 -->
 
+exit "        42           "
+
+
+export | grep "OLDPWD"
+
+lien symbolique ls -s file file
