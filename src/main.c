@@ -78,6 +78,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 	while (1)
 	{
 		data.parse_end = 0;
+		data.r_break = 0;
 		prompt = get_prompt();
 		buff = readline(prompt);
 		free(prompt);

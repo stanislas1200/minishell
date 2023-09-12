@@ -52,6 +52,8 @@ int	cmd_check_b(t_ASTNode *node, int r, char *path, t_data *data)
 	if (!node || !is_builtin(node))
 		return (0);
 	ex_redirection(save, r, path, data);
+	if (data->r_break && ft_strncmp(node->data, "cd", 2))
+		return (1);
 	arr = make_cmd_arr(node, node->right);
 	if (!arr)
 		return (data->last_exit = 1);

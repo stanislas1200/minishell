@@ -110,7 +110,9 @@ void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
 		ft_putstr_fd(M "-stanshell" C ": " Y, 2);
 		ft_putstr_fd(path, 2);
 		ft_putstr_fd(C ": No such file or directory\n", 2);
-		return ;
+		if (is_builtin(s->left))
+			return ;
+		exit(1);
 	}
 	else if (s->right && s->right->type != CHAR_PIPE)
 	{
