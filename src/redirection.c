@@ -110,9 +110,7 @@ void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
 		ft_putstr_fd(M "-stanshell" C ": " Y, 2);
 		ft_putstr_fd(path, 2);
 		ft_putstr_fd(C ": No such file or directory\n", 2);
-		free_matrix(data->env);
-		ast_destroy(data->ast_root);
-		exit(1);
+		return ;
 	}
 	else if (s->right && s->right->type != CHAR_PIPE)
 	{

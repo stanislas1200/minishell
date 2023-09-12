@@ -67,6 +67,7 @@ typedef struct t_data
 	int			r_break;
 	int			pipefd[2];
 	int			fdin;
+	int			fdout;
 	int			in_pipe;
 	char		*path;
 	char		**env;
@@ -125,6 +126,7 @@ void		free_matrix(char **str);
 int			matrix_len(char **str);
 long		ft_long_atoi(const char *nptr);
 int			execute_builtin(t_ASTNode *node, char **arr, t_data *data);
+int			is_builtin(t_ASTNode *node);
 
 // Lexer
 int			token_init(t_token *token, int size);

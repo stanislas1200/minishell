@@ -15,7 +15,6 @@ cd "doesntexist"
 cd "doesntexist" 2>/dev/null 
 cd ../../..
 cd "wtf" 2>/dev/null 
-cd .. 
 cd ..
 cd ?
 cd +
@@ -55,7 +54,7 @@ echo ~/123/456
 echo $USER
 echo "$USER"
 echo "'$USER'"
-echo " '$USER' "
+echo "'$USER'"
 echo text"$USER"
 echo text"'$USER'" ' $USER '
 echo "text"   "$USER"    "$USER"

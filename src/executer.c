@@ -41,19 +41,26 @@ int	cmd_child(t_ASTNode *node, t_data *data)
 	exit(data->last_exit);
 }
 
-int	cmd_check_b(t_ASTNode *node, t_data *data)
+int	cmd_check_b(t_ASTNode *node, int r, char *path, t_data *data)
 {
-	char	**arr;
+	char		**arr;
+	t_ASTNode	*save;
 
+	save = node;
+	if (r)
+		node = node->left;
+	if (!node || !is_builtin(node))
+		return (0);
+	ex_redirection(save, r, path, data);
 	arr = make_cmd_arr(node, node->right);
 	if (!arr)
 		return (data->last_exit = 1);
 	data->last_exit = execute_builtin(node, arr, data);
 	free(arr);
 	arr = NULL;
-	if (data->last_exit != -1)
-		return (data->last_exit);
-	return (-1);
+	dup2(data->fdin, STDIN_FILENO);
+	dup2(data->fdout, STDOUT_FILENO);
+	return (1);
 }
 
 int	cmd_parent(t_ASTNode *save, t_data *data, pid_t pid)
@@ -96,8 +103,8 @@ int	execute_cmd(t_ASTNode *node, t_ASTNode *save, t_data *data)
 		path = node->data;
 		node = node->left;
 	}
-	if (data->ast_root == node)
-		if (cmd_check_b(node, data) != -1)
+	if (data->ast_root->type != CHAR_PIPE)
+		if (cmd_check_b(save, redirection, path, data))
 			return (data->last_exit);
 	pid = fork();
 	if (pid == -1)
