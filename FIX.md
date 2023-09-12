@@ -35,3 +35,6 @@ exit "        42           "
 export | grep "OLDPWD"
 
 lien symbolique ls -s file file
+
+echo hey you | cat < TODO > R | wc << EOF | <<EOF > G | > B echo hey | < R echo 1 > G 2
+echo hey <> FILE you ( should work and create FILE but not redirect )
