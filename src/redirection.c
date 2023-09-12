@@ -78,7 +78,7 @@ void	output(char *path, t_data *data, int redirection, t_ASTNode *s)
 	else
 		fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (fd == -1)
-		return (perror("open"), exit(1));
+		return (cperror("open", path, NULL, 1), exit(1));
 	if (s->right && s->right->type != CHAR_PIPE && s->right->type != 4)
 	{
 		if (s->right->type != redirection)
