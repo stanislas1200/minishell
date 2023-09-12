@@ -100,7 +100,7 @@ int			echo(char **args);
 int			env(char **envp);
 int			export(char ***envp, char **args);
 int			unset(char ***envp, char **args);
-void		ft_exit(char **envp, char **args, t_data *data);
+int			ft_exit(char **envp, char **args, t_data *data);
 
 void		export2(char ***envp, char *var, int i, int append);
 void		update_pwd(char ***envp);

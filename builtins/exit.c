@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/16 22:04:16 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/08 18:59:34 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/12 16:32:44 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,19 @@
 int		check_exit(char *str);
 int		is_numeric(char *str);
 
-void	ft_exit(char **envp, char **args, t_data *data)
+int	ft_exit(char **envp, char **args, t_data *data)
 {
 	long	number;
 	int		exit_code;
 
 	errno = 0;
 	exit_code = 0;
-	// if (!data->in_pipe)
-	// 	printf(R "exit\n" C);
+	if (!data->in_pipe)
+		printf(R "exit\n" C);
 	if (matrix_len(args) > 2)
 	{
 		cperror("exit", NULL, "too many arguments", 0);
-		exit(1);
+		return (1);
 	}
 	else if (matrix_len(args) == 2)
 		exit_code = check_exit(args[1]);
@@ -35,6 +35,7 @@ void	ft_exit(char **envp, char **args, t_data *data)
 	free_matrix(data->env);
 	free(args);
 	exit(exit_code);
+	return (0);
 }
 
 int	check_exit(char *str)
