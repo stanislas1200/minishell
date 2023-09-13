@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 13:01:10 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 14:02:51 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ int	export(char ***envp, char **args)
 		i = -1;
 		option = NORMAL;
 		tmp = check_identifier(*envp, args[j], &i, &option);
-		printf("option %d\n", option);
 		if (i != -1 && tmp)
 			export2(envp, tmp, i, option);
 		else if (i == -1)

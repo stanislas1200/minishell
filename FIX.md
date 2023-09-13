@@ -7,4 +7,16 @@
 <!-- export t=~/nimp -->
 
 <!-- export lol+=2 puis export lol ne devrait pas changer la valeur de lol. -->
-export t="~"
+
+<!-- echo ~+ -->
+<!-- echo ~- -->
+
+<!-- unset PWD OLDPWD -->
+<!-- echo ~+ -->
+<!-- echo ~- -->
+
+<!-- echo x=~ -->
+<!-- echo 5x=~ -->
+<!-- echo =~ -->
+
+<!-- export t="~" -->
