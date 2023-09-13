@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/12 19:16:49 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 18:21:17 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,20 @@ int	env(char **envp)
 	}
 	printf("_=/usr/bin/env\n");
 	return (0);
+}
+
+char	*join_until_dollar(char *s1, char *input)
+{
+	char	*copy;
+	int		i;
+
+	i = 0;
+	copy = ft_strdup(input);
+	while (copy[i])
+	{
+		if (copy[i] == '$')
+			copy[i] = 0;
+		i++;
+	}
+	return (free_join(s1, copy));
 }

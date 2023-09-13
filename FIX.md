@@ -1,4 +1,4 @@
-<!-- cd print pwd -->
+`<!-- cd print pwd -->
 
 <!-- export t=~ && echo $t -->
 
@@ -18,5 +18,8 @@
 <!-- echo x=~ -->
 <!-- echo 5x=~ -->
 <!-- echo =~ -->
+
+<!-- echo ~/$USER$PWD -->
+<!-- export dan=~ ; echo $dan -->
 
 <!-- export t="~" -->

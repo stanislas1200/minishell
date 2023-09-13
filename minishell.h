@@ -169,6 +169,6 @@ void		clean(t_data *data);
 char		*get_home(char **env);
 int			ft_isspace(char n);
 int			is_tilde(char *input, int i, int quote);
-char		*expand_home(t_data *data, char *input, int i);
+void		expand_home(t_data *data, char *input, int i, char **result);
 
 #endif

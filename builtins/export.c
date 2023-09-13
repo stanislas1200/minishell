@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 14:02:51 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 17:03:50 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	add_to_env(char ***envp, char *str)
 	*envp = new_env;
 }
 
-void	print_sort_env(char **envp)
+void	print_sort_env(char **e)
 {
 	int		i;
 	int		j;
@@ -105,25 +105,25 @@ void	print_sort_env(char **envp)
 	char	*tmp;
 
 	i = -1;
-	while (envp && envp[++i])
+	while (e && e[++i])
 	{
 		j = -1;
-		while (envp[++j + 1])
+		while (e[++j + 1])
 		{
 			len = 0;
-			while (envp[j][len] != '=' && envp[j + 1][len] != '=')
+			while (e[j][len] && e[j][len] != '=' && e[j + 1][len] != '=')
 				len++;
-			if (ft_strncmp(envp[j], envp[j + 1], len + 1) > 0)
+			if (ft_strncmp(e[j], e[j + 1], len + 1) > 0)
 			{
-				tmp = envp[j];
-				envp[j] = envp[j + 1];
-				envp[j + 1] = tmp;
+				tmp = e[j];
+				e[j] = e[j + 1];
+				e[j + 1] = tmp;
 			}
 		}
 	}
 	i = -1;
-	while (envp && envp[++i])
-		print_export_no_arg(envp[i]);
+	while (e && e[++i])
+		print_export_no_arg(e[i]);
 }
 
 char	*plus_remover(char *str)

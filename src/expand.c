@@ -97,20 +97,20 @@ char	*expand_variables(char *input, t_data *data)
 
 	quote = 0;
 	result = ft_calloc(1, sizeof(char));
-	if (!result)
-		return (NULL);
 	data->i = 0;
-	while (input[data->i])
+	while (input[data->i] && result)
 	{
 		if ((input[data->i] == '\'' || input[data->i] == '\"') && quote == 0)
 			quote = input[data->i];
 		else if (input[data->i] == quote)
 			quote = 0;
 		if (input[data->i] == '$' && quote != '\'')
+		{
 			if (expand(data, &result, input, ++data->i))
 				return (free(result), NULL);
-		if (is_tilde(input, data->i, quote))
-			return (free(result), expand_home(data, input, data->i));
+		}
+		else if (is_tilde(input, data->i, quote) && result)
+			expand_home(data, input, data->i, &result);
 		else if (result_add(data, &result, input, tmp))
 			return (free(result), NULL);
 	}

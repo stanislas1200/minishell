@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 17:40:13 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 15:30:04 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 18:21:59 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int		expand(t_data *data, char **result, char *input, int var_start);
 int		result_add(t_data *data, char **result, char *input, char *tmp);
 int		valid_identifier(char *var);
 char	*expand_home2(t_data *data, char *input, int i, char *tmp);
+char	*join_until_dollar(char *s1, char *input);
 
 char	*get_home(char **env)
 {
@@ -33,7 +34,7 @@ int	ft_isspace(char n)
 	n == '\v' || n == '\f' || n == '\r');
 }
 
-char	*expand_home(t_data *data, char *input, int i)
+void	expand_home(t_data *data, char *input, int i, char **result)
 {
 	char	*tmp;
 
@@ -46,14 +47,18 @@ char	*expand_home(t_data *data, char *input, int i)
 	if (tmp)
 		tmp = ft_strdup(tmp);
 	if (!tmp)
-		return (ft_strdup(input));
+		tmp = ft_strdup(input);
 	else if ((input[i + 1] == '-' || input[i + 1] == '+'))
-		tmp = free_join(tmp, &input[i + 2]);
+		tmp = join_until_dollar(tmp, &input[i + 3]);
 	else
-		tmp = free_join(tmp, &input[i + 1]);
+		tmp = join_until_dollar(tmp, &input[i + 2]);
+	if (input[i + 1] == '-' || input[i + 1] == '+')
+		data->i++;
+	data->i++;
 	if (tmp && i > 0)
-		return (expand_home2(data, input, i, tmp));
-	return (tmp);
+		tmp = expand_home2(data, input, i, tmp);
+	free(*result);
+	*result = tmp;
 }
 
 char	*expand_home2(t_data *data, char *input, int i, char *tmp)
