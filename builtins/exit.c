@@ -67,7 +67,7 @@ int	is_numeric(char *str)
 	while (str[++i])
 	{
 		if (!((str[i] >= '0' && str[i] <= '9') || \
-		(str[i] == '-' || str[i] == '+')))
+		(str[i] == '-' || str[i] == '+' || ft_isspace(str[i]))))
 			return (EXIT_FAILURE);
 		if ((str[i] == '-' || str[i] == '+') && (i != 0 || !str[i + 1]))
 			return (EXIT_FAILURE);
