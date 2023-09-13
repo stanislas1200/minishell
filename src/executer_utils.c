@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 18:20:02 by sgodin            #+#    #+#             */
-/*   Updated: 2023/09/04 18:23:46 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/12 16:31:38 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	execute_builtin(t_ASTNode *node, char **arr, t_data *data)
 	if (ft_strncmp(node->data, "unset", ft_strlen("unset") + 1) == 0)
 		return (unset(&data->env, arr));
 	if (ft_strncmp(node->data, "exit", ft_strlen("exit") + 1) == 0)
-		return (ft_exit(data->env, arr, data), 0);
+		return (ft_exit(data->env, arr, data));
 	return (-1);
 }
 
@@ -74,4 +74,16 @@ char	**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node)
 	}
 	arr[i] = NULL;
 	return (arr);
+}
+
+void	open_error(char *path, t_data *data, t_ASTNode *s)
+{
+	data->r_break = 1;
+	if (s->right && check_heredoc(s->right))
+		ex_redirection(s->right, s->right->type, s->right->data, data);
+	cperror("open", path, "No such file or directory", 0);
+	if (data->builtin)
+		return ;
+	clean(data);
+	exit(1);
 }

@@ -67,7 +67,10 @@ typedef struct t_data
 	int			r_break;
 	int			pipefd[2];
 	int			fdin;
+	int			fdout;
 	int			in_pipe;
+	int			builtin;
+	int			r;
 	char		*path;
 	char		**env;
 	t_ASTNode	*ast_root;
@@ -106,7 +109,7 @@ int			echo(char **args);
 int			env(char **envp);
 int			export(char ***envp, char **args);
 int			unset(char ***envp, char **args);
-void		ft_exit(char **envp, char **args, t_data *data);
+int			ft_exit(char **envp, char **args, t_data *data);
 
 void		export2(char ***envp, char *var, int i, int append);
 void		update_pwd(char ***envp);
@@ -132,6 +135,7 @@ void		free_matrix(char **str);
 int			matrix_len(char **str);
 long		ft_long_atoi(const char *nptr);
 int			execute_builtin(t_ASTNode *node, char **arr, t_data *data);
+int			is_builtin(t_ASTNode *node);
 
 // Lexer
 int			token_init(t_token *token, int size);
@@ -164,6 +168,10 @@ int			check_heredoc(t_ASTNode *node);
 char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
 int			execute_pipe(t_ASTNode *node, t_data *data);
 void		clean(t_data *data);
+void		open_error(char *path, t_data *data, t_ASTNode *s);
+void		heredoc_child(t_data *data, char *path, int fd[2], t_ASTNode *s);
+void		heredoc_send(int fd[2], char *text, t_data *data);
+char		*heredoc_next(char *text, t_data *data, t_ASTNode *save);
 
 // Expand 2
 char		*get_home(char **env);

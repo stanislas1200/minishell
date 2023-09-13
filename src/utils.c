@@ -44,7 +44,7 @@ char	*heredoc_loop(char *path, int fd[2])
 	while (1)
 	{
 		buffer = readline(G "> " C);
-		if (strcmp(buffer, path) == 0)
+		if (!buffer || ft_strncmp(buffer, path, ft_strlen(path)) == 0)
 			break ;
 		if (!text)
 			text = ft_strdup(buffer);
@@ -64,6 +64,7 @@ void	clean(t_data *data)
 {
 	free_matrix(data->env);
 	ast_destroy(data->ast_root);
+	rl_clear_history();
 }
 
 int	get_next_token(t_token **token)

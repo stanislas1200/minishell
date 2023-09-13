@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 15:51:53 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/10 19:41:59 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 18:34:02 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,23 +25,23 @@ char	*create_command_path(char *path, char *command)
 	return (full_path);
 }
 
-char	*find_command_path(char *all_paths, char *command)
+char	*find_command_path(char *all_paths, char *c)
 {
 	int		i;
 	char	**arr;
 	char	*full_path;
 
 	i = -1;
-	if (!command || !ft_strlen(command))
+	if (!c || !ft_strlen(c))
 		return (NULL);
-	if (!all_paths || !ft_strncmp(command, "./", 2) && !access(command, X_OK))
-		return (ft_strdup(command));
+	if (!all_paths || !ft_strncmp(c, "./", 2) || !ft_strncmp(c, "/", 1))
+		return (ft_strdup(c));
 	arr = ft_split(all_paths, ':');
 	if (!arr)
 		return (cperror("Malloc", NULL, NULL, 1), NULL);
 	while (arr && arr[++i])
 	{
-		full_path = create_command_path(arr[i], command);
+		full_path = create_command_path(arr[i], c);
 		if (full_path && access(full_path, X_OK) == 0)
 		{
 			free_matrix(arr);
@@ -51,7 +51,7 @@ char	*find_command_path(char *all_paths, char *command)
 			free(full_path);
 	}
 	free_matrix(arr);
-	return (ft_strdup(command));
+	return (ft_strdup(c));
 }
 
 void	ft_execve(t_data *data, char *cmd, char **args)
@@ -61,17 +61,16 @@ void	ft_execve(t_data *data, char *cmd, char **args)
 	cmd_path = find_command_path(ft_getenv(data->env, "PATH"), cmd);
 	signal(SIGQUIT, SIG_DFL);
 	execve(cmd_path, args, data->env);
-	perror(cmd);
-	free_matrix(data->env);
+	cperror("execve", cmd, NULL, 1);
 	if (cmd_path)
 		free(cmd_path);
 	if (cmd[0] == '.')
 	{
-		ast_destroy(data->ast_root);
+		clean(data);
 		free(args);
 		exit(126);
 	}
-	ast_destroy(data->ast_root);
+	clean(data);
 	free(args);
 	if (errno == EACCES || errno == ENOENT)
 		exit(127);

@@ -78,6 +78,7 @@ void	main_loop(t_data data, char *buff, char *prompt)
 	while (1)
 	{
 		data.parse_end = 0;
+		data.r_break = 0;
 		prompt = get_prompt();
 		buff = readline(prompt);
 		free(prompt);
@@ -117,6 +118,8 @@ int	main(int ac, char **av, char **envv)
 	data.pipefd[1] = 0;
 	data.in_pipe = 0;
 	data.fdin = dup(STDIN_FILENO);
+	data.fdout = dup(STDOUT_FILENO);
+	data.builtin = 0;
 	print_header();
 	main_loop(data, buff, prompt);
 	rl_clear_history();

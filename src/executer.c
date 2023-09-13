@@ -41,19 +41,33 @@ int	cmd_child(t_ASTNode *node, t_data *data)
 	exit(data->last_exit);
 }
 
-int	cmd_check_b(t_ASTNode *node, t_data *data)
+int	cmd_check_b(t_ASTNode *node, int r, char *path, t_data *data)
 {
-	char	**arr;
+	char		**arr;
+	t_ASTNode	*save;
 
+	save = node;
+	if (r)
+		node = node->left;
+	if (!node || !is_builtin(node))
+		return (0);
+	data->builtin = 1;
+	ex_redirection(save, r, path, data);
+	data->builtin = 0;
+	if (data->r_break)
+	{
+		dup2(data->fdin, STDIN_FILENO);
+		dup2(data->fdout, STDOUT_FILENO);
+		return (data->last_exit = 1, 1);
+	}
 	arr = make_cmd_arr(node, node->right);
 	if (!arr)
 		return (data->last_exit = 1);
 	data->last_exit = execute_builtin(node, arr, data);
 	free(arr);
-	arr = NULL;
-	if (data->last_exit != -1)
-		return (data->last_exit);
-	return (-1);
+	dup2(data->fdin, STDIN_FILENO);
+	dup2(data->fdout, STDOUT_FILENO);
+	return (arr = NULL, 1);
 }
 
 int	cmd_parent(t_ASTNode *save, t_data *data, pid_t pid)
@@ -70,15 +84,13 @@ int	cmd_parent(t_ASTNode *save, t_data *data, pid_t pid)
 		execute_ast_node(save->right, data);
 	if (WIFSIGNALED(status))
 	{
-		data->last_exit = WTERMSIG(status);
-		if (data->last_exit == 3)
-		{
-			data->last_exit = 131;
-			printf("Quit: 3\n");
-		}
-		if (data->last_exit == 2)
-			data->last_exit = 130;
-		return (data->last_exit);
+		data->i = WTERMSIG(status);
+		if (data->i == 3)
+			return (printf(R "Quit" C ":" M "3\n" C), 131);
+		if (data->i == 2 && save->type == 4)
+			return (1);
+		if (data->i == 2)
+			return (130);
 	}
 	return (WEXITSTATUS(status));
 }
@@ -98,8 +110,8 @@ int	execute_cmd(t_ASTNode *node, t_ASTNode *save, t_data *data)
 		path = node->data;
 		node = node->left;
 	}
-	if (data->ast_root == node)
-		if (cmd_check_b(node, data) != -1)
+	if (data->ast_root->type != CHAR_PIPE)
+		if (cmd_check_b(save, redirection, path, data))
 			return (data->last_exit);
 	pid = fork();
 	if (pid == -1)

@@ -40,48 +40,46 @@ char	*heredoc_next(char *text, t_data *data, t_ASTNode *save)
 	return (text);
 }
 
-void	heredoc(char *path, t_data *data, int redirection, t_ASTNode *s)
+void	heredoc(char *path, t_data *data, t_ASTNode *s)
 {
 	int		fd[2];
-	char	*text;
+	pid_t	pid;
+	int		status;
 
-	dup2(data->fdin, STDIN_FILENO);
-	signal(SIGINT, SIG_DFL);
-	text = heredoc_next(heredoc_loop(path, fd), data, s);
-	if (s->right && s->right->type != CHAR_PIPE)
+	if (data->builtin)
+		pid = fork();
+	if (pid == 0)
+		heredoc_child(data, path, fd, s);
+	if (data->builtin)
 	{
-		if (s->right->type != redirection && s->right->type != CHAR_INPUTR)
+		signal(SIGINT, SIG_IGN);
+		waitpid(pid, &status, 0);
+		signal(SIGINT, signal_handler);
+		if (WIFSIGNALED(status))
 		{
-			if (!check_heredoc(s->right))
+			data->i = WTERMSIG(status);
+			if (data->i == 2)
 			{
-				write(fd[1], text, strlen(text));
-				dup2(fd[0], STDIN_FILENO);
+				data->r_break = 1;
+				data->last_exit = 1;
 			}
 		}
-		close(fd[1]);
-		close(fd[0]);
-		ex_redirection(s->right, s->right->type, s->right->data, data);
-		return ;
 	}
-	write(fd[1], text, strlen(text));
-	close(fd[1]);
-	dup2(fd[0], STDIN_FILENO);
-	close(fd[0]);
 }
 
-void	output(char *path, t_data *data, int redirection, t_ASTNode *s)
+void	output(char *path, t_data *data, t_ASTNode *s)
 {
 	int	fd;
 
-	if (redirection == 3)
+	if (data->r == 3)
 		fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0666);
 	else
 		fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (fd == -1)
-		return (perror("open"), exit(1));
+		return (open_error(path, data, s));
 	if (s->right && s->right->type != CHAR_PIPE && s->right->type != 4)
 	{
-		if (s->right->type != redirection)
+		if (s->right->type != data->r)
 			dup2(fd, STDOUT_FILENO);
 		close(fd);
 		ex_redirection(s->right, s->right->type, s->right->data, data);
@@ -97,26 +95,16 @@ void	output(char *path, t_data *data, int redirection, t_ASTNode *s)
 	close(fd);
 }
 
-void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
+void	input(char *path, t_data *data, t_ASTNode *s)
 {
 	int	fd;
 
 	fd = open(path, O_RDONLY);
 	if (fd == -1)
-	{
-		data->r_break = 1;
-		if (s->right && check_heredoc(s->right))
-			ex_redirection(s->right, s->right->type, s->right->data, data);
-		ft_putstr_fd(M "-stanshell" C ": " Y, 2);
-		ft_putstr_fd(path, 2);
-		ft_putstr_fd(C ": No such file or directory\n", 2);
-		free_matrix(data->env);
-		ast_destroy(data->ast_root);
-		exit(1);
-	}
+		return (open_error(path, data, s));
 	else if (s->right && s->right->type != CHAR_PIPE)
 	{
-		if (s->right->type != redirection && !check_heredoc(s->right))
+		if (s->right->type != data->r && !check_heredoc(s->right))
 			dup2(fd, STDIN_FILENO);
 		close(fd);
 		ex_redirection(s->right, s->right->type, s->right->data, data);
@@ -128,6 +116,7 @@ void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
 
 void	ex_redirection(t_ASTNode *save, int redir, char *path, t_data *data)
 {
+	data->r = redir;
 	if (data->r_break && redir != 4)
 	{
 		if (save->right && check_heredoc(save->right))
@@ -136,10 +125,10 @@ void	ex_redirection(t_ASTNode *save, int redir, char *path, t_data *data)
 		else
 			return ;
 	}
-	if (redir == 3 || redir == CHAR_OUTPUTR)
-		output(path, data, redir, save);
-	else if (redir == CHAR_INPUTR)
-		input(path, data, redir, save);
-	else if (redir == 4)
-		heredoc(path, data, redir, save);
+	if (data->r == 3 || data->r == CHAR_OUTPUTR)
+		output(path, data, save);
+	else if (data->r == CHAR_INPUTR)
+		input(path, data, save);
+	else if (data->r == 4)
+		heredoc(path, data, save);
 }
