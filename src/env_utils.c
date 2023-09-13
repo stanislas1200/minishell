@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 18:31:37 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 18:40:26 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 int		is_numeric(char *str);
-char	*expand_home(t_data *data, char *input, int i);
 
 char	*ft_getenv(char **env, char *str)
 {
