@@ -20,17 +20,24 @@ echo \-n hello -->
 <!-- /Users
 Users -->
 <!-- exit 0 0 -->
+`<!-- cd print pwd -->
 
-<!-- ls.c > doit regarder d'abord dans PATH -->
+<!-- export t=~ && echo $t -->
 
-<!-- ctrl+c <<EOF > exit code 1 -->
+<!-- export Dan+=2 ; export Dan+=2 ; export Da+=2 ; export Dann+=2 ; export lol ; export lol+=2 -->
 
-<!-- ctr+\ cat > quit -->
+<!-- export t=~/nimp -->
 
-<!-- cat ctrl+c > code 130 -->
+<!-- export lol+=2 puis export lol ne devrait pas changer la valeur de lol. -->
 
-exit "        42           "
+ctrl+c <<EOF > exit code 1
 
+ctr+\ cat > quit
+
+cat ctrl+c > code 130
+
+<!-- echo ~/$USER$PWD -->
+<!-- export dan=~ ; echo $dan -->
 
 export | grep "OLDPWD"
 
@@ -46,3 +53,4 @@ ctrl-d
 segmentation fault  ./minishell -->
 <!-- ctrl-c
 exit minishell -->
+<!-- export t="~" -->

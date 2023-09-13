@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_tools.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:36:58 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 17:10:33 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/13 11:14:21 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	add_to_env(char ***envp, char *str);
 
 void	cperror(char *func, char *arg, char *error, int p_err)
 {
@@ -82,4 +84,26 @@ long	ft_long_atoi(const char *nptr)
 		i++;
 	}
 	return (number * sign);
+}
+
+void	export3(char ***en, char *v, int i, int opt)
+{
+	char	*tmp;
+	int		ret;
+
+	ret = ft_getindexenv(*en, v);
+	if (ret != -1 && opt == NORMAL)
+		tmp = ft_strdup(v);
+	else
+	{
+		if (!(*en)[ret][i - 1])
+		{
+			tmp = ft_strjoin((*en)[ret], "=");
+			tmp = free_join(tmp, &v[++i]);
+		}
+		else
+			tmp = ft_strjoin((*en)[ret], &v[++i]);
+	}
+	free((*en)[ret]);
+	(*en)[ret] = tmp;
 }

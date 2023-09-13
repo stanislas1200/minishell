@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/10 13:41:43 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/13 18:31:37 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	is_numeric(char *str);
+int		is_numeric(char *str);
+char	*expand_home(t_data *data, char *input, int i);
 
 char	*ft_getenv(char **env, char *str)
 {
@@ -21,31 +22,31 @@ char	*ft_getenv(char **env, char *str)
 	i = -1;
 	while (env[++i])
 		if (ft_strncmp(env[i], str, ft_strlen(str)) == 0)
-			return (&env[i][ft_strlen(str) + 1]);
+			if (env[i][ft_strlen(str)] == '=')
+				return (&env[i][ft_strlen(str) + 1]);
 	return (NULL);
 }
 
 int	ft_getindexenv(char **env, char *str)
 {
 	int		i;
-	int		len;
-	char	*tmp;
+	int		j;
+	int		flag;
 
-	tmp = ft_strdup(str);
-	if (!tmp)
-		return (cperror("Malloc", NULL, NULL, 1), -1);
-	len = 0;
-	while (tmp[len] && (tmp[len] != '=' && tmp[len] != '+'))
-		len++;
-	if (tmp[len] == '+')
-		tmp[len] = '=';
-	if (tmp[len] == '=')
-		len++;
 	i = -1;
 	while (env[++i])
-		if (ft_strncmp(env[i], tmp, len) == 0)
-			return (free(tmp), i);
-	return (free(tmp), -1);
+	{
+		flag = 0;
+		j = -1;
+		while (env[i][++j] != '\0' && str[j] != '\0' && \
+		env[i][j] != '=' && env[i][j] != '+' && str[j] != '=' && str[j] != '+')
+			if (env[i][j] != str[j])
+				flag = 1;
+		if (!flag && (env[i][j] == '\0' || env[i][j] == '=' || \
+		env[i][j] == '+') && (str[j] == '\0' || str[j] == '=' || str[j] == '+'))
+			return (i);
+	}
+	return (-1);
 }
 
 char	**dup_env(char **envp)
@@ -81,7 +82,7 @@ void	shell_lvl(char ***envp)
 	num = 1;
 	tmp2 = ft_getenv(*envp, "SHLVL");
 	if (!tmp2)
-		return (export2(envp, "SHLVL=1", 5, 0));
+		return (export2(envp, ft_strdup("SHLVL=1"), 5, 0));
 	if (is_numeric(tmp2) == 0)
 	{
 		num = ft_atoi(tmp2);
@@ -94,7 +95,6 @@ void	shell_lvl(char ***envp)
 	if (!tmp)
 		return (errno = 0, cperror("SHLVL", "malloc", NULL, 1));
 	export2(envp, tmp, 5, 0);
-	free(tmp);
 	errno = 0;
 }
 
@@ -102,9 +102,14 @@ void	update_env(char ***envp)
 {
 	int			i;
 	char		*tmp;
+	static int	count;
 
-	shell_lvl(envp);
-	update_pwd(envp);
+	if (count == 0)
+	{
+		shell_lvl(envp);
+		update_pwd(envp);
+		count++;
+	}
 	i = ft_getindexenv(*envp, "_=");
 	if (i != -1)
 		delete_from_env(envp, i);

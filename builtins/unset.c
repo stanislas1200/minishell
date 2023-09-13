@@ -6,13 +6,14 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 13:36:56 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/20 18:11:00 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/12 14:53:41 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 void	delete_from_env(char ***envp, int del);
+int		valid_identifier(char *var);
 
 int	unset(char ***envp, char **args)
 {
@@ -24,6 +25,9 @@ int	unset(char ***envp, char **args)
 	j = 0;
 	while (args[++j])
 	{
+		len = 0;
+		if (valid_identifier(args[j]) != 2)
+			return (cperror("unset", args[j], "not a valid identifier", 0), 1);
 		len = 0;
 		i = ft_getindexenv(*envp, args[j]);
 		if (i != -1)

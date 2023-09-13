@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/12 15:44:38 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/13 18:30:42 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	cd2(char ***envp, char **paths)
 	int	state;
 
 	state = 0;
-	if (!paths[1] || ft_strncmp(paths[1], "~", 2) == 0)
+	if (!paths[1])
 	{
 		if (chdir(ft_getenv(*envp, "HOME")) == -1)
 		{
@@ -73,7 +73,6 @@ void	update_old_pwd(char ***envp)
 	if (!tmp)
 		return ;
 	export2(envp, tmp, 6, 0);
-	free(tmp);
 	update_pwd(envp);
 }
 
@@ -88,6 +87,5 @@ void	update_pwd(char ***envp)
 		if (!tmp)
 			return ;
 		export2(envp, tmp, 3, 0);
-		free(tmp);
 	}
 }

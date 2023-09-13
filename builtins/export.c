@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/08/28 15:39:40 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 17:03:50 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,57 +17,55 @@ char	*plus_remover(char *str);
 void	export2(char ***envp, char *var, int i, int append);
 void	add_to_env(char ***envp, char *str);
 int		valid_identifier(char *var);
-void	check_identifier(char **envp, char *var, int *i, int *append);
+char	*check_identifier(char **envp, char *var, int *i, int *append);
 void	print_export_no_arg(char *str);
+void	export3(char ***en, char *v, int i, int opt);
 
 int	export(char ***envp, char **args)
 {
 	int		i;
 	int		j;
-	int		append;
-	int		exit_code;
+	int		option;
+	char	*tmp;
 
 	j = 0;
-	exit_code = 0;
 	while (args[++j])
 	{
 		i = -1;
-		append = 0;
-		check_identifier(*envp, args[j], &i, &append);
-		if (i > -1)
-			export2(envp, args[j], i, append);
+		option = NORMAL;
+		tmp = check_identifier(*envp, args[j], &i, &option);
+		if (i != -1 && tmp)
+			export2(envp, tmp, i, option);
 		else if (i == -1)
-			exit_code = 1;
+			return (1);
 	}
 	if (j == 1)
 		export_no_arg(*envp);
-	return (exit_code);
+	return (0);
 }
 
-void	export2(char ***envp, char *var, int i, int append)
+void	export2(char ***en, char *v, int i, int opt)
 {
 	char	*tmp;
 	int		ret;
 
-	ret = ft_getindexenv(*envp, var);
-	if (ret != -1 && append == 0 || ret != -1 && append == 1)
+	if (!v)
+		return ;
+	ret = ft_getindexenv(*en, v);
+	if (ret != -1 && !v[i])
+		return (free(v));
+	if (ret != -1 && opt == NORMAL || ret != -1 && opt == APPEND)
+		export3(en, v, i, opt);
+	else if (ret == -1 && opt == APPEND)
 	{
-		if (ret != -1 && append == 0)
-			tmp = ft_strdup(var);
-		else
-			tmp = ft_strjoin((*envp)[ret], &var[++i]);
-		free((*envp)[ret]);
-		(*envp)[ret] = tmp;
-	}
-	else if (ret == -1 && append == 1)
-	{
-		tmp = plus_remover(var);
+		tmp = plus_remover(v);
 		if (tmp)
-			add_to_env(envp, tmp);
+			add_to_env(en, tmp);
 		free(tmp);
 	}
-	else
-		add_to_env(envp, var);
+	else if (ret == -1)
+		add_to_env(en, v);
+	free(v);
 }
 
 void	add_to_env(char ***envp, char *str)
@@ -99,7 +97,7 @@ void	add_to_env(char ***envp, char *str)
 	*envp = new_env;
 }
 
-void	print_sort_env(char **envp)
+void	print_sort_env(char **e)
 {
 	int		i;
 	int		j;
@@ -107,25 +105,25 @@ void	print_sort_env(char **envp)
 	char	*tmp;
 
 	i = -1;
-	while (envp && envp[++i])
+	while (e && e[++i])
 	{
 		j = -1;
-		while (envp[++j + 1])
+		while (e[++j + 1])
 		{
 			len = 0;
-			while (envp[j][len] != '=' && envp[j + 1][len] != '=')
+			while (e[j][len] && e[j][len] != '=' && e[j + 1][len] != '=')
 				len++;
-			if (ft_strncmp(envp[j], envp[j + 1], len + 1) > 0)
+			if (ft_strncmp(e[j], e[j + 1], len + 1) > 0)
 			{
-				tmp = envp[j];
-				envp[j] = envp[j + 1];
-				envp[j + 1] = tmp;
+				tmp = e[j];
+				e[j] = e[j + 1];
+				e[j + 1] = tmp;
 			}
 		}
 	}
 	i = -1;
-	while (envp && envp[++i])
-		print_export_no_arg(envp[i]);
+	while (e && e[++i])
+		print_export_no_arg(e[i]);
 }
 
 char	*plus_remover(char *str)

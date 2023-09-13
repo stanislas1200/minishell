@@ -53,7 +53,9 @@ int	expand(t_data *data, char **result, char *input, int var_start)
 	char	*var_name;
 	char	*var_value;
 
-	while (ft_isalnum(input[data->i]))
+	if (ft_isdigit(input[var_start]))
+		return (data->i++, 0);
+	while (ft_isalnum(input[data->i]) || input[data->i] == '_')
 		data->i++;
 	if (input[var_start] == '?')
 		get_exit_code(result, data);
@@ -71,9 +73,7 @@ int	expand(t_data *data, char **result, char *input, int var_start)
 	}
 	else
 		*result = free_join(*result, "$");
-	if (!*result)
-		return (1);
-	return (0);
+	return ((*result == NULL));
 }
 
 int	result_add(t_data *data, char **result, char *input, char *tmp)
@@ -97,10 +97,8 @@ char	*expand_variables(char *input, t_data *data)
 
 	quote = 0;
 	result = ft_calloc(1, sizeof(char));
-	if (!result)
-		return (NULL);
 	data->i = 0;
-	while (input[data->i])
+	while (input[data->i] && result)
 	{
 		if ((input[data->i] == '\'' || input[data->i] == '\"') && quote == 0)
 			quote = input[data->i];
@@ -108,10 +106,11 @@ char	*expand_variables(char *input, t_data *data)
 			quote = 0;
 		if (input[data->i] == '$' && quote != '\'')
 		{
-			data->i++;
-			if (expand(data, &result, input, data->i))
+			if (expand(data, &result, input, ++data->i))
 				return (free(result), NULL);
 		}
+		else if (is_tilde(input, data->i, quote) && result)
+			expand_home(data, input, data->i, &result);
 		else if (result_add(data, &result, input, tmp))
 			return (free(result), NULL);
 	}

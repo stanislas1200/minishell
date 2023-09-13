@@ -92,6 +92,13 @@ enum e_TOKEN_TYPE
 	ARG = -2
 };
 
+enum e_EXPORT_TYPE
+{
+	NORMAL = 0,
+	APPEND = 1,
+	HOME = 2
+};
+
 //utils
 char		*free_join(char *s1, char *s2);
 
@@ -165,5 +172,11 @@ void		open_error(char *path, t_data *data, t_ASTNode *s);
 void		heredoc_child(t_data *data, char *path, int fd[2], t_ASTNode *s);
 void		heredoc_send(int fd[2], char *text, t_data *data);
 char		*heredoc_next(char *text, t_data *data, t_ASTNode *save);
+
+// Expand 2
+char		*get_home(char **env);
+int			ft_isspace(char n);
+int			is_tilde(char *input, int i, int quote);
+void		expand_home(t_data *data, char *input, int i, char **result);
 
 #endif
