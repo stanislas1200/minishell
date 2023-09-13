@@ -54,7 +54,7 @@ int	cmd_check_b(t_ASTNode *node, int r, char *path, t_data *data)
 	data->builtin = 1;
 	ex_redirection(save, r, path, data);
 	data->builtin = 0;
-	if (data->r_break && ft_strncmp(node->data, "cd", 2))
+	if (data->r_break)
 	{
 		dup2(data->fdin, STDIN_FILENO);
 		dup2(data->fdout, STDOUT_FILENO);

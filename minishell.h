@@ -70,6 +70,7 @@ typedef struct t_data
 	int			fdout;
 	int			in_pipe;
 	int			builtin;
+	int			r;
 	char		*path;
 	char		**env;
 	t_ASTNode	*ast_root;
@@ -161,5 +162,8 @@ char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
 int			execute_pipe(t_ASTNode *node, t_data *data);
 void		clean(t_data *data);
 void		open_error(char *path, t_data *data, t_ASTNode *s);
+void		heredoc_child(t_data *data, char *path, int fd[2], t_ASTNode *s);
+void		heredoc_send(int fd[2], char *text, t_data *data);
+char		*heredoc_next(char *text, t_data *data, t_ASTNode *save);
 
 #endif

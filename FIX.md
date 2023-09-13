@@ -40,3 +40,9 @@ lien symbolique ls -s file file
 echo hey <> FILE you ( should work and create FILE but not redirect )
 
 echo hi >         ./outfiles/outfile01 bye // works but not in tester
+
+<!-- builtin <<EOF
+ctrl-d
+segmentation fault  ./minishell -->
+<!-- ctrl-c
+exit minishell -->

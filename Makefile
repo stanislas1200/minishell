@@ -19,6 +19,7 @@ SRCS = src/main.c\
 		src/parser_check.c\
 		src/executer.c\
 		src/executer_utils.c\
+		src/heredoc.c\
 		src/pipe.c\
 		src/redirection.c\
 		src/execve.c \
