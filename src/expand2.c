@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 17:40:13 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 18:21:59 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 21:00:22 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,29 +36,22 @@ int	ft_isspace(char n)
 
 void	expand_home(t_data *data, char *input, int i, char **result)
 {
-	char	*tmp;
-
+	free(*result);
 	if (input[i + 1] == '+')
-		tmp = ft_getenv(data->env, "PWD");
+		*result = ft_getenv(data->env, "PWD");
 	else if (input[i + 1] == '-')
-		tmp = ft_getenv(data->env, "OLDPWD");
+		*result = ft_getenv(data->env, "OLDPWD");
 	else 
-		tmp = get_home(data->env);
-	if (tmp)
-		tmp = ft_strdup(tmp);
-	if (!tmp)
-		tmp = ft_strdup(input);
-	else if ((input[i + 1] == '-' || input[i + 1] == '+'))
-		tmp = join_until_dollar(tmp, &input[i + 3]);
-	else
-		tmp = join_until_dollar(tmp, &input[i + 2]);
+		*result = get_home(data->env);
+	if (*result)
+		*result = ft_strdup(*result);
+	if (!*result)
+		return ((void)(*result = ft_strdup(input)));
 	if (input[i + 1] == '-' || input[i + 1] == '+')
 		data->i++;
 	data->i++;
-	if (tmp && i > 0)
-		tmp = expand_home2(data, input, i, tmp);
-	free(*result);
-	*result = tmp;
+	if (*result && i > 0)
+		*result = expand_home2(data, input, i, *result);
 }
 
 char	*expand_home2(t_data *data, char *input, int i, char *tmp)
@@ -85,11 +78,11 @@ int	is_tilde(char *input, int i, int quote)
 	char	*tmp;
 
 	p = 0;
+	if (input[i] != '~')
+		return (0);
 	if (i > 0)
 		p = input[i - 1];
 	n = input[i + 1];
-	if (input[i] != '~')
-		return (0);
 	if (i >= 2)
 		if (!valid_identifier(input) && \
 		(ft_isspace(n) || n == '/' || n == '+' || n == '-' || !n) && !quote)

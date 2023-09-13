@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 09:18:44 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 18:31:33 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 20:43:46 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,20 +63,4 @@ int	is_builtin(t_ASTNode *node)
 	if (ft_strncmp(node->data, "exit", ft_strlen("exit") + 1) == 0)
 		return (1);
 	return (0);
-}
-
-char	*join_until_dollar(char *s1, char *input)
-{
-	char	*copy;
-	int		i;
-
-	i = 0;
-	copy = ft_strdup(input);
-	while (copy[i])
-	{
-		if (copy[i] == '$')
-			copy[i] = 0;
-		i++;
-	}
-	return (free_join(s1, copy));
 }
