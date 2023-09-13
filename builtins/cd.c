@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 18:30:42 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 19:05:42 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,18 @@ int	cd(char ***envp, char **paths)
 	state = 0;
 	if (paths[1] && ft_strncmp(paths[1], "-", 2) == 0)
 	{
-		if (chdir(ft_getenv(*envp, "OLDPWD")) == -1)
+		if (!ft_getenv(*envp, "OLDPWD"))
+			ft_putstr_fd(R "cd:" Y " OLDPWD" C " not set\n", 2);
+		else if (chdir(ft_getenv(*envp, "OLDPWD")) == -1)
 		{
 			state = 1;
-			ft_putstr_fd(R "cd: OLDPWD not set\n" C, 2);
+			cperror("cd", ft_getenv(*envp, "OLDPWD"), NULL, 1);
 		}
 		else
+		{
+			pwd();
 			update_old_pwd(envp);
+		}
 	}
 	else
 		state = cd2(envp, paths);
