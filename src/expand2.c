@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 17:40:13 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 21:00:22 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 21:03:53 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ int		expand(t_data *data, char **result, char *input, int var_start);
 int		result_add(t_data *data, char **result, char *input, char *tmp);
 int		valid_identifier(char *var);
 char	*expand_home2(t_data *data, char *input, int i, char *tmp);
-char	*join_until_dollar(char *s1, char *input);
 
 char	*get_home(char **env)
 {
