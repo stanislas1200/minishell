@@ -46,6 +46,7 @@ void	heredoc(char *path, t_data *data, t_ASTNode *s)
 	pid_t	pid;
 	int		status;
 
+	pid = 0;
 	if (data->builtin)
 		pid = fork();
 	if (pid == 0)

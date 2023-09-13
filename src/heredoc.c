@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/13 17:58:25 by sgodin            #+#    #+#             */
-/*   Updated: 2023/09/13 17:59:32 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/13 21:57:08 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,15 @@
 void	heredoc_send(int fd[2], char *text, t_data *data)
 {
 	write(fd[1], text, strlen(text));
+	free(text);
 	close(fd[1]);
 	dup2(fd[0], STDIN_FILENO);
 	close(fd[0]);
 	if (data->builtin)
+	{
+		clean(data); //check
 		exit (0);
+	}
 }
 
 void	heredoc_child(t_data *data, char *path, int fd[2], t_ASTNode *s)

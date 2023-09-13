@@ -45,16 +45,18 @@ char	*heredoc_loop(char *path, int fd[2])
 	{
 		buffer = readline(G "> " C);
 		if (!buffer || ft_strncmp(buffer, path, ft_strlen(path)) == 0)
+		{
+			free(buffer);
 			break ;
+		}
 		if (!text)
 			text = ft_strdup(buffer);
 		else
 		{
-			temp = ft_strjoin(text, buffer);
-			free(text);
+			temp = free_join(text, buffer);
 			text = temp;
 		}
-		text = ft_strjoin(text, "\n");
+		text = free_join(text, "\n");
 		free(buffer);
 	}
 	return (text);
