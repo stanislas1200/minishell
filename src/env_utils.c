@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 12:56:52 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 15:28:13 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,16 +37,13 @@ int	ft_getindexenv(char **env, char *str)
 	while (env[++i])
 	{
 		flag = 0;
-		j = 0;
-		while (env[i][j] && str[j])
-		{
-			if (str[j] != env[i][j])
+		j = -1;
+		while (env[i][++j] != '\0' && str[j] != '\0' && \
+		env[i][j] != '=' && env[i][j] != '+' && str[j] != '=' && str[j] != '+')
+			if (env[i][j] != str[j])
 				flag = 1;
-			if (env[i][j] == '=' || str[j] == '+' || str[j] == '=')
-				break ;
-			j++;
-		}
-		if (!flag && (str[j] == env[i][j] || !str[j] || !env[i][j]))
+		if (!flag && (env[i][j] == '\0' || env[i][j] == '=' || \
+		env[i][j] == '+') && (str[j] == '\0' || str[j] == '=' || str[j] == '+'))
 			return (i);
 	}
 	return (-1);

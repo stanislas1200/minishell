@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 17:40:13 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 14:00:57 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 15:30:04 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	is_tilde(char *input, int i, int quote)
 		return (0);
 	if (i >= 2)
 		if (!valid_identifier(input) && \
-		(ft_isspace(n) || n == '/' || n == '+' || n == '-' || !n))
+		(ft_isspace(n) || n == '/' || n == '+' || n == '-' || !n) && !quote)
 			return (1);
 	if ((ft_isspace(n) || n == '/' || n == '+' || n == '-' || !n) \
 	&& (ft_isspace(p) || !p) && !quote)
