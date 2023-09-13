@@ -107,18 +107,10 @@ char	*expand_variables(char *input, t_data *data)
 		else if (input[data->i] == quote)
 			quote = 0;
 		if (input[data->i] == '$' && quote != '\'')
-		{
-			data->i++;
-			if (expand(data, &result, input, data->i))
+			if (expand(data, &result, input, ++data->i))
 				return (free(result), NULL);
-		}
-		else if (input[data->i] == '~' && !quote)
-		{
-			tmp = expand_home(data, input, data->i);
-			if (tmp)
-				return (free(result), tmp);
-			result_add(data, &result, input, "~");
-		}
+		if (is_tilde(input, data->i, quote))
+			return (free(result), expand_home(data, input, data->i));
 		else if (result_add(data, &result, input, tmp))
 			return (free(result), NULL);
 	}

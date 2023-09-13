@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:28:55 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/12 20:36:54 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 13:01:10 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	add_to_env(char ***envp, char *str);
 int		valid_identifier(char *var);
 char	*check_identifier(char **envp, char *var, int *i, int *append);
 void	print_export_no_arg(char *str);
-void	export3(char ***en, char *v, int i, int ret);
+void	export3(char ***en, char *v, int i, int opt);
 
 int	export(char ***envp, char **args)
 {
@@ -53,25 +53,10 @@ void	export2(char ***en, char *v, int i, int opt)
 	if (!v)
 		return ;
 	ret = ft_getindexenv(*en, v);
-	printf("ret %d\n", ret);
+	if (ret != -1 && !v[i])
+		return (free(v));
 	if (ret != -1 && opt == NORMAL || ret != -1 && opt == APPEND)
-	{
-		if (ret != -1 && opt == NORMAL)
-			tmp = ft_strdup(v);
-		else
-		{
-			if (!(*en)[ret][i - 1])
-			{
-				printf(B "blue\n" C);
-				tmp = ft_strjoin((*en)[ret], "=");
-				tmp = free_join(tmp, &v[++i]);
-			}
-			else
-				tmp = ft_strjoin((*en)[ret], &v[++i]);
-		}
-		free((*en)[ret]);
-		(*en)[ret] = tmp;
-	}
+		export3(en, v, i, opt);
 	else if (ret == -1 && opt == APPEND)
 	{
 		tmp = plus_remover(v);

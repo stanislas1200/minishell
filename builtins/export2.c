@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 00:07:18 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/12 19:29:28 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 12:45:34 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ int	valid_identifier(char *var)
 
 char	*check_identifier(char **envp, char *var, int *i, int *option)
 {
-	int	j;
-	int	ret;
+	int		j;
+	int		ret;
 
 	j = -1;
 	ret = valid_identifier(var);
@@ -52,7 +52,8 @@ char	*check_identifier(char **envp, char *var, int *i, int *option)
 			if (var[j] == '+')
 				*option = APPEND;
 		*i = j;
-		if (var[j] == '=' && var[j + 1] == '~' && !var[j + 2])
+		if (var[j] == '=' && var[j + 1] == '~' && \
+		(ft_isspace(var[j + 2]) || var[j + 2] == '/' || !var[j + 2]))
 		{
 			var[j + 1] = 0;
 			return (ft_strjoin(var, get_home(envp)));

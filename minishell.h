@@ -165,8 +165,10 @@ char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
 int			execute_pipe(t_ASTNode *node, t_data *data);
 void		clean(t_data *data);
 
+// Expand 2
 char		*get_home(char **env);
+int			ft_isspace(char n);
+int			is_tilde(char *input, int i, int quote);
 char		*expand_home(t_data *data, char *input, int i);
-int			expand_variables2(char *input, t_data *data, char *result, int quote);
 
 #endif

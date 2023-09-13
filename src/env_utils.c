@@ -6,13 +6,14 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:33:36 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/12 20:37:10 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/13 12:56:52 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	is_numeric(char *str);
+int		is_numeric(char *str);
+char	*expand_home(t_data *data, char *input, int i);
 
 char	*ft_getenv(char **env, char *str)
 {
@@ -31,26 +32,24 @@ int	ft_getindexenv(char **env, char *str)
 	int		i;
 	int		j;
 	int		flag;
-	char	*tmp;
 
 	i = -1;
-	tmp = ft_strdup(str);
-	if (!tmp)
-		return (cperror("Malloc", NULL, NULL, 1), -1);
 	while (env[++i])
 	{
 		flag = 0;
 		j = 0;
-		while (env[i][j] && env[i][j] != '=' && tmp[j] && tmp[j] != '+')
+		while (env[i][j] && str[j])
 		{
-			if (tmp[j] != env[i][j])
+			if (str[j] != env[i][j])
 				flag = 1;
+			if (env[i][j] == '=' || str[j] == '+' || str[j] == '=')
+				break ;
 			j++;
 		}
-		if (!flag && tmp[j])
-			return (free(tmp), i);
+		if (!flag && (str[j] == env[i][j] || !str[j] || !env[i][j]))
+			return (i);
 	}
-	return (free(tmp), -1);
+	return (-1);
 }
 
 char	**dup_env(char **envp)

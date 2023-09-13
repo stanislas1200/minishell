@@ -2,13 +2,9 @@
 
 <!-- export t=~ && echo $t -->
 
-export export
-export echo
-export pwd
-export cd
-export export
-export unset
-export sudo
+<!-- export Dan+=2 ; export Da+=2 ; export Dann+=2 ; export lol ; export lol+=2 -->
 
-export lol=2
-export lol
+<!-- export t=~/nimp -->
+
+<!-- export lol+=2 puis export lol ne devrait pas changer la valeur de lol. -->
+export t="~"
