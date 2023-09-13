@@ -78,7 +78,7 @@ void	output(char *path, t_data *data, int redirection, t_ASTNode *s)
 	else
 		fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (fd == -1)
-		return (cperror("open", path, NULL, 1), exit(1));
+		return (open_error(path, data, s));
 	if (s->right && s->right->type != CHAR_PIPE && s->right->type != 4)
 	{
 		if (s->right->type != redirection)
@@ -103,17 +103,7 @@ void	input(char *path, t_data *data, int redirection, t_ASTNode *s)
 
 	fd = open(path, O_RDONLY);
 	if (fd == -1)
-	{
-		data->r_break = 1;
-		if (s->right && check_heredoc(s->right))
-			ex_redirection(s->right, s->right->type, s->right->data, data);
-		ft_putstr_fd(M "-stanshell" C ": " Y, 2);
-		ft_putstr_fd(path, 2);
-		ft_putstr_fd(C ": No such file or directory\n", 2);
-		if (is_builtin(s->left))
-			return ;
-		exit(1);
-	}
+		return (open_error(path, data, s));
 	else if (s->right && s->right->type != CHAR_PIPE)
 	{
 		if (s->right->type != redirection && !check_heredoc(s->right))

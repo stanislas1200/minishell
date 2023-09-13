@@ -64,6 +64,7 @@ void	clean(t_data *data)
 {
 	free_matrix(data->env);
 	ast_destroy(data->ast_root);
+	rl_clear_history();
 }
 
 int	get_next_token(t_token **token)

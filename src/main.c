@@ -119,6 +119,7 @@ int	main(int ac, char **av, char **envv)
 	data.in_pipe = 0;
 	data.fdin = dup(STDIN_FILENO);
 	data.fdout = dup(STDOUT_FILENO);
+	data.builtin = 0;
 	print_header();
 	main_loop(data, buff, prompt);
 	rl_clear_history();

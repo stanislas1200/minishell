@@ -51,18 +51,23 @@ int	cmd_check_b(t_ASTNode *node, int r, char *path, t_data *data)
 		node = node->left;
 	if (!node || !is_builtin(node))
 		return (0);
+	data->builtin = 1;
 	ex_redirection(save, r, path, data);
+	data->builtin = 0;
 	if (data->r_break && ft_strncmp(node->data, "cd", 2))
-		return (1);
+	{
+		dup2(data->fdin, STDIN_FILENO);
+		dup2(data->fdout, STDOUT_FILENO);
+		return (data->last_exit = 1, 1);
+	}
 	arr = make_cmd_arr(node, node->right);
 	if (!arr)
 		return (data->last_exit = 1);
 	data->last_exit = execute_builtin(node, arr, data);
 	free(arr);
-	arr = NULL;
 	dup2(data->fdin, STDIN_FILENO);
 	dup2(data->fdout, STDOUT_FILENO);
-	return (1);
+	return (arr = NULL, 1);
 }
 
 int	cmd_parent(t_ASTNode *save, t_data *data, pid_t pid)

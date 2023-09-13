@@ -75,3 +75,15 @@ char	**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node)
 	arr[i] = NULL;
 	return (arr);
 }
+
+void	open_error(char *path, t_data *data, t_ASTNode *s)
+{
+	data->r_break = 1;
+	if (s->right && check_heredoc(s->right))
+		ex_redirection(s->right, s->right->type, s->right->data, data);
+	cperror("open", path, "No such file or directory", 0);
+	if (data->builtin)
+		return ;
+	clean(data);
+	exit(1);
+}

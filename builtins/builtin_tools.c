@@ -14,7 +14,7 @@
 
 void	cperror(char *func, char *arg, char *error, int p_err)
 {
-	ft_putstr_fd(R, 2);
+	ft_putstr_fd(M "-stanshell" C ": " R, 2);
 	if (func)
 	{
 		ft_putstr_fd(func, 2);

@@ -31,8 +31,7 @@ int	ft_exit(char **envp, char **args, t_data *data)
 	}
 	else if (matrix_len(args) == 2)
 		exit_code = check_exit(args[1]);
-	ast_destroy(data->ast_root);
-	free_matrix(data->env);
+	clean(data);
 	free(args);
 	exit(exit_code);
 	return (0);

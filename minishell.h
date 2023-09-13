@@ -69,6 +69,7 @@ typedef struct t_data
 	int			fdin;
 	int			fdout;
 	int			in_pipe;
+	int			builtin;
 	char		*path;
 	char		**env;
 	t_ASTNode	*ast_root;
@@ -159,5 +160,6 @@ int			check_heredoc(t_ASTNode *node);
 char		**make_cmd_arr(t_ASTNode *node, t_ASTNode *arg_node);
 int			execute_pipe(t_ASTNode *node, t_data *data);
 void		clean(t_data *data);
+void		open_error(char *path, t_data *data, t_ASTNode *s);
 
 #endif
