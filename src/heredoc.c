@@ -21,7 +21,7 @@ void	heredoc_send(int fd[2], char *text, t_data *data)
 	close(fd[0]);
 	if (data->builtin)
 	{
-		clean(data); //check
+		clean(data);
 		exit (0);
 	}
 }
@@ -45,9 +45,15 @@ void	heredoc_child(t_data *data, char *path, int fd[2], t_ASTNode *s)
 		}
 		close(fd[1]);
 		close(fd[0]);
+		free(text);
 		ex_redirection(s->right, s->right->type, s->right->data, data);
 		if (data->builtin)
+		{
+			clean(data);
+			if (data->r_break)
+				exit (1);
 			exit (0);
+		}
 		return ;
 	}
 	heredoc_send(fd, text, data);

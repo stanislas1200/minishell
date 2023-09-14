@@ -35,7 +35,7 @@ void	*parser_error(t_data *data)
 
 char	*heredoc_loop(char *path, int fd[2])
 {
-	char	*buffer;
+	char	buffer[MAXLINE];
 	char	*text;
 	char	*temp;
 
@@ -43,10 +43,11 @@ char	*heredoc_loop(char *path, int fd[2])
 	pipe(fd);
 	while (1)
 	{
-		buffer = readline(G "> " C);
-		if (!buffer || ft_strncmp(buffer, path, ft_strlen(path)) == 0)
+		// buffer = readline(G "> " C);
+		// if (!buffer || ft_strncmp(buffer, path, ft_strlen(path)) == 0)
+		if (fgets(buffer, MAXLINE, stdin) == NULL || ft_strncmp(buffer, path, ft_strlen(path)) == 0)
 		{
-			free(buffer);
+			// free(buffer);
 			break ;
 		}
 		if (!text)
@@ -57,7 +58,7 @@ char	*heredoc_loop(char *path, int fd[2])
 			text = temp;
 		}
 		text = free_join(text, "\n");
-		free(buffer);
+		// free(buffer);
 	}
 	return (text);
 }

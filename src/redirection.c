@@ -56,6 +56,8 @@ void	heredoc(char *path, t_data *data, t_ASTNode *s)
 		signal(SIGINT, SIG_IGN);
 		waitpid(pid, &status, 0);
 		signal(SIGINT, signal_handler);
+		if (WEXITSTATUS(status) == 1)
+			data->r_break = 1;
 		if (WIFSIGNALED(status))
 		{
 			data->i = WTERMSIG(status);
