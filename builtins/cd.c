@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 03:24:17 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 19:05:42 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/14 13:43:37 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,13 @@ int	cd2(char ***envp, char **paths)
 	state = 0;
 	if (!paths[1])
 	{
-		if (chdir(ft_getenv(*envp, "HOME")) == -1)
+		if (!ft_getenv(*envp, "HOME"))
+			return (cperror("cd", NULL, "HOME not set", 0), 1);
+		else if (chdir(ft_getenv(*envp, "HOME")) == -1)
 		{
 			state = 1;
-			cperror("cd", NULL, "HOME not set", 0);
+			cperror("cd", ft_getenv(*envp, "HOME"), NULL, 1);
 		}
-		else
-			update_old_pwd(envp);
 	}
 	else if (paths[1])
 	{
@@ -64,9 +64,9 @@ int	cd2(char ***envp, char **paths)
 			state = 1;
 			cperror("cd", paths[1], NULL, 1);
 		}
-		else
-			update_old_pwd(envp);
 	}
+	if (state == 0)
+		update_old_pwd(envp);
 	return (state);
 }
 

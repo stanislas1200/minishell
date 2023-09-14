@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 17:40:13 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/13 21:03:53 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/14 13:55:03 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ int	ft_isspace(char n)
 
 void	expand_home(t_data *data, char *input, int i, char **result)
 {
+	char	*save;
+
+	save = ft_strdup(*result);
 	free(*result);
 	if (input[i + 1] == '+')
 		*result = ft_getenv(data->env, "PWD");
@@ -44,13 +47,14 @@ void	expand_home(t_data *data, char *input, int i, char **result)
 		*result = get_home(data->env);
 	if (*result)
 		*result = ft_strdup(*result);
-	if (!*result)
-		return ((void)(*result = ft_strdup(input)));
 	if (input[i + 1] == '-' || input[i + 1] == '+')
 		data->i++;
 	data->i++;
+	if (!*result)
+		return ((void)(*result = save));
 	if (*result && i > 0)
 		*result = expand_home2(data, input, i, *result);
+	free(save);
 }
 
 char	*expand_home2(t_data *data, char *input, int i, char *tmp)
