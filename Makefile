@@ -41,7 +41,7 @@ OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
 
 SHELL = bash
 NAME = minishell
-GCC = gcc -Wall -Wextra -Werror -g -fsanitize=address
+GCC = gcc -Wall -Wextra -Werror -g #-fsanitize=address
 
 RED = \033[1;31m
 GREEN = \033[1;32m
