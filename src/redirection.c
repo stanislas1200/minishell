@@ -62,10 +62,7 @@ void	heredoc(char *path, t_data *data, t_ASTNode *s)
 		{
 			data->i = WTERMSIG(status);
 			if (data->i == 2)
-			{
-				data->r_break = 1;
-				data->last_exit = 1;
-			}
+				return ((void)(data->r_break = 1, data->last_exit = 1));
 		}
 	}
 }

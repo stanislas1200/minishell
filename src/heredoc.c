@@ -6,7 +6,7 @@
 /*   By: sgodin <sgodin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/13 17:58:25 by sgodin            #+#    #+#             */
-/*   Updated: 2023/09/13 21:57:08 by sgodin           ###   ########.fr       */
+/*   Updated: 2023/09/14 16:10:18 by sgodin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,18 @@ void	heredoc_send(int fd[2], char *text, t_data *data)
 		clean(data);
 		exit (0);
 	}
+}
+
+void	heredoc_leave(t_data *data)
+{
+	if (data->builtin)
+	{
+		clean(data);
+		if (data->r_break)
+			exit (1);
+		exit (0);
+	}
+	return ;
 }
 
 void	heredoc_child(t_data *data, char *path, int fd[2], t_ASTNode *s)
@@ -47,14 +59,7 @@ void	heredoc_child(t_data *data, char *path, int fd[2], t_ASTNode *s)
 		close(fd[0]);
 		free(text);
 		ex_redirection(s->right, s->right->type, s->right->data, data);
-		if (data->builtin)
-		{
-			clean(data);
-			if (data->r_break)
-				exit (1);
-			exit (0);
-		}
-		return ;
+		return (heredoc_leave(data));
 	}
 	heredoc_send(fd, text, data);
 }
