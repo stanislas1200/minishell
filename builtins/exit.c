@@ -26,15 +26,21 @@ int	ft_exit(char **envp, char **args, t_data *data)
 		printf(R "exit\n" C);
 	if (matrix_len(args) > 2)
 	{
-		cperror("exit", NULL, "too many arguments", 0);
-		return (1);
+		if (!ft_strncmp(args[1], "--", ft_strlen(args[1])) && args[2])
+			exit_code = check_exit(args[2]);
+		else
+		{
+			if (!is_numeric(args[1]))
+				return (cperror("exit", NULL, "too many arguments", 0), 1);
+			cperror("exit", args[1], "numeric argument required", 0);
+			exit_code = 255;
+		}
 	}
-	else if (matrix_len(args) == 2)
+	else if (args[1])
 		exit_code = check_exit(args[1]);
 	clean(data);
 	free(args);
-	exit(exit_code);
-	return (0);
+	return (exit(exit_code), 0);
 }
 
 int	check_exit(char *str)

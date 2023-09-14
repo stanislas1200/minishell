@@ -71,20 +71,18 @@ void	*get_prompt(void)
 	return (str);
 }
 
-void	main_loop(t_data data, char *bufff, char *prompt)
+void	main_loop(t_data data, char *buff, char *prompt)
 {
 	t_lexer		*lexer;
 
-	char buff[MAXLINE];
 	while (1)
 	{
 		data.parse_end = 0;
 		data.r_break = 0;
 		prompt = get_prompt();
-		// buff = readline(prompt);
+		buff = readline(prompt);
 		free(prompt);
-		if (fgets(buff, MAXLINE, stdin) == NULL)
-		// if (!buff)
+		if (!buff)
 		{
 			free_matrix(data.env);
 			printf(R "exit\n" C);
@@ -92,12 +90,12 @@ void	main_loop(t_data data, char *bufff, char *prompt)
 		}
 		if (buff[0] != '\0')
 		{
-			// add_history(buff);
+			add_history(buff);
 			lexer = lexer_build(buff, &data);
 			if (lexer)
 				process_parsing(&data, lexer);
 		}
-		// free(buff);
+		free(buff);
 	}
 }
 
