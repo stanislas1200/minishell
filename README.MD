@@ -9,7 +9,7 @@
 You will learn a lot about processes and file descriptors.
 The existence of shells is linked to the very existence of IT.
 
----
+
 
 ## 💻 To use the program 
 <h3>you must first compile it with the makefile by using the command 'make' in the shell</h3>
@@ -27,7 +27,7 @@ make all
 ![Screenshot](stanshell.png)
 
 **You can now try all the different functionalities !**
----
+
 ## 📋 Functionalities
 
 - Prompt Display: Displays a **prompt** when waiting for a new command.
